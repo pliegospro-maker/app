@@ -1,7 +1,7 @@
 import streamlit as st
 from supabase import create_client, Client
 
-# 1. Conectar a Supabase usando los secretos que guardamos
+# 1. Conectar a Supabase
 url_supabase: str = st.secrets["SUPABASE_URL"]
 clave_supabase: str = st.secrets["SUPABASE_KEY"]
 supabase: Client = create_client(url_supabase, clave_supabase)
@@ -10,12 +10,11 @@ supabase: Client = create_client(url_supabase, clave_supabase)
 if 'usuario_autenticado' not in st.session_state:
     st.session_state.usuario_autenticado = False
 
-# 3. Pantalla de Bloqueo (Login/Registro)
+# 3. Pantalla de Bloqueo y Verificación de Planes
 if not st.session_state.usuario_autenticado:
     st.title("🔐 Acceso a PliegoPro")
     st.write("Iniciá sesión o creá tu cuenta para generar tus pliegos.")
 
-    # Creamos dos pestañas visuales
     tab_login, tab_registro = st.tabs(["Iniciar Sesión", "Crear Cuenta"])
 
     with tab_login:
@@ -23,10 +22,22 @@ if not st.session_state.usuario_autenticado:
         password_login = st.text_input("Tu Contraseña", type="password", key="pass_login")
         if st.button("Ingresar al Software", type="primary"):
             try:
-                # Intentamos iniciar sesión en Supabase
+                # 1. Inicia sesión en Supabase
                 respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
-                st.session_state.usuario_autenticado = True
-                st.rerun() # Si todo sale bien, recargamos la página y entra
+                user_id = respuesta.user.id
+                
+                # 2. Busca su estado en la tabla 'perfiles'
+                perfil = supabase.table("perfiles").select("*").eq("id", user_id).execute()
+                
+                if len(perfil.data) > 0:
+                    estado = perfil.data[0]["estado"]
+                    if estado == "Activo":
+                        st.session_state.usuario_autenticado = True
+                        st.rerun()
+                    else:
+                        st.warning("⚠️ Tu cuenta está creada pero figura Inactiva. Solicitá la activación eligiendo un plan abajo.")
+                else:
+                    st.error("Error: Perfil no encontrado.")
             except Exception as e:
                 st.error("❌ Email o contraseña incorrectos.")
 
@@ -36,17 +47,37 @@ if not st.session_state.usuario_autenticado:
         password_reg = st.text_input("Nueva Contraseña (mínimo 6 letras/números)", type="password", key="pass_reg")
         if st.button("Registrarme"):
             try:
-                # Intentamos crear el usuario en Supabase
+                # 1. Crea la cuenta
                 respuesta = supabase.auth.sign_up({"email": email_reg, "password": password_reg})
+                user_id = respuesta.user.id
+                # 2. Anota al usuario en tu tabla como 'Inactivo'
+                supabase.table("perfiles").insert({"id": user_id, "email": email_reg}).execute()
                 st.success("✅ ¡Cuenta creada con éxito! Ahora podés Iniciar Sesión en la pestaña de al lado.")
             except Exception as e:
                 st.error("⚠️ Hubo un error. Revisá que el mail sea válido o probá otra contraseña.")
-    
-    # 4. EL ESCUDO: Si no inició sesión, frenamos el código acá y no mostramos el programa
-    st.stop()
 
-# --- A PARTIR DE ACÁ ABAJO VA TODO EL CÓDIGO DE TU GENERADOR DE PLIEGOS ---
-# st.title("🖨️ Generador Automático de Pliegos Pro")
+    st.markdown("---")
+    st.subheader("🚀 ¿Aún no tenés acceso? Elegí tu plan:")
+    st.caption("⚠️ **IMPORTANTE:** Al momento de pagar, asegurate de usar en Mercado Pago el MISMO correo que usaste para crear tu cuenta aquí.")
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.info("🥉 **Pase Diario**\n\nAcceso por 24hs para un trabajo puntual.")
+        # Acordate de cambiar este texto por tu link real de Mercado Pago
+        st.link_button("Pagar Pase Diario", "https://mpago.la/1zcwXt5")
+        
+    with col2:
+        st.info("🥈 **Plan Emprendedor**\n\nUso mensual ideal para talleres en crecimiento.")
+        # Acordate de cambiar este texto por tu link real de Mercado Pago
+        st.link_button("Suscribirme al Emprendedor", "https://mpago.la/2kqA8Kp")
+        
+    with col3:
+        st.info("🥇 **Plan Pro**\n\nUso intensivo y soporte prioritario.")
+        # Acordate de cambiar este texto por tu link real de Mercado Pago
+        st.link_button("Suscribirme al Pro", "https://mpago.la/1eurW1Q")
+
+    # 4. EL ESCUDO
+    st.stop()
 # ... (todo lo que ya tenías)
 import streamlit as st
 from PIL import Image, ImageFilter, ImageDraw
