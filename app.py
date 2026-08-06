@@ -1,4 +1,54 @@
 import streamlit as st
+from supabase import create_client, Client
+
+# 1. Conectar a Supabase usando los secretos que guardamos
+url_supabase: str = st.secrets["SUPABASE_URL"]
+clave_supabase: str = st.secrets["SUPABASE_KEY"]
+supabase: Client = create_client(url_supabase, clave_supabase)
+
+# 2. Configurar la memoria temporal
+if 'usuario_autenticado' not in st.session_state:
+    st.session_state.usuario_autenticado = False
+
+# 3. Pantalla de Bloqueo (Login/Registro)
+if not st.session_state.usuario_autenticado:
+    st.title("🔐 Acceso a PliegoPro")
+    st.write("Iniciá sesión o creá tu cuenta para generar tus pliegos.")
+
+    # Creamos dos pestañas visuales
+    tab_login, tab_registro = st.tabs(["Iniciar Sesión", "Crear Cuenta"])
+
+    with tab_login:
+        email_login = st.text_input("Tu Email", key="email_login")
+        password_login = st.text_input("Tu Contraseña", type="password", key="pass_login")
+        if st.button("Ingresar al Software", type="primary"):
+            try:
+                # Intentamos iniciar sesión en Supabase
+                respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
+                st.session_state.usuario_autenticado = True
+                st.rerun() # Si todo sale bien, recargamos la página y entra
+            except Exception as e:
+                st.error("❌ Email o contraseña incorrectos.")
+
+    with tab_registro:
+        st.info("Creá tu cuenta gratis para ver los planes disponibles.")
+        email_reg = st.text_input("Nuevo Email", key="email_reg")
+        password_reg = st.text_input("Nueva Contraseña (mínimo 6 letras/números)", type="password", key="pass_reg")
+        if st.button("Registrarme"):
+            try:
+                # Intentamos crear el usuario en Supabase
+                respuesta = supabase.auth.sign_up({"email": email_reg, "password": password_reg})
+                st.success("✅ ¡Cuenta creada con éxito! Ahora podés Iniciar Sesión en la pestaña de al lado.")
+            except Exception as e:
+                st.error("⚠️ Hubo un error. Revisá que el mail sea válido o probá otra contraseña.")
+    
+    # 4. EL ESCUDO: Si no inició sesión, frenamos el código acá y no mostramos el programa
+    st.stop()
+
+# --- A PARTIR DE ACÁ ABAJO VA TODO EL CÓDIGO DE TU GENERADOR DE PLIEGOS ---
+# st.title("🖨️ Generador Automático de Pliegos Pro")
+# ... (todo lo que ya tenías)
+import streamlit as st
 from PIL import Image, ImageFilter, ImageDraw
 from rectpack import newPacker, PackingMode, PackingBin
 import io
