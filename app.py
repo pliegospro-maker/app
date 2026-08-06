@@ -1,0 +1,549 @@
+import streamlit as st
+from PIL import Image, ImageFilter, ImageDraw
+from rectpack import newPacker, PackingMode, PackingBin
+import io
+import os
+import datetime
+import zipfile
+import requests
+from streamlit_cropper import st_cropper
+
+# Configuración de página
+st.set_page_config(page_title="DTF / UV - Creador de Pliegos Pro", layout="wide", initial_sidebar_state="expanded")
+
+# Constantes
+DPI_HIGH = 300
+DPI_LOW = 72
+PX_PER_CM = int(DPI_HIGH / 2.54)
+SHEET_TYPES = {
+    "DTF Textil (58x100 cm)": {"width_cm": 58, "height_cm": 100},
+    "DTF UV (57x100 cm)": {"width_cm": 57, "height_cm": 100}
+}
+MUESTRA_BG_COLOR = (169, 169, 169, 255) 
+HISTORY_BASE_FOLDER = "historial_pliegos"
+os.makedirs(HISTORY_BASE_FOLDER, exist_ok=True)
+
+# Colores de fondo para el recuadro de la imagen
+BACKGROUND_COLORS = {
+    "Blanco": "#FFFFFF",
+    "Gris Topo": "#8B8589",
+    "Gris Intermedio": "#808080",
+    "Gris Oscuro": "#404040",
+    "Negro": "#000000"
+}
+
+def cm_to_px(cm): return int(cm * PX_PER_CM)
+def px_to_cm(px): return px / PX_PER_CM
+
+def get_preview_with_bg(img, bg_hex):
+    bg_color = tuple(int(bg_hex.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) + (255,)
+    bg_img = Image.new("RGBA", img.size, bg_color)
+    if img.mode != 'RGBA':
+        img = img.convert('RGBA')
+    bg_img.paste(img, (0,0), img)
+    return bg_img
+
+# --- API DE REMOVE.BG ---
+def remove_background_api(image_bytes, api_key):
+    response = requests.post(
+        'https://api.remove.bg/v1.0/removebg',
+        files={'image_file': ('image.png', image_bytes, 'image/png')},
+        data={'size': 'auto'},
+        headers={'X-Api-Key': api_key},
+    )
+    if response.status_code == requests.codes.ok:
+        return response.content
+    else:
+        st.error(f"Error en la API: Verifica tu API Key. (Código: {response.status_code})")
+        return None
+
+# --- FILTROS PROFESIONALES ---
+def apply_alpha_threshold(img):
+    if img.mode != 'RGBA': img = img.convert('RGBA')
+    r, g, b, a = img.split()
+    a = a.point(lambda p: 255 if p > 50 else 0)
+    return Image.merge('RGBA', (r, g, b, a))
+
+def apply_white_choke(img):
+    if img.mode != 'RGBA': img = img.convert('RGBA')
+    r, g, b, a = img.split()
+    a = a.filter(ImageFilter.MinFilter(3))
+    return Image.merge('RGBA', (r, g, b, a))
+
+def apply_white_stroke(img, size=5):
+    if img.mode != 'RGBA': img = img.convert('RGBA')
+    r, g, b, a = img.split()
+    stroke_alpha = a.filter(ImageFilter.MaxFilter(size * 2 + 1))
+    stroke_img = Image.new('RGBA', img.size, (255, 255, 255, 255))
+    stroke_img.putalpha(stroke_alpha)
+    return Image.alpha_composite(stroke_img, img)
+
+def remove_specific_color(img, target_hex, tolerance=30):
+    if img.mode != 'RGBA': img = img.convert('RGBA')
+    target_hex = target_hex.lstrip('#')
+    tr, tg, tb = tuple(int(target_hex[i:i+2], 16) for i in (0, 2, 4))
+    
+    data = img.getdata()
+    new_data = []
+    for item in data:
+        r, g, b, a = item
+        if a > 0:
+            if abs(r - tr) <= tolerance and abs(g - tg) <= tolerance and abs(b - tb) <= tolerance:
+                new_data.append((r, g, b, 0)) 
+            else:
+                new_data.append(item)
+        else:
+            new_data.append(item)
+            
+    new_img = Image.new("RGBA", img.size)
+    new_img.putdata(new_data)
+    return new_img
+
+def remove_luminance(img, lum_target, tolerance=30):
+    if img.mode != 'RGBA': img = img.convert('RGBA')
+    data = img.getdata()
+    new_data = []
+    for item in data:
+        r, g, b, a = item
+        if a > 0: 
+            luma = int(0.299 * r + 0.587 * g + 0.114 * b)
+            if abs(luma - lum_target) <= tolerance:
+                new_data.append((r, g, b, 0)) 
+            else:
+                new_data.append(item)
+        else:
+            new_data.append(item)
+            
+    new_img = Image.new("RGBA", img.size)
+    new_img.putdata(new_data)
+    return new_img
+
+# Inicializar estados de memoria
+if "deleted_images" not in st.session_state: st.session_state.deleted_images = set()
+if "image_history" not in st.session_state: st.session_state.image_history = {}
+if "last_action_msg" not in st.session_state: st.session_state.last_action_msg = "" 
+
+st.title("🖨️ Generador Automático de Pliegos Pro")
+st.markdown("Recorte Manual, Acomodo Tetris 90° Optimizado y Auto-Umbral.")
+
+if st.session_state.last_action_msg:
+    st.toast(st.session_state.last_action_msg)
+    st.session_state.last_action_msg = "" 
+
+col1, col2 = st.columns([1, 2.5])
+
+with col1:
+    st.subheader("1. Configuración del Pliego")
+    sheet_choice = st.selectbox("Tipo de pliego:", list(SHEET_TYPES.keys()))
+    sheet_width_cm = SHEET_TYPES[sheet_choice]["width_cm"]
+    sheet_height_cm = SHEET_TYPES[sheet_choice]["height_cm"]
+    
+    margin_cm = st.number_input("Espacio entre imágenes (cm):", min_value=0.3, max_value=1.0, value=0.3, step=0.1)
+    margin_px = cm_to_px(margin_cm)
+    
+    use_edge_margins = st.checkbox("Aplicar márgenes de borde", value=True, help="Deja un espacio libre en los 4 bordes del pliego.")
+
+    st.subheader("2. Marca de Agua")
+    watermark_file = st.file_uploader("Logo empresa (PNG):", type=["png"])
+
+    st.subheader("3. Cargar Diseños")
+    uploaded_files = st.file_uploader("Subir imágenes", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
+    if st.button("🗑️ Limpiar papelera"):
+        st.session_state.deleted_images = set()
+        st.session_state.image_history = {}
+        st.session_state.last_action_msg = "♻️ Papelera limpiada correctamente."
+        st.rerun()
+
+# --- PANEL LATERAL Y CLAVES API Y FONDOS ---
+edge_margin_px = cm_to_px(0.3) if use_edge_margins else 0
+gang_width_px = cm_to_px(sheet_width_cm)
+gang_height_px = cm_to_px(sheet_height_cm)
+usable_sheet_w_px = gang_width_px - (2 * edge_margin_px)
+usable_sheet_h_px = gang_height_px - (2 * edge_margin_px)
+
+with st.sidebar:
+    st.header("⚙️ Ajustes Avanzados")
+    api_key_input = st.text_input("Remove.bg API Key:", type="password")
+    
+    st.markdown("---")
+    st.markdown("**Personalización**")
+    bg_color_choice = st.selectbox("🎨 Color de fondo para recuadros:", list(BACKGROUND_COLORS.keys()), index=1)
+    selected_bg_hex = BACKGROUND_COLORS[bg_color_choice]
+
+    st.markdown("---")
+    st.markdown("**Optimización de Espacio**")
+    allow_rotation = st.checkbox("🔄 Permitir rotar imágenes (Tetris)", value=True, help="El sistema evaluará si rotar 90° la imagen ahorra material en el pliego.")
+
+    st.markdown("---")
+    st.header("👀 Visor Real de Pliego")
+    sidebar_visor = st.empty()
+    sidebar_stats = st.empty()
+
+with col2:
+    st.subheader("4. Edición de Imágenes")
+    
+    if uploaded_files:
+        with st.expander("🛠️ Edición Masiva", expanded=False):
+            b_col1, b_col2, b_col3, b_col4 = st.columns([1.5, 1, 1, 1])
+            with b_col1: bulk_dim = st.radio("Ajustar todas por:", ["Ancho", "Alto"], horizontal=True, key="bulk_dim")
+            with b_col2: bulk_val = st.number_input("Medida (cm)", min_value=0.1, value=5.0, step=0.5, key="bulk_val")
+            with b_col3: bulk_qty = st.number_input("Cantidad c/u", min_value=1, value=1, step=1, key="bulk_qty")
+            with b_col4:
+                st.markdown("<br>", unsafe_allow_html=True)
+                if st.button("✅ Aplicar a Todas", type="primary", use_container_width=True):
+                    for file in uploaded_files:
+                        if file.name in st.session_state.deleted_images: continue
+                        st.session_state[f"qty_{file.name}"] = bulk_qty
+                        if bulk_dim == "Ancho":
+                            st.session_state[f"dim_{file.name}"] = "Ancho"
+                            st.session_state[f"w_{file.name}"] = float(bulk_val)
+                        else:
+                            st.session_state[f"dim_{file.name}"] = "Alto"
+                            st.session_state[f"h_{file.name}"] = float(bulk_val)
+                    st.session_state.last_action_msg = "✅ Edición masiva aplicada correctamente."
+                    st.rerun()
+    
+    image_configs = []
+    
+    if uploaded_files:
+        for idx, file in enumerate(uploaded_files):
+            if file.name in st.session_state.deleted_images: continue
+            
+            if file.name not in st.session_state.image_history:
+                st.session_state.image_history[file.name] = [Image.open(file)]
+                
+            img = st.session_state.image_history[file.name][-1]
+            
+            orig_w, orig_h = img.size
+            aspect_ratio = orig_w / orig_h if orig_h != 0 else 1
+            
+            with st.expander(f"⚙️ {file.name}", expanded=False):
+                
+                if len(st.session_state.image_history[file.name]) > 1:
+                    if st.button("↩️ Deshacer último cambio", key=f"undo_{file.name}"):
+                        st.session_state.image_history[file.name].pop()
+                        st.session_state.last_action_msg = f"↩️ Último cambio deshecho en {file.name}."
+                        st.rerun()
+                
+                c_img, c_size, c_act1, c_act2 = st.columns([1, 1.5, 1, 1])
+                
+                with c_size:
+                    dim_choice = st.radio("Ajustar:", ["Ancho", "Alto"], horizontal=True, key=f"dim_{file.name}")
+                    if dim_choice == "Ancho":
+                        new_w_cm = st.number_input("Ancho (cm)", min_value=0.1, value=round(px_to_cm(orig_w), 2), key=f"w_{file.name}")
+                        new_h_cm = new_w_cm / aspect_ratio
+                        st.caption(f"Alto: {new_h_cm:.2f} cm")
+                        effective_dpi = orig_w / (new_w_cm / 2.54) if new_w_cm > 0 else 300
+                    else:
+                        new_h_cm = st.number_input("Alto (cm)", min_value=0.1, value=round(px_to_cm(orig_h), 2), key=f"h_{file.name}")
+                        new_w_cm = new_h_cm * aspect_ratio
+                        st.caption(f"Ancho: {new_w_cm:.2f} cm")
+                        effective_dpi = orig_h / (new_h_cm / 2.54) if new_h_cm > 0 else 300
+
+                with c_img:
+                    img_for_preview = get_preview_with_bg(img, selected_bg_hex)
+                    st.image(img_for_preview, use_container_width=True)
+                    qty = st.number_input(f"Cantidad", min_value=1, value=1, key=f"qty_{file.name}")
+                    
+                    if effective_dpi < 150:
+                        st.warning(f"⚠️ Calidad baja: {int(effective_dpi)} DPI.")
+                        if st.button("🪄 Upscale IA", key=f"up_{file.name}"):
+                            with st.spinner("Mejorando resolución..."):
+                                new_size = (orig_w * 2, orig_h * 2)
+                                upscaled = img.resize(new_size, Image.Resampling.LANCZOS)
+                                st.session_state.image_history[file.name].append(upscaled)
+                                st.session_state.last_action_msg = f"🪄 Upscale aplicado correctamente a {file.name}."
+                                st.rerun()
+                
+                with c_act1:
+                    st.markdown("**Limpieza Rápida**")
+                    if st.button("☁️ Quitar Fondo API", key=f"bg_{file.name}"):
+                        if not api_key_input:
+                            st.warning("⚠️ Falta API Key")
+                        else:
+                            with st.spinner("Procesando y aplicando Umbral automático..."):
+                                buf = io.BytesIO()
+                                img.save(buf, format="PNG")
+                                result_bytes = remove_background_api(buf.getvalue(), api_key_input)
+                                if result_bytes:
+                                    new_img = Image.open(io.BytesIO(result_bytes))
+                                    new_img = apply_alpha_threshold(new_img)
+                                    st.session_state.image_history[file.name].append(new_img)
+                                    st.session_state.last_action_msg = f"☁️ Fondo eliminado (y Umbral aplicado) en {file.name}."
+                                    st.rerun()
+                            
+                    if st.button("✂️ Recortar Bordes Automático", key=f"crop_{file.name}"):
+                        bbox = img.getbbox()
+                        if bbox:
+                            new_img = img.crop(bbox)
+                            st.session_state.image_history[file.name].append(new_img)
+                            st.session_state.last_action_msg = f"✂️ Bordes vacíos recortados correctamente en {file.name}."
+                            st.rerun()
+                            
+                    if st.button("🗑️ Borrar Imagen", key=f"del_{file.name}"):
+                        st.session_state.deleted_images.add(file.name)
+                        st.session_state.last_action_msg = f"🗑️ Imagen {file.name} borrada correctamente."
+                        st.rerun()
+
+                with c_act2:
+                    st.markdown("**Avanzadas (RIP)**")
+                    if st.button("🌑 Asfixia (-1px)", key=f"choke_{file.name}"):
+                        new_img = apply_white_choke(img)
+                        st.session_state.image_history[file.name].append(new_img)
+                        st.session_state.last_action_msg = f"🌑 Asfixia aplicada correctamente a {file.name}."
+                        st.rerun()
+                    if st.button("⬛ Umbral", key=f"thresh_{file.name}"):
+                        new_img = apply_alpha_threshold(img)
+                        st.session_state.image_history[file.name].append(new_img)
+                        st.session_state.last_action_msg = f"⬛ Umbral aplicado correctamente a {file.name}."
+                        st.rerun()
+                    
+                    if "DTF UV" in sheet_choice:
+                        st.markdown("**Estilo Sticker UV**")
+                        s_col1, s_col2 = st.columns([1, 1])
+                        with s_col1:
+                            stroke_size = st.number_input("Grosor px", min_value=1, max_value=50, value=15, key=f"stroke_size_{file.name}")
+                        with s_col2:
+                            st.markdown("<br>", unsafe_allow_html=True)
+                            if st.button("⚪ Reborde", key=f"stroke_{file.name}"):
+                                new_img = apply_white_stroke(img, size=stroke_size)
+                                st.session_state.image_history[file.name].append(new_img)
+                                st.session_state.last_action_msg = f"⚪ Reborde blanco aplicado correctamente a {file.name}."
+                                st.rerun()
+
+                st.markdown("---")
+                if st.checkbox("✂️ Recorte Manual (Cropper Avanzado)", key=f"manual_crop_check_{file.name}"):
+                    st.info("Ajusta el recuadro azul para enmarcar el área que deseas conservar. Al terminar, presiona Aplicar.")
+                    cropped_img = st_cropper(img, realtime_update=True, box_color='#0000FF', aspect_ratio=None, key=f"cropper_{file.name}")
+                    if st.button("✅ Aplicar Recorte Manual", key=f"apply_manual_crop_{file.name}", type="primary"):
+                        st.session_state.image_history[file.name].append(cropped_img)
+                        st.session_state.last_action_msg = f"✂️ Recorte manual aplicado en {file.name}."
+                        st.rerun()
+                
+                st.markdown("---")
+                st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
+                remove_type = st.radio("Método de borrado:", ["Gotero (Color Exacto)", "Barra (Luminosidad)"], key=f"rm_type_{file.name}", horizontal=True)
+
+                if remove_type == "Gotero (Color Exacto)":
+                    cc1, cc2 = st.columns(2)
+                    with cc1:
+                        target_color = st.color_picker("Color (Clica para usar el gotero)", "#000000", key=f"cp_{file.name}")
+                    with cc2:
+                        tol_val = st.slider("Tolerancia", 0, 100, 30, key=f"tol_exact_{file.name}")
+                    
+                    preview_img = remove_specific_color(img, target_color, tol_val)
+                    
+                    prev_col1, prev_col2 = st.columns([2, 1])
+                    with prev_col1:
+                        st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_container_width=True)
+                    with prev_col2:
+                        st.markdown("<br><br>", unsafe_allow_html=True)
+                        if st.button("✅ Aplicar a la imagen", key=f"apply_c_{file.name}", type="primary", use_container_width=True):
+                            final_img = apply_alpha_threshold(preview_img)
+                            st.session_state.image_history[file.name].append(final_img)
+                            st.session_state.last_action_msg = f"💧 Color eliminado (y Umbral aplicado) en {file.name}."
+                            st.rerun()
+                else:
+                    cc1, cc2 = st.columns(2)
+                    with cc1:
+                        lum_val = st.slider("Tono (0=Negro, 255=Blanco)", 0, 255, 0, key=f"lum_{file.name}")
+                    with cc2:
+                        tol_val = st.slider("Tolerancia", 0, 100, 30, key=f"tol_lum_{file.name}")
+                        
+                    preview_img = remove_luminance(img, lum_val, tol_val)
+                    
+                    prev_col1, prev_col2 = st.columns([2, 1])
+                    with prev_col1:
+                        st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_container_width=True)
+                    with prev_col2:
+                        st.markdown("<br><br>", unsafe_allow_html=True)
+                        if st.button("✅ Aplicar a la imagen", key=f"apply_l_{file.name}", type="primary", use_container_width=True):
+                            final_img = apply_alpha_threshold(preview_img)
+                            st.session_state.image_history[file.name].append(final_img)
+                            st.session_state.last_action_msg = f"🌓 Tono eliminado (y Umbral aplicado) en {file.name}."
+                            st.rerun()
+
+                image_configs.append({
+                    "file": file, "image": img, "qty": qty,
+                    "w_px": cm_to_px(new_w_cm), "h_px": cm_to_px(new_h_cm)
+                })
+
+# --- ACTUALIZAR VISOR EN VIVO ---
+if len(image_configs) > 0:
+    live_packer = newPacker(mode=PackingMode.Offline, bin_algo=PackingBin.BFF, rotation=allow_rotation)
+    live_packer.add_bin(usable_sheet_w_px, usable_sheet_h_px, count=1)
+    
+    rect_id = 0
+    rect_map_live = {}
+    for config in image_configs:
+        for _ in range(config["qty"]):
+            req_w = config["w_px"] + margin_px
+            req_h = config["h_px"] + margin_px
+            live_packer.add_rect(req_w, req_h, rect_id)
+            rect_map_live[rect_id] = config
+            rect_id += 1
+            
+    live_packer.pack()
+    all_live_rects = live_packer.rect_list()
+    
+    preview_scale = 0.1 
+    mini_w = int(gang_width_px * preview_scale)
+    mini_h = int(gang_height_px * preview_scale)
+    
+    minimap = Image.new("RGBA", (mini_w, mini_h), (240, 240, 240, 255))
+    draw = ImageDraw.Draw(minimap)
+    
+    if use_edge_margins:
+        safe_x0, safe_y0 = int(edge_margin_px * preview_scale), int(edge_margin_px * preview_scale)
+        safe_x1, safe_y1 = mini_w - safe_x0, mini_h - safe_y0
+        draw.rectangle([safe_x0, safe_y0, safe_x1, safe_y1], outline=(200, 200, 200, 255), width=1)
+    
+    area_usada = 0
+    for rect in all_live_rects:
+        b, x, y, w, h, rid = rect
+        conf = rect_map_live[rid]
+        area_usada += (w * h)
+        
+        req_w_margin = conf["w_px"] + margin_px
+        req_h_margin = conf["h_px"] + margin_px
+        is_rotated = False
+        if w == req_h_margin and h == req_w_margin and w != h:
+            is_rotated = True
+        
+        px0 = int((x + edge_margin_px) * preview_scale)
+        py0 = int((gang_height_px - (y + h) - edge_margin_px) * preview_scale)
+        pw = int(w * preview_scale)
+        ph = int(h * preview_scale)
+        
+        if pw > 0 and ph > 0:
+            thumb_w = int(conf["w_px"] * preview_scale)
+            thumb_h = int(conf["h_px"] * preview_scale)
+            if thumb_w > 0 and thumb_h > 0:
+                thumb = conf["image"].resize((thumb_w, thumb_h), Image.Resampling.LANCZOS)
+                if thumb.mode != 'RGBA':
+                    thumb = thumb.convert('RGBA')
+                
+                if is_rotated:
+                    thumb = thumb.rotate(90, expand=True)
+                
+                minimap.paste(thumb, (px0, py0), thumb)
+                draw.rectangle([px0, py0, px0 + pw, py0 + ph], outline=(50, 100, 200, 100), width=1)
+        
+    sidebar_visor.image(minimap, use_container_width=True)
+    
+    area_total = usable_sheet_w_px * usable_sheet_h_px
+    if len(all_live_rects) < rect_id:
+        sidebar_stats.error(f"¡Rebasaste al Pliego 2! {rect_id - len(all_live_rects)} ítems fuera.")
+    else:
+        sidebar_stats.success(f"Espacio usado: {(area_usada / area_total) * 100:.1f}%")
+
+# 6. Generador Final
+if uploaded_files and len(image_configs) > 0:
+    st.markdown("---")
+    if st.button("🚀 Generar Archivos Finales", type="primary", use_container_width=True):
+        with st.spinner("Procesando pliegos de impresión estricta..."):
+            
+            packer = newPacker(mode=PackingMode.Offline, bin_algo=PackingBin.BFF, rotation=allow_rotation)
+            packer.add_bin(usable_sheet_w_px, usable_sheet_h_px, count=20)
+            
+            rect_id = 0
+            rect_map = {} 
+            for config in image_configs:
+                for _ in range(config["qty"]):
+                    req_w = config["w_px"] + margin_px
+                    req_h = config["h_px"] + margin_px
+                    packer.add_rect(req_w, req_h, rect_id)
+                    rect_map[rect_id] = config
+                    rect_id += 1
+                    
+            packer.pack()
+            all_placed_rects = packer.rect_list()
+            
+            bins_rects = {}
+            for rect in all_placed_rects:
+                b_id = rect[0]
+                if b_id not in bins_rects: bins_rects[b_id] = []
+                bins_rects[b_id].append(rect)
+                
+            sheets_used = sorted(list(bins_rects.keys()))
+            
+            now = datetime.datetime.now()
+            folder_name = os.path.join(HISTORY_BASE_FOLDER, now.strftime("%Y-%m-%d"), now.strftime("%H%M%S"))
+            os.makedirs(folder_name, exist_ok=True)
+            
+            gang_files_high, gang_files_low = [], []
+            
+            for i, bin_id in enumerate(sheets_used):
+                gang_high_res = Image.new("RGBA", (gang_width_px, gang_height_px), (255, 255, 255, 0))
+                
+                for rect in bins_rects[bin_id]:
+                    _, x, y, w, h, rid = rect
+                    conf = rect_map[rid]
+                    
+                    req_w_margin = conf["w_px"] + margin_px
+                    req_h_margin = conf["h_px"] + margin_px
+                    is_rotated = False
+                    if w == req_h_margin and h == req_w_margin and w != h:
+                        is_rotated = True
+                    
+                    resized_img = conf["image"].resize((conf["w_px"], conf["h_px"]), Image.Resampling.LANCZOS)
+                    if resized_img.mode != 'RGBA': resized_img = resized_img.convert('RGBA')
+
+                    if is_rotated:
+                        resized_img = resized_img.rotate(90, expand=True)
+
+                    paste_x = x + edge_margin_px
+                    paste_y = gang_height_px - (y + h) - edge_margin_px
+                    gang_high_res.paste(resized_img, (paste_x, paste_y), resized_img)
+                
+                high_filename = os.path.join(folder_name, f"pliego_{i+1}_alta.png")
+                gang_high_res.save(high_filename, format='PNG', dpi=(DPI_HIGH, DPI_HIGH))
+                gang_files_high.append(high_filename)
+                
+                scale_factor = DPI_LOW / DPI_HIGH
+                prev_w, prev_h = int(gang_width_px * scale_factor), int(gang_height_px * scale_factor)
+                
+                preview_sheet = Image.new("RGBA", (prev_w, prev_h), MUESTRA_BG_COLOR)
+                final_sheet_low = gang_high_res.resize((prev_w, prev_h), Image.Resampling.LANCZOS)
+                preview_sheet.paste(final_sheet_low, (0, 0), final_sheet_low)
+
+                if watermark_file:
+                    wm_img = Image.open(watermark_file).convert("RGBA")
+                    wm_w = 250
+                    wm_h = int(wm_w * (wm_img.height / wm_img.width))
+                    wm_img = wm_img.resize((wm_w, wm_h), Image.Resampling.LANCZOS)
+                    alpha = wm_img.split()[3]
+                    alpha = Image.eval(alpha, lambda a: int(a * 0.7))
+                    wm_img.putalpha(alpha)
+                    
+                    watermark_layer = Image.new("RGBA", preview_sheet.size, (255, 255, 255, 0))
+                    for y_pos in range(0, prev_h, wm_h + 80):
+                        for x_pos in range(0, prev_w, wm_w + 80):
+                            watermark_layer.paste(wm_img, (x_pos, y_pos), wm_img)
+                    preview_sheet = Image.alpha_composite(preview_sheet, watermark_layer)
+
+                low_filename = os.path.join(folder_name, f"muestra_{i+1}_cliente.png")
+                preview_sheet.save(low_filename, format='PNG', dpi=(DPI_LOW, DPI_LOW))
+                gang_files_low.append(low_filename)
+
+            st.success(f"¡Proceso completado! Se utilizaron {len(sheets_used)} pliegos.")
+            st.session_state.last_action_msg = "🖨️ Pliegos generados y guardados en historial correctamente."
+            
+            col_d1, col_d2 = st.columns(2)
+            
+            zip_buffer_low = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer_low, 'w') as zip_file:
+                for f in gang_files_low: zip_file.write(f, os.path.basename(f))
+            zip_buffer_low.seek(0)
+            
+            zip_buffer_high = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer_high, 'w') as zip_file:
+                for f in gang_files_high: zip_file.write(f, os.path.basename(f))
+            zip_buffer_high.seek(0)
+            
+            with col_d1:
+                st.download_button("📥 ZIP Muestras (72 DPI)", zip_buffer_low, "muestra_cliente.zip", "application/zip")
+            with col_d2:
+                st.download_button("🖨️ ZIP Pliegos (300 DPI)", zip_buffer_high, "pliegos_impresion.zip", "application/zip", type="primary")
+            
+            st.rerun()

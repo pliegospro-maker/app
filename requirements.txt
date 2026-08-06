@@ -1,0 +1,5 @@
+streamlit
+Pillow
+rectpack
+requests
+streamlit-cropper
