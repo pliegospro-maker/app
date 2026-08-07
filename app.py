@@ -10,73 +10,43 @@ supabase: Client = create_client(url_supabase, clave_supabase)
 if 'usuario_autenticado' not in st.session_state:
     st.session_state.usuario_autenticado = False
 
-# 3. Pantalla de Bloqueo y Verificación de Planes
+# 3. Pantalla de Autenticación (Modelo Freemium)
 if not st.session_state.usuario_autenticado:
     st.title("🔐 Acceso a PliegoPro")
-    st.write("Iniciá sesión o creá tu cuenta para generar tus pliegos.")
+    st.write("Iniciá sesión o creá tu cuenta gratis para probar el software.")
 
     tab_login, tab_registro = st.tabs(["Iniciar Sesión", "Crear Cuenta"])
 
     with tab_login:
         email_login = st.text_input("Tu Email", key="email_login")
         password_login = st.text_input("Tu Contraseña", type="password", key="pass_login")
+
         if st.button("Ingresar al Software", type="primary"):
             try:
-                # 1. Inicia sesión en Supabase
+                # Inicia sesión directamente sin pedir que esté "Activo"
                 respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
-                user_id = respuesta.user.id
-                
-                # 2. Busca su estado en la tabla 'perfiles'
-                perfil = supabase.table("perfiles").select("*").eq("id", user_id).execute()
-                
-                if len(perfil.data) > 0:
-                    estado = perfil.data[0]["estado"]
-                    if estado == "Activo":
-                        st.session_state.usuario_autenticado = True
-                        st.rerun()
-                    else:
-                        st.warning("⚠️ Tu cuenta está creada pero figura Inactiva. Solicitá la activación eligiendo un plan abajo.")
-                else:
-                    st.error("Error: Perfil no encontrado.")
+                st.session_state.usuario_autenticado = True
+                st.rerun()
             except Exception as e:
                 st.error("❌ Email o contraseña incorrectos.")
 
     with tab_registro:
-        st.info("Creá tu cuenta gratis para ver los planes disponibles.")
+        st.info("Creá tu cuenta gratis. Podés armar tus pliegos y solo pagás cuando quieras descargarlos en alta calidad.")
         email_reg = st.text_input("Nuevo Email", key="email_reg")
         password_reg = st.text_input("Nueva Contraseña (mínimo 6 letras/números)", type="password", key="pass_reg")
+
         if st.button("Registrarme"):
             try:
-                # 1. Crea la cuenta
                 respuesta = supabase.auth.sign_up({"email": email_reg, "password": password_reg})
                 user_id = respuesta.user.id
-                # 2. Anota al usuario en tu tabla como 'Inactivo'
+                
+                # Anota al usuario en tu tabla (Supabase le pondrá 0 créditos automáticamente)
                 supabase.table("perfiles").insert({"id": user_id, "email": email_reg}).execute()
                 st.success("✅ ¡Cuenta creada con éxito! Ahora podés Iniciar Sesión en la pestaña de al lado.")
             except Exception as e:
                 st.error("⚠️ Hubo un error. Revisá que el mail sea válido o probá otra contraseña.")
 
-    st.markdown("---")
-    st.subheader("🚀 ¿Aún no tenés acceso? Elegí tu plan:")
-    st.caption("⚠️ **IMPORTANTE:** Al momento de pagar, asegurate de usar en Mercado Pago el MISMO correo que usaste para crear tu cuenta aquí.")
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.info("🥉 **Pase Diario**\n\nAcceso por 24hs para un trabajo puntual.")
-        # Acordate de cambiar este texto por tu link real de Mercado Pago
-        st.link_button("Pagar Pase Diario", "https://mpago.la/1zcwXt5")
-        
-    with col2:
-        st.info("🥈 **Plan Emprendedor**\n\nUso mensual ideal para talleres en crecimiento.")
-        # Acordate de cambiar este texto por tu link real de Mercado Pago
-        st.link_button("Suscribirme al Emprendedor", "https://mpago.la/2kqA8Kp")
-        
-    with col3:
-        st.info("🥇 **Plan Pro**\n\nUso intensivo y soporte prioritario.")
-        # Acordate de cambiar este texto por tu link real de Mercado Pago
-        st.link_button("Suscribirme al Pro", "https://mpago.la/1eurW1Q")
-
-    # 4. EL ESCUDO
+    # EL ESCUDO (Frena el código acá si no inició sesión)
     st.stop()
 # ... (todo lo que ya tenías)
 import streamlit as st
