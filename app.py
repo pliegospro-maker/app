@@ -26,6 +26,7 @@ if not st.session_state.usuario_autenticado:
                 # Inicia sesión directamente sin pedir que esté "Activo"
                 respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
                 st.session_state.usuario_autenticado = True
+                st.session_state.email_usuario = email_login
                 st.rerun()
             except Exception as e:
                 st.error("❌ Email o contraseña incorrectos.")
