@@ -44,7 +44,7 @@ if not st.session_state.usuario_autenticado:
                 supabase.table("perfiles").insert({"id": user_id, "email": email_reg}).execute()
                 st.success("✅ ¡Cuenta creada con éxito! Ahora podés Iniciar Sesión en la pestaña de al lado.")
             except Exception as e:
-                st.error("⚠️ Hubo un error. Revisá que el mail sea válido o probá otra contraseña.")
+                st.error(f"⚠️ Error exacto: {e}")
 
     # EL ESCUDO (Frena el código acá si no inició sesión)
     st.stop()
