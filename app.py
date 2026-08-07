@@ -220,7 +220,7 @@ with col_titulo:
     st.markdown("Recorte Manual, Acomodo Tetris 90° Optimizado y Auto-Umbral.")
 with col_billetera:
     st.info(f"💳 **Tus Créditos: {creditos_actuales}**")
-    st.markdown("[👉 Recargar Créditos ($5.000 c/u)](ACÁ_PEGÁS_TU_LINK_DE_MERCADO_PAGO)")
+    st.markdown("[👉 Recargar Créditos ($5.000 c/u)](https://mpago.li/2GESomZ)")
 # ---------------------------
 
 if st.session_state.last_action_msg:
