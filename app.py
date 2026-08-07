@@ -176,8 +176,7 @@ if "image_history" not in st.session_state: st.session_state.image_history = {}
 if "last_action_msg" not in st.session_state: st.session_state.last_action_msg = "" 
 
 # --- LECTURA DE CRÉDITOS ---
-usuario_actual = supabase.auth.get_user()
-email_usuario = usuario_actual.user.email
+email_usuario = st.session_state.email_usuario
 
 respuesta_perfil = supabase.table("perfiles").select("creditos").eq("email", email_usuario).execute()
 if respuesta_perfil.data:
