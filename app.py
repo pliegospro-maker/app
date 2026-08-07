@@ -204,8 +204,24 @@ if "deleted_images" not in st.session_state: st.session_state.deleted_images = s
 if "image_history" not in st.session_state: st.session_state.image_history = {}
 if "last_action_msg" not in st.session_state: st.session_state.last_action_msg = "" 
 
-st.title("🖨️ Generador Automático de Pliegos Pro")
-st.markdown("Recorte Manual, Acomodo Tetris 90° Optimizado y Auto-Umbral.")
+# --- LECTURA DE CRÉDITOS ---
+usuario_actual = supabase.auth.get_user()
+email_usuario = usuario_actual.user.email
+
+respuesta_perfil = supabase.table("perfiles").select("creditos").eq("email", email_usuario).execute()
+if respuesta_perfil.data:
+    creditos_actuales = respuesta_perfil.data[0].get("creditos", 0)
+else:
+    creditos_actuales = 0
+
+col_titulo, col_billetera = st.columns([3, 1])
+with col_titulo:
+    st.title("🖨️ Generador Automático de Pliegos Pro")
+    st.markdown("Recorte Manual, Acomodo Tetris 90° Optimizado y Auto-Umbral.")
+with col_billetera:
+    st.info(f"💳 **Tus Créditos: {creditos_actuales}**")
+    st.markdown("[👉 Recargar Créditos ($5.000 c/u)](ACÁ_PEGÁS_TU_LINK_DE_MERCADO_PAGO)")
+# ---------------------------
 
 if st.session_state.last_action_msg:
     st.toast(st.session_state.last_action_msg)
@@ -607,24 +623,48 @@ if uploaded_files and len(image_configs) > 0:
                 preview_sheet.save(low_filename, format='PNG', dpi=(DPI_LOW, DPI_LOW))
                 gang_files_low.append(low_filename)
 
-            st.success(f"¡Proceso completado! Se utilizaron {len(sheets_used)} pliegos.")
-            st.session_state.last_action_msg = "🖨️ Pliegos generados y guardados en historial correctamente."
+           # --- SISTEMA DE DESCARGAS Y CRÉDITOS ---
+        cantidad_pliegos = len(sheets_used)
+        st.success(f"¡Proceso completado! Se armaron {cantidad_pliegos} pliegos.")
+        
+        # Guardar temporalmente los archivos para no perderlos si la página se recarga
+        if "pliegos_desbloqueados" not in st.session_state:
+            st.session_state.pliegos_desbloqueados = False
             
-            col_d1, col_d2 = st.columns(2)
+        col_d1, col_d2 = st.columns(2)
+        
+        # 1. Creamos el ZIP de Muestra Gratis
+        zip_buffer_low = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer_low, 'w') as zip_file:
+            for f in gang_files_low:
+                zip_file.write(f, os.path.basename(f))
+        zip_buffer_low.seek(0)
+        
+        with col_d1:
+            st.info("👀 **Vista previa gratis**\n(72 DPI y con marca de agua).")
+            st.download_button("📥 Descargar Muestras", zip_buffer_low, "muestras_cliente.zip", "application/zip")
+
+        # 2. Creamos el ZIP de Alta Resolución (Bloqueado)
+        zip_buffer_high = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer_high, 'w') as zip_file:
+            for f in gang_files_high:
+                zip_file.write(f, os.path.basename(f))
+        zip_buffer_high.seek(0)
+
+        with col_d2:
+            st.warning(f"🖨️ **Archivos de impresión (300 DPI)**\nCosto total: {cantidad_pliegos} créditos.")
             
-            zip_buffer_low = io.BytesIO()
-            with zipfile.ZipFile(zip_buffer_low, 'w') as zip_file:
-                for f in gang_files_low: zip_file.write(f, os.path.basename(f))
-            zip_buffer_low.seek(0)
-            
-            zip_buffer_high = io.BytesIO()
-            with zipfile.ZipFile(zip_buffer_high, 'w') as zip_file:
-                for f in gang_files_high: zip_file.write(f, os.path.basename(f))
-            zip_buffer_high.seek(0)
-            
-            with col_d1:
-                st.download_button("📥 ZIP Muestras (72 DPI)", zip_buffer_low, "muestra_cliente.zip", "application/zip")
-            with col_d2:
-                st.download_button("🖨️ ZIP Pliegos (300 DPI)", zip_buffer_high, "pliegos_impresion.zip", "application/zip", type="primary")
-            
-            st.rerun()
+            if st.session_state.pliegos_desbloqueados:
+                st.success("✅ ¡Desbloqueado! Listo para imprimir.")
+                st.download_button("🖨️ Descargar Archivos Finales", zip_buffer_high, "pliegos_alta.zip", "application/zip", type="primary")
+            else:
+                if creditos_actuales >= cantidad_pliegos:
+                    if st.button(f"💎 Usar {cantidad_pliegos} Créditos para Desbloquear", use_container_width=True):
+                        # Restamos los créditos en Supabase
+                        nuevos_creditos = creditos_actuales - cantidad_pliegos
+                        supabase.table("perfiles").update({"creditos": nuevos_creditos}).eq("email", email_usuario).execute()
+                        st.session_state.pliegos_desbloqueados = True
+                        st.rerun() # Recargamos para mostrar el botón de descarga
+                else:
+                    st.error("❌ No tenés créditos suficientes.")
+                    st.markdown("[👉 Comprar más créditos aquí](https://mpago.li/2GESomZ)")
