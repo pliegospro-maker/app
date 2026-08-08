@@ -656,7 +656,8 @@ if uploaded_files and len(image_configs) > 0:
                             "payer": {"email": email_usuario},
                             "back_urls": {"success": "TU_LINK_DE_STREAMLIT_AQUI"},
                             "auto_return": "approved",
-                            "external_reference": email_usuario
+                            "external_reference": email_usuario,
+                            "notification_url": "https://hook.us2.make.com/r5og8gzq9xaj9vwbma93aff51ahsx5jb"  # <--- EL TELÉFONO DE TU ROBOT
                         }
                         res_peaje = sdk.preference().create(pref_data_peaje)
                         link_mp_peaje = res_peaje["response"]["init_point"]
