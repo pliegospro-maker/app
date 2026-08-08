@@ -11,6 +11,11 @@ supabase: Client = create_client(url_supabase, clave_supabase)
 if 'usuario_autenticado' not in st.session_state:
     st.session_state.usuario_autenticado = False
 
+# === NUEVO: RECUPERAR SESIÓN TRAS APRETAR F5 ===
+if "usuario" in st.query_params:
+    st.session_state.usuario_autenticado = True
+    st.session_state.email_usuario = st.query_params["usuario"]
+
 # 3. Pantalla de Autenticación (Modelo Freemium)
 if not st.session_state.usuario_autenticado:
     st.title("🔐 Acceso a PliegoPro")
@@ -24,10 +29,14 @@ if not st.session_state.usuario_autenticado:
 
         if st.button("Ingresar al Software", type="primary"):
             try:
-                # Inicia sesión directamente sin pedir que esté "Activo"
+                # Inicia sesión directamente
                 respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
                 st.session_state.usuario_autenticado = True
                 st.session_state.email_usuario = email_login
+                
+                # === NUEVO: GUARDAMOS LA HUELLA EN LA URL ===
+                st.query_params["usuario"] = email_login
+                
                 st.rerun()
             except Exception as e:
                 st.error("❌ Email o contraseña incorrectos.")
@@ -42,7 +51,7 @@ if not st.session_state.usuario_autenticado:
                 respuesta = supabase.auth.sign_up({"email": email_reg, "password": password_reg})
                 user_id = respuesta.user.id
                 
-                # Anota al usuario en tu tabla (Supabase le pondrá 0 créditos automáticamente)
+                # Anota al usuario en tu tabla
                 supabase.table("perfiles").insert({"id": user_id, "email": email_reg}).execute()
                 st.success("✅ ¡Cuenta creada con éxito! Ahora podés Iniciar Sesión en la pestaña de al lado.")
             except Exception as e:
