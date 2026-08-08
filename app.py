@@ -63,15 +63,15 @@ from streamlit_cropper import st_cropper
 
 # Configuración de página
 st.set_page_config(page_title="DTF / UV - Creador de Pliegos Pro", layout="wide", initial_sidebar_state="expanded")
-# Ocultar menú de Streamlit, botón de GitHub y pie de página
+# Ocultar menú de Streamlit y pie de página (Versión Segura)
 ocultar_elementos = """
     <style>
     #MainMenu {visibility: hidden;}
-    [data-testid="stToolbar"] {visibility: hidden !important;}
     footer {visibility: hidden;}
     </style>
 """
-# st.markdown(ocultar_elementos, unsafe_allow_html=True)
+st.markdown(ocultar_elementos, unsafe_allow_html=True)
+
 
 # Constantes
 DPI_HIGH = 300
