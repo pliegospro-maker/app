@@ -654,7 +654,8 @@ if uploaded_files and len(image_configs) > 0:
                             "items": [{"title": f"{creditos_faltantes} Créditos PliegosPro", "quantity": 1, "unit_price": precio_total, "currency_id": "ARS"}],
                             "payer": {"email": email_usuario},
                             "back_urls": {"success": "TU_LINK_DE_STREAMLIT_AQUI"},
-                            "auto_return": "approved"
+                            "auto_return": "approved",
+                            "external_reference": email_usuario
                         }
                         res_peaje = sdk.preference().create(pref_data_peaje)
                         link_mp_peaje = res_peaje["response"]["init_point"]
