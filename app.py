@@ -105,19 +105,6 @@ def get_preview_with_bg(img, bg_hex):
     bg_img.paste(img, (0,0), img)
     return bg_img
 
-# --- API DE REMOVE.BG ---
-def remove_background_api(image_bytes, api_key):
-    response = requests.post(
-        'https://api.remove.bg/v1.0/removebg',
-        files={'image_file': ('image.png', image_bytes, 'image/png')},
-        data={'size': 'auto'},
-        headers={'X-Api-Key': api_key},
-    )
-    if response.status_code == requests.codes.ok:
-        return response.content
-    else:
-        st.error(f"Error en la API: Verifica tu API Key. (Código: {response.status_code})")
-        return None
 
 # --- FILTROS PROFESIONALES ---
 def apply_alpha_threshold(img):
@@ -197,7 +184,7 @@ else:
 col_titulo, col_billetera = st.columns([3, 1])
 with col_titulo:
     st.title("🖨️ Generador Automático de Pliegos Pro")
-    st.markdown("Recorte Manual, Acomodo Tetris 90° Optimizado y Auto-Umbral.")
+    st.markdown("TU SOLUCIÓN PROFESIONAL A LA PREPARACIÓN DE PLIEGOS")
 with col_billetera:
     st.info(f"💳 **Tus Créditos: {creditos_actuales}**")
     
@@ -254,8 +241,6 @@ usable_sheet_w_px = gang_width_px - (2 * edge_margin_px)
 usable_sheet_h_px = gang_height_px - (2 * edge_margin_px)
 
 with st.sidebar:
-    st.header("⚙️ Ajustes Avanzados")
-    api_key_input = st.text_input("Remove.bg API Key:", type="password")
     
     st.markdown("---")
     st.markdown("**Personalización**")
@@ -346,23 +331,7 @@ with col2:
                                 st.session_state.image_history[file.name].append(upscaled)
                                 st.session_state.last_action_msg = f"🪄 Upscale aplicado correctamente a {file.name}."
                                 st.rerun()
-                
-                with c_act1:
-                    st.markdown("**Limpieza Rápida**")
-                    if st.button("☁️ Quitar Fondo API", key=f"bg_{file.name}"):
-                        if not api_key_input:
-                            st.warning("⚠️ Falta API Key")
-                        else:
-                            with st.spinner("Procesando y aplicando Umbral automático..."):
-                                buf = io.BytesIO()
-                                img.save(buf, format="PNG")
-                                result_bytes = remove_background_api(buf.getvalue(), api_key_input)
-                                if result_bytes:
-                                    new_img = Image.open(io.BytesIO(result_bytes))
-                                    new_img = apply_alpha_threshold(new_img)
-                                    st.session_state.image_history[file.name].append(new_img)
-                                    st.session_state.last_action_msg = f"☁️ Fondo eliminado (y Umbral aplicado) en {file.name}."
-                                    st.rerun()
+            
                             
                     if st.button("✂️ Recortar Bordes Automático", key=f"crop_{file.name}"):
                         bbox = img.getbbox()
