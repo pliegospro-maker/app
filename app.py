@@ -195,6 +195,7 @@ with col_titulo:
     st.title("🖨️ Generador Automático de Pliegos Pro")
     st.markdown("TU SOLUCIÓN PROFESIONAL A LA PREPARACIÓN DE PLIEGOS")
 with col_billetera:
+    st.markdown(f"👋 Bienvenido/a, **{st.session_state.email_usuario}**")
     st.info(f"💳 **Tus Créditos: {creditos_actuales}**")
     
     # Generamos un link automático para 1 crédito
