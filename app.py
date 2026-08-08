@@ -71,7 +71,7 @@ ocultar_elementos = """
     footer {visibility: hidden;}
     </style>
 """
-st.markdown(ocultar_elementos, unsafe_allow_html=True)
+# st.markdown(ocultar_elementos, unsafe_allow_html=True)
 
 # Constantes
 DPI_HIGH = 300
