@@ -206,7 +206,8 @@ with col_billetera:
             "payer": {"email": email_usuario},
             "back_urls": {"success": "https://pliegospro.streamlit.app/"},
             "auto_return": "approved",
-            "external_reference": email_usuario  # <--- ESTO ES VITAL PARA QUE MAKE SEPA QUIÉN PAGÓ
+            "external_reference": email_usuario,  # <--- EL DNI DEL USUARIO
+            "notification_url": "https://hook.us2.make.com/r5og8gzq9xaj9vwbma93aff51ahsx5jb"  # <--- EL TELÉFONO DE TU ROBOT
         }
         res_billetera = sdk.preference().create(pref_data_billetera)
         link_mp_billetera = res_billetera["response"]["init_point"]
