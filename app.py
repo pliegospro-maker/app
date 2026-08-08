@@ -238,7 +238,7 @@ with col1:
     texto_marca = "MUESTRA GRATIS - PLIEGOS PRO" 
     opacidad_marca = 128
 
-    st.subheader("3. Cargar Diseños")
+    st.subheader("2. Cargar Diseños")
     uploaded_files = st.file_uploader("Subir imágenes", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
     if st.button("🗑️ Limpiar papelera"):
         st.session_state.deleted_images = set()
@@ -272,7 +272,7 @@ with st.sidebar:
     sidebar_stats = st.empty()
 
 with col2:
-    st.subheader("4. Edición de Imágenes")
+    st.subheader("3. Edición de Imágenes")
     
     if uploaded_files:
         with st.expander("🛠️ Edición Masiva", expanded=False):
