@@ -198,14 +198,15 @@ with col_billetera:
     st.markdown(f"👋 Bienvenido/a, **{st.session_state.email_usuario}**")
     st.info(f"💳 **Tus Créditos: {creditos_actuales}**")
     
-    # Generamos un link automático para 1 crédito
+# Generamos un link automático para 1 crédito
     try:
         sdk = mercadopago.SDK(st.secrets["MP_ACCESS_TOKEN"])
         pref_data_billetera = {
             "items": [{"title": "1 Crédito PliegosPro", "quantity": 1, "unit_price": 5000.0, "currency_id": "ARS"}],
             "payer": {"email": email_usuario},
             "back_urls": {"success": "https://pliegospro.streamlit.app/"},
-            "auto_return": "approved"
+            "auto_return": "approved",
+            "external_reference": email_usuario  # <--- ESTO ES VITAL PARA QUE MAKE SEPA QUIÉN PAGÓ
         }
         res_billetera = sdk.preference().create(pref_data_billetera)
         link_mp_billetera = res_billetera["response"]["init_point"]
