@@ -4,3 +4,4 @@ rectpack
 requests
 streamlit-cropper
 supabase
+mercadopago
