@@ -234,8 +234,9 @@ with col1:
     
     use_edge_margins = st.checkbox("Aplicar márgenes de borde", value=True, help="Deja un espacio libre en los 4 bordes del pliego.")
 
-    st.subheader("2. Marca de Agua")
-    watermark_file = st.file_uploader("Logo empresa (PNG):", type=["png"])
+  # Marca de agua fija y oculta para las descargas gratuitas
+texto_marca = "MUESTRA GRATIS - PLIEGOS PRO" 
+opacidad_marca = 128
 
     st.subheader("3. Cargar Diseños")
     uploaded_files = st.file_uploader("Subir imágenes", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
