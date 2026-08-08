@@ -1,4 +1,5 @@
 import streamlit as st
+import mercadopago
 from supabase import create_client, Client
 
 # 1. Conectar a Supabase
@@ -199,7 +200,21 @@ with col_titulo:
     st.markdown("Recorte Manual, Acomodo Tetris 90° Optimizado y Auto-Umbral.")
 with col_billetera:
     st.info(f"💳 **Tus Créditos: {creditos_actuales}**")
-    st.markdown("[👉 Recargar Créditos ($5.000 c/u)](https://mpago.li/2GESomZ)")
+    
+    # Generamos un link automático para 1 crédito
+    try:
+        sdk = mercadopago.SDK(st.secrets["MP_ACCESS_TOKEN"])
+        pref_data_billetera = {
+            "items": [{"title": "1 Crédito PliegosPro", "quantity": 1, "unit_price": 5000.0, "currency_id": "ARS"}],
+            "payer": {"email": email_usuario},
+            "back_urls": {"success": "https://pliegospro.streamlit.app/"},
+            "auto_return": "approved"
+        }
+        res_billetera = sdk.preference().create(pref_data_billetera)
+        link_mp_billetera = res_billetera["response"]["init_point"]
+        st.markdown(f"[👉 Recargar 1 Crédito ($5.000)]({link_mp_billetera})")
+    except Exception as e:
+        st.error("Error al conectar con Mercado Pago.")
 # ---------------------------
 
 if st.session_state.last_action_msg:
@@ -644,6 +659,24 @@ if uploaded_files and len(image_configs) > 0:
                         supabase.table("perfiles").update({"creditos": nuevos_creditos}).eq("email", email_usuario).execute()
                         st.session_state.pliegos_desbloqueados = True
                         st.rerun() # Recargamos para mostrar el botón de descarga
-                else:
+                  else:
                     st.error("❌ No tenés créditos suficientes.")
-                    st.markdown("[👉 Comprar más créditos aquí](https://mpago.li/2GESomZ)")
+                    
+                    # Generamos el link por el total de créditos que le faltan
+                    try:
+                        creditos_faltantes = cantidad_pliegos - creditos_actuales
+                        precio_total = float(creditos_faltantes * 5000)
+                        
+                        sdk = mercadopago.SDK(st.secrets["MP_ACCESS_TOKEN"])
+                        pref_data_peaje = {
+                            "items": [{"title": f"{creditos_faltantes} Créditos PliegosPro", "quantity": 1, "unit_price": precio_total, "currency_id": "ARS"}],
+                            "payer": {"email": email_usuario},
+                            "back_urls": {"success": "TU_LINK_DE_STREAMLIT_AQUI"},
+                            "auto_return": "approved"
+                        }
+                        res_peaje = sdk.preference().create(pref_data_peaje)
+                        link_mp_peaje = res_peaje["response"]["init_point"]
+                        
+                        st.markdown(f"[👉 Comprar los {creditos_faltantes} créditos que faltan aquí]({link_mp_peaje})")
+                    except Exception as e:
+                        st.write("Cargando botón de pago...")
