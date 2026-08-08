@@ -202,7 +202,7 @@ with col_billetera:
     try:
         sdk = mercadopago.SDK(st.secrets["MP_ACCESS_TOKEN"])
         pref_data_billetera = {
-            "items": [{"title": "1 Crédito PliegosPro", "quantity": 1, "unit_price": 5000.0, "currency_id": "ARS"}],
+            "items": [{"title": "1 Crédito PliegosPro", "quantity": 1, "unit_price": 10.0, "currency_id": "ARS"}],
             "payer": {"email": email_usuario},
             "back_urls": {"success": "https://pliegospro.streamlit.app/"},
             "auto_return": "approved",
