@@ -251,8 +251,9 @@ with st.sidebar:
     st.markdown("**Optimización de Espacio**")
     allow_rotation = st.checkbox("🔄 Permitir rotar imágenes (Tetris)", value=True, help="El sistema evaluará si rotar 90° la imagen ahorra material en el pliego.")
 
-    st.markdown("---")
-    st.header("👀 Visor Real de Pliego")
+# --- NUEVO VISOR DESPLEGABLE EN LA PÁGINA PRINCIPAL ---
+# (Fijate que "with st.expander" está pegado al margen izquierdo, sin espacios)
+with st.expander("🔍 ABRIR VISOR DE VISTA PREVIA", expanded=True):
     sidebar_visor = st.empty()
     sidebar_stats = st.empty()
 
