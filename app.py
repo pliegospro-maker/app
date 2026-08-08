@@ -659,7 +659,7 @@ if uploaded_files and len(image_configs) > 0:
                         supabase.table("perfiles").update({"creditos": nuevos_creditos}).eq("email", email_usuario).execute()
                         st.session_state.pliegos_desbloqueados = True
                         st.rerun() # Recargamos para mostrar el botón de descarga
-                  else:
+                else:
                     st.error("❌ No tenés créditos suficientes.")
                     
                     # Generamos el link por el total de créditos que le faltan
