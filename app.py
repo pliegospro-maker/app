@@ -72,17 +72,17 @@ from streamlit_cropper import st_cropper
 
 # Configuración de página
 st.set_page_config(page_title="Pliegos Pro", page_icon="favicon.png", layout="wide", initial_sidebar_state="expanded")
-# Ocultar menú derecho y pie de página sin romper la barra lateral
+# Ocultar menú derecho (modo fantasma) y pie de página 
 ocultar_elementos = """
     <style>
-    /* Oculta SOLO el bloque de botones derecho (GitHub, 3 puntitos) */
-    [data-testid="stHeaderActionElements"] {display: none !important;}
+    /* Hace que los botones de GitHub y el menú sean invisibles y no se puedan cliquear */
+    [data-testid="stToolbar"] {
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
     
-    /* Oculta el pie de página de Streamlit y elimina su espacio en blanco */
-    footer {display: none !important;}
-    
-    /* Protege y fuerza a que el botón de la barra lateral siempre se vea */
-    [data-testid="collapsedControl"] {display: flex !important; visibility: visible !important;}
+    /* Oculta la marca de agua de Streamlit del fondo */
+    footer {visibility: hidden !important;}
     </style>
 """
 st.markdown(ocultar_elementos, unsafe_allow_html=True)
