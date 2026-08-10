@@ -595,16 +595,15 @@ if uploaded_files and len(image_configs) > 0:
                 preview_sheet.paste(final_sheet_low, (0, 0), final_sheet_low)
                 watermark_file = None
 
-              # 2. Acá seguro tenés tu lógica de Streamlit
-                if st.checkbox("¿Querés sumar una marca de agua?"):
-                 watermark_file = st.file_uploader("Subí tu imagen acá")
-                if watermark_file:
-                    wm_img = Image.open(watermark_file).convert("RGBA")
-                    wm_w = 250
+         # --- INICIO MARCA DE AGUA AUTOMÁTICA ---
+                ruta_logo = "logo.png"
+                if os.path.exists(ruta_logo):
+                    wm_img = Image.open(ruta_logo).convert("RGBA")
+                    wm_w = 250 # Tamaño del logo a lo ancho
                     wm_h = int(wm_w * (wm_img.height / wm_img.width))
                     wm_img = wm_img.resize((wm_w, wm_h), Image.Resampling.LANCZOS)
                     alpha = wm_img.split()[3]
-                    alpha = Image.eval(alpha, lambda a: int(a * 0.7))
+                    alpha = Image.eval(alpha, lambda a: int(a * 0.7)) # Opacidad al 70%
                     wm_img.putalpha(alpha)
                     
                     watermark_layer = Image.new("RGBA", preview_sheet.size, (255, 255, 255, 0))
@@ -612,11 +611,7 @@ if uploaded_files and len(image_configs) > 0:
                         for x_pos in range(0, prev_w, wm_w + 80):
                             watermark_layer.paste(wm_img, (x_pos, y_pos), wm_img)
                     preview_sheet = Image.alpha_composite(preview_sheet, watermark_layer)
-
-                low_filename = os.path.join(folder_name, f"muestra_{i+1}_cliente.png")
-                preview_sheet.save(low_filename, format='PNG', dpi=(DPI_LOW, DPI_LOW))
-                gang_files_low.append(low_filename)
-
+                # --- FIN MARCA DE AGUA AUTOMÁTICA ---   
            # --- SISTEMA DE DESCARGAS Y CRÉDITOS ---
         cantidad_pliegos = len(sheets_used)
         st.success(f"¡Proceso completado! Se armaron {cantidad_pliegos} pliegos.")
@@ -663,7 +658,7 @@ if uploaded_files and len(image_configs) > 0:
                 st.success("✅ ¡Desbloqueado! Listo para imprimir.")
                 
                 # ---> LÍNEA DETECTIVE ACÁ <---
-                st.write(f"🕵️‍♂️ Tamaño del ZIP: {len(st.session_state.zip_final_alta)} bytes")
+                # st.write(f"🕵️‍♂️ Tamaño del ZIP: {len(st.session_state.zip_final_alta)} bytes")
                 
                 # Le pasamos los datos directamente desde la memoria
                 st.download_button(
