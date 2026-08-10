@@ -75,11 +75,14 @@ st.set_page_config(page_title="Pliegos Pro", page_icon="favicon.png", layout="wi
 # Ocultar menú derecho y pie de página sin romper la barra lateral
 ocultar_elementos = """
     <style>
-    /* Oculta los botones y el menú de los 3 puntitos de la derecha */
-    [data-testid="stToolbar"] {visibility: hidden !important;}
+    /* Oculta SOLO el bloque de botones derecho (GitHub, 3 puntitos) */
+    [data-testid="stHeaderActionElements"] {display: none !important;}
     
-    /* Oculta el texto de 'Made with Streamlit' de abajo de todo */
-    footer {visibility: hidden !important;}
+    /* Oculta el pie de página de Streamlit y elimina su espacio en blanco */
+    footer {display: none !important;}
+    
+    /* Protege y fuerza a que el botón de la barra lateral siempre se vea */
+    [data-testid="collapsedControl"] {display: flex !important; visibility: visible !important;}
     </style>
 """
 st.markdown(ocultar_elementos, unsafe_allow_html=True)
