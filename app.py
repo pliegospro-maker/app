@@ -514,7 +514,20 @@ if len(image_configs) > 0:
 # 6. Generador Final
 if uploaded_files and len(image_configs) > 0:
     st.markdown("---")
+   # 6. Generador Final
+if uploaded_files and len(image_configs) > 0:
+    st.markdown("---")
+    
+    # 1. Creamos la memoria
+    if "proceso_iniciado" not in st.session_state:
+        st.session_state.proceso_iniciado = False
+        
+    # 2. El botón ahora solo enciende la memoria
     if st.button("🚀 Generar Archivos Finales", type="primary", use_container_width=True):
+        st.session_state.proceso_iniciado = True
+        
+    # 3. Todo tu código pasa a depender de la memoria
+    if st.session_state.proceso_iniciado:
         with st.spinner("Procesando pliegos de impresión estricta..."):
             
             packer = newPacker(mode=PackingMode.Offline, bin_algo=PackingBin.BFF, rotation=allow_rotation)
