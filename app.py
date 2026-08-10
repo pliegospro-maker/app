@@ -612,6 +612,11 @@ if uploaded_files and len(image_configs) > 0:
                             watermark_layer.paste(wm_img, (x_pos, y_pos), wm_img)
                     preview_sheet = Image.alpha_composite(preview_sheet, watermark_layer)
                 # --- FIN MARCA DE AGUA AUTOMÁTICA ---   
+
+                low_filename = os.path.join(folder_name, f"muestra_{i+1}_cliente.png")
+                preview_sheet.save(low_filename, format='PNG', dpi=(DPI_LOW, DPI_LOW))
+                gang_files_low.append(low_filename)
+
            # --- SISTEMA DE DESCARGAS Y CRÉDITOS ---
         cantidad_pliegos = len(sheets_used)
         st.success(f"¡Proceso completado! Se armaron {cantidad_pliegos} pliegos.")
