@@ -635,24 +635,25 @@ if uploaded_files and len(image_configs) > 0:
                 file_name="muestras_cliente.zip", 
                 mime="application/zip"
             )
-
-        # 2. Creamos el ZIP de Alta Resolución (Bloqueado)
+# 2. Creamos el ZIP de Alta Resolución (Bloqueado)
         zip_buffer_high = io.BytesIO()
         with zipfile.ZipFile(zip_buffer_high, 'w') as zip_file:
             for f in gang_files_high:
                 zip_file.write(f, os.path.basename(f))
                 
-        # EL SECRETO: Extraer los bytes de alta calidad
-        zip_bytes_high = zip_buffer_high.getvalue() 
+        # EL BLINDAJE DEFINITIVO: Lo anclamos a la memoria de Streamlit
+        st.session_state.zip_final_alta = zip_buffer_high.getvalue()
 
         with col_d2:
             st.warning(f"🖨️ **Archivos de impresión (300 DPI)**\nCosto total: {cantidad_pliegos} créditos.")
             
             if st.session_state.pliegos_desbloqueados:
                 st.success("✅ ¡Desbloqueado! Listo para imprimir.")
+                
+                # Le pasamos los datos directamente desde la memoria
                 st.download_button(
                     label="🖨️ Descargar Archivos Finales", 
-                    data=zip_bytes_high, 
+                    data=st.session_state.zip_final_alta, 
                     file_name="pliegos_alta.zip", 
                     mime="application/zip", 
                     type="primary"
@@ -687,4 +688,4 @@ if uploaded_files and len(image_configs) > 0:
                         
                         st.markdown(f"[👉 Comprar los {creditos_faltantes} créditos que faltan aquí]({link_mp_peaje})")
                     except Exception as e:
-                        st.write("Cargando botón de pago...")
+                        st.write("Cargando botón de pago...")            
