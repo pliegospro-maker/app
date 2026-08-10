@@ -643,12 +643,14 @@ if uploaded_files and len(image_configs) > 0:
                 
         # EL BLINDAJE DEFINITIVO: Lo anclamos a la memoria de Streamlit
         st.session_state.zip_final_alta = zip_buffer_high.getvalue()
-
         with col_d2:
             st.warning(f"🖨️ **Archivos de impresión (300 DPI)**\nCosto total: {cantidad_pliegos} créditos.")
             
             if st.session_state.pliegos_desbloqueados:
                 st.success("✅ ¡Desbloqueado! Listo para imprimir.")
+                
+                # ---> LÍNEA DETECTIVE ACÁ <---
+                st.write(f"🕵️‍♂️ Tamaño del ZIP: {len(st.session_state.zip_final_alta)} bytes")
                 
                 # Le pasamos los datos directamente desde la memoria
                 st.download_button(
