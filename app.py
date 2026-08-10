@@ -614,30 +614,49 @@ if uploaded_files and len(image_configs) > 0:
             
         col_d1, col_d2 = st.columns(2)
         
+       # Asegurarnos de que la variable exista en la memoria antes de usarla
+        if "pliegos_desbloqueados" not in st.session_state:
+            st.session_state.pliegos_desbloqueados = False
+
         # 1. Creamos el ZIP de Muestra Gratis
         zip_buffer_low = io.BytesIO()
         with zipfile.ZipFile(zip_buffer_low, 'w') as zip_file:
             for f in gang_files_low:
                 zip_file.write(f, os.path.basename(f))
-        zip_buffer_low.seek(0)
+        
+        # EL SECRETO: Extraer los bytes reales para que no se pierdan al recargar
+        zip_bytes_low = zip_buffer_low.getvalue() 
         
         with col_d1:
             st.info("👀 **Vista previa gratis**\n(72 DPI y con marca de agua).")
-            st.download_button("📥 Descargar Muestras", zip_buffer_low, "muestras_cliente.zip", "application/zip")
+            st.download_button(
+                label="📥 Descargar Muestras", 
+                data=zip_bytes_low, 
+                file_name="muestras_cliente.zip", 
+                mime="application/zip"
+            )
 
         # 2. Creamos el ZIP de Alta Resolución (Bloqueado)
         zip_buffer_high = io.BytesIO()
         with zipfile.ZipFile(zip_buffer_high, 'w') as zip_file:
             for f in gang_files_high:
                 zip_file.write(f, os.path.basename(f))
-        zip_buffer_high.seek(0)
+                
+        # EL SECRETO: Extraer los bytes de alta calidad
+        zip_bytes_high = zip_buffer_high.getvalue() 
 
         with col_d2:
             st.warning(f"🖨️ **Archivos de impresión (300 DPI)**\nCosto total: {cantidad_pliegos} créditos.")
             
             if st.session_state.pliegos_desbloqueados:
                 st.success("✅ ¡Desbloqueado! Listo para imprimir.")
-                st.download_button("🖨️ Descargar Archivos Finales", zip_buffer_high, "pliegos_alta.zip", "application/zip", type="primary")
+                st.download_button(
+                    label="🖨️ Descargar Archivos Finales", 
+                    data=zip_bytes_high, 
+                    file_name="pliegos_alta.zip", 
+                    mime="application/zip", 
+                    type="primary"
+                )
             else:
                 if creditos_actuales >= cantidad_pliegos:
                     if st.button(f"💎 Usar {cantidad_pliegos} Créditos para Desbloquear", use_container_width=True):
@@ -661,7 +680,7 @@ if uploaded_files and len(image_configs) > 0:
                             "back_urls": {"success": "TU_LINK_DE_STREAMLIT_AQUI"},
                             "auto_return": "approved",
                             "external_reference": email_usuario,
-                            "notification_url": "https://hook.us2.make.com/r5og8gzq9xaj9vwbma93aff51ahsx5jb"  # <--- EL TELÉFONO DE TU ROBOT
+                            "notification_url": "https://hook.us2.make.com/r5og8gzq9xaj9vwbma93aff51ahsx5jb"
                         }
                         res_peaje = sdk.preference().create(pref_data_peaje)
                         link_mp_peaje = res_peaje["response"]["init_point"]
