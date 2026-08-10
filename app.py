@@ -580,7 +580,11 @@ if uploaded_files and len(image_configs) > 0:
                 preview_sheet = Image.new("RGBA", (prev_w, prev_h), MUESTRA_BG_COLOR)
                 final_sheet_low = gang_high_res.resize((prev_w, prev_h), Image.Resampling.LANCZOS)
                 preview_sheet.paste(final_sheet_low, (0, 0), final_sheet_low)
+                watermark_file = None
 
+              # 2. Acá seguro tenés tu lógica de Streamlit
+                if st.checkbox("¿Querés sumar una marca de agua?"):
+                watermark_file = st.file_uploader("Subí tu imagen acá")
                 if watermark_file:
                     wm_img = Image.open(watermark_file).convert("RGBA")
                     wm_w = 250
