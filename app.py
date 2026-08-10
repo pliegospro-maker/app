@@ -72,11 +72,14 @@ from streamlit_cropper import st_cropper
 
 # Configuración de página
 st.set_page_config(page_title="Pliegos Pro", page_icon="favicon.png", layout="wide", initial_sidebar_state="expanded")
-# Ocultar menú de Streamlit y pie de página (Versión Segura)
+# Ocultar menú derecho y pie de página sin romper la barra lateral
 ocultar_elementos = """
     <style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
+    /* Oculta los botones y el menú de los 3 puntitos de la derecha */
+    [data-testid="stToolbar"] {visibility: hidden !important;}
+    
+    /* Oculta el texto de 'Made with Streamlit' de abajo de todo */
+    footer {visibility: hidden !important;}
     </style>
 """
 st.markdown(ocultar_elementos, unsafe_allow_html=True)
