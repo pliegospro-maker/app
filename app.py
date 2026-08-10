@@ -71,7 +71,7 @@ import requests
 from streamlit_cropper import st_cropper
 
 # Configuración de página
-st.set_page_config(page_title="Pliegos Pro", page_icon="favicon.png", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="DTF / UV - Creador de Pliegos Pro", layout="wide", initial_sidebar_state="expanded")
 # Ocultar elementos para los clientes (Seguro y definitivo)
 ocultar_elementos = """
     <style>
