@@ -72,20 +72,19 @@ from streamlit_cropper import st_cropper
 
 # Configuración de página
 st.set_page_config(page_title="Pliegos Pro", page_icon="favicon.png", layout="wide", initial_sidebar_state="expanded")
-# Ocultar elementos estéticos de Streamlit de forma quirúrgica
+# Ocultar elementos estéticos de Streamlit de forma quirúrgica (Seguro para Barra Lateral)
 ocultar_elementos = """
     <style>
-    /* Oculta el menú de los 3 puntitos */
-    #MainMenu {visibility: hidden !important;}
+    /* 1. Oculta específicamente el botón de "Manage app" (Deploy) */
+    .stAppDeployButton {display: none !important;}
     
-    /* Oculta el botón de GitHub, el de Manage App y la zona derecha */
-    header [data-testid="stToolbar"] {display: none !important;}
-    header [data-testid="stHeaderActionElements"] {display: none !important;}
+    /* 2. Oculta específicamente el menú de los 3 puntitos */
+    #MainMenu {display: none !important;}
     
-    /* Vuelve transparente el fondo de la barra superior para que quede más limpio */
+    /* 3. Vuelve transparente el fondo de arriba para que se vea limpio */
     header {background-color: transparent !important;}
     
-    /* Oculta la marca de agua de Streamlit del pie de página */
+    /* 4. Oculta la marca de agua del pie de página */
     footer {display: none !important;}
     </style>
 """
