@@ -87,7 +87,6 @@ ocultar_elementos = """
 """
 st.markdown(ocultar_elementos, unsafe_allow_html=True)
 
-
 # Constantes
 DPI_HIGH = 300
 DPI_LOW = 72
