@@ -69,17 +69,21 @@ import datetime
 import zipfile
 import requests
 from streamlit_cropper import st_cropper
-# Ocultar menú de opciones para proteger el código
+# Ocultar elementos estéticos apuntando al botón exacto
 ocultar_elementos = """
     <style>
-    /* Oculta los 3 puntitos de arriba a la derecha para que no vean el código */
-    #MainMenu {visibility: hidden;}
+    /* 1. Oculta exactamente el ícono/botón que encontraste */
+    .stToolbarActionButtonIcon {display: none !important;}
+    [data-testid="stToolbarActionButton"] {display: none !important;}
     
-    /* Oculta la marca de agua de Streamlit de abajo */
-    footer {visibility: hidden;}
+    /* 2. Oculta el menú de los 3 puntitos */
+    #MainMenu {display: none !important;}
     
-    /* Vuelve el fondo de arriba transparente */
-    header {background: transparent !important;}
+    /* 3. Vuelve el fondo de arriba transparente */
+    header {background-color: transparent !important;}
+    
+    /* 4. Oculta la marca de agua del pie de página */
+    footer {display: none !important;}
     </style>
 """
 st.markdown(ocultar_elementos, unsafe_allow_html=True)
