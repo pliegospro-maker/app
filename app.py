@@ -48,17 +48,8 @@ if not st.session_state.usuario_autenticado:
                 try:
                     respuesta_bd = supabase.table("perfiles").select("creditos").eq("email", email_login).execute()
                     
-                    if len(respuesta_bd.data) > 0:
-                        st.session_state.creditos = respuesta_bd.data[0]["creditos"]
-                        st.success(f"Éxito leyendo BD. Créditos: {st.session_state.creditos}") # Chismoso 1
-                    else:
-                        st.session_state.creditos = 0
-                        st.warning("Tu email no aparece en la tabla perfiles.") # Chismoso 2
-                        
-                except Exception as error_db:
-                    st.error(f"El error de lectura es: {error_db}") # Chismoso 3
-                
-                    st.rerun(),  <-- (PONELO CON EL NUMERAL # ADELANTE TEMPORALMENTE PARA QUE NO SE RECARGUE RÁPIDO Y PODAMOS LEER EL CARTEL)
+                   
+                    st.rerun()  <-- (PONELO CON EL NUMERAL # ADELANTE TEMPORALMENTE PARA QUE NO SE RECARGUE RÁPIDO Y PODAMOS LEER EL CARTEL)
 
             except Exception as e:
                 st.error("Email o contraseña incorrectos.")
