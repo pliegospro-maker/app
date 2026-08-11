@@ -27,19 +27,28 @@ if not st.session_state.usuario_autenticado:
         email_login = st.text_input("Tu Email", key="email_login")
         password_login = st.text_input("Tu Contraseña", type="password", key="pass_login")
 
-        if st.button("Ingresar al Software", type="primary"):
+if st.button("Ingresar al Software", type="primary"):
             try:
                 # Inicia sesión directamente
                 respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
                 st.session_state.usuario_autenticado = True
                 st.session_state.email_usuario = email_login
+
+                # === NUEVO: IR A BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
+                # (Reemplazá 'usuarios' por el nombre real de tu tabla, y 'creditos' por tu columna)
+                respuesta_bd = supabase.table("usuarios").select("creditos").eq("email", email_login).execute()
                 
-                # === NUEVO: GUARDAMOS LA HUELLA EN LA URL ===
-                st.query_params["usuario"] = email_login
+                # Si encontró al usuario en la tabla, guarda sus créditos reales en la memoria
+                if len(respuesta_bd.data) > 0:
+                    st.session_state.creditos = respuesta_bd.data[0]["creditos"]
+                else:
+                    st.session_state.creditos = 0
+                # ========================================================
                 
-                st.rerun()
+                st.rerun() # Recarga la página para que se actualice todo
+
             except Exception as e:
-                st.error("❌ Email o contraseña incorrectos.")
+                st.error("Email o contraseña incorrectos.")
 
     with tab_registro:
         st.info("Creá tu cuenta gratis. Podés armar tus pliegos y solo pagás cuando quieras descargarlos en alta calidad.")
