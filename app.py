@@ -47,8 +47,19 @@ if not st.session_state.usuario_autenticado:
                 # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
                 try:
                     respuesta_bd = supabase.table("perfiles").select("creditos").eq("email", email_login).execute()
-                   
-        st.rerun()
+                    
+                    if len(respuesta_bd.data) > 0:
+                        st.session_state.creditos = respuesta_bd.data[0]["creditos"]
+                    else:
+                        st.session_state.creditos = 0
+                        
+                except Exception as error_db:
+                    st.session_state.creditos = 0 
+                
+                st.rerun() 
+
+            except Exception as e:
+                st.error("Email o contraseña incorrectos.")        
             except Exception as e:
                 st.error("Email o contraseña incorrectos.")
        
