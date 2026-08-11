@@ -35,7 +35,7 @@ if not st.session_state.usuario_autenticado:
     tab_login, tab_registro = st.tabs(["Iniciar Sesión", "Crear Cuenta"])
 
     with tab_login:
-        email_login = st.text_input("Tu Email", key="email_login")
+        email_login = st.text_input("Tu Email", key="email_login".strip().lower()
         password_login = st.text_input("Tu Contraseña", type="password", key="pass_login")
         if st.button("Ingresar al Software", type="primary"):
             try:
