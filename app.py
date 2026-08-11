@@ -69,16 +69,16 @@ import datetime
 import zipfile
 import requests
 from streamlit_cropper import st_cropper
-# Ocultar elementos para los clientes
+# Ocultar menú de opciones para proteger el código
 ocultar_elementos = """
     <style>
-    /* Oculta los 3 puntitos de arriba a la derecha */
+    /* Oculta los 3 puntitos de arriba a la derecha para que no vean el código */
     #MainMenu {visibility: hidden;}
     
-    /* Oculta la marca de agua de 'Made with Streamlit' de abajo */
+    /* Oculta la marca de agua de Streamlit de abajo */
     footer {visibility: hidden;}
     
-    /* Vuelve el fondo de arriba transparente para que se vea más limpio */
+    /* Vuelve el fondo de arriba transparente */
     header {background: transparent !important;}
     </style>
 """
