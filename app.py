@@ -38,7 +38,7 @@ if not st.session_state.usuario_autenticado:
         email_login = st.text_input("Tu Email", key="email_login")
         password_login = st.text_input("Tu Contraseña", type="password", key="pass_login")
 
-if st.button("Ingresar al Software", type="primary"):
+        if st.button("Ingresar al Software", type="primary"):
             try:
                 # Inicia sesión directamente
                 respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
