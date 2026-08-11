@@ -15,6 +15,17 @@ if 'usuario_autenticado' not in st.session_state:
 if "usuario" in st.query_params:
     st.session_state.usuario_autenticado = True
     st.session_state.email_usuario = st.query_params["usuario"]
+    
+    # Recuperar los créditos de Supabase al recargar la página
+    if "creditos" not in st.session_state:
+        try:
+            respuesta_bd = supabase.table("usuarios").select("creditos").eq("email", st.session_state.email_usuario).execute()
+            if len(respuesta_bd.data) > 0:
+                st.session_state.creditos = respuesta_bd.data[0]["creditos"]
+            else:
+                st.session_state.creditos = 0
+        except:
+            st.session_state.creditos = 0
 
 # 3. Pantalla de Autenticación (Modelo Freemium)
 if not st.session_state.usuario_autenticado:
@@ -34,16 +45,14 @@ if st.button("Ingresar al Software", type="primary"):
                 st.session_state.usuario_autenticado = True
                 st.session_state.email_usuario = email_login
 
-                # === NUEVO: IR A BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
-                # (Reemplazá 'usuarios' por el nombre real de tu tabla, y 'creditos' por tu columna)
+                # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
                 respuesta_bd = supabase.table("usuarios").select("creditos").eq("email", email_login).execute()
                 
-                # Si encontró al usuario en la tabla, guarda sus créditos reales en la memoria
+                # Si encontró al usuario, guarda sus créditos reales en la memoria
                 if len(respuesta_bd.data) > 0:
                     st.session_state.creditos = respuesta_bd.data[0]["creditos"]
                 else:
                     st.session_state.creditos = 0
-                # ========================================================
                 
                 st.rerun() # Recarga la página para que se actualice todo
 
