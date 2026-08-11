@@ -12,14 +12,14 @@ if 'usuario_autenticado' not in st.session_state:
     st.session_state.usuario_autenticado = False
 
 # === NUEVO: RECUPERAR SESIÓN TRAS APRETAR F5 ===
-if "usuario" in st.query_params:
+if "perfiles" in st.query_params:
     st.session_state.usuario_autenticado = True
     st.session_state.email_usuario = st.query_params["usuario"]
     
     # Recuperar los créditos de Supabase al recargar la página
     if "creditos" not in st.session_state:
         try:
-            respuesta_bd = supabase.table("usuarios").select("creditos").eq("email", st.session_state.email_usuario).execute()
+            respuesta_bd = supabase.table("perfiles").select("creditos").eq("email", st.session_state.email_usuario).execute()
             if len(respuesta_bd.data) > 0:
                 st.session_state.creditos = respuesta_bd.data[0]["creditos"]
             else:
