@@ -12,7 +12,7 @@ if 'usuario_autenticado' not in st.session_state:
     st.session_state.usuario_autenticado = False
 
 # === NUEVO: RECUPERAR SESIÓN TRAS APRETAR F5 ===
-if "perfiles" in st.query_params:
+if "usuario" in st.query_params:
     st.session_state.usuario_autenticado = True
     st.session_state.email_usuario = st.query_params["usuario"]
     
