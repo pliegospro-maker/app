@@ -69,7 +69,20 @@ import datetime
 import zipfile
 import requests
 from streamlit_cropper import st_cropper
-
+# Ocultar elementos para los clientes
+ocultar_elementos = """
+    <style>
+    /* Oculta los 3 puntitos de arriba a la derecha */
+    #MainMenu {visibility: hidden;}
+    
+    /* Oculta la marca de agua de 'Made with Streamlit' de abajo */
+    footer {visibility: hidden;}
+    
+    /* Vuelve el fondo de arriba transparente para que se vea más limpio */
+    header {background: transparent !important;}
+    </style>
+"""
+st.markdown(ocultar_elementos, unsafe_allow_html=True)
 # Configuración de página
 st.set_page_config(page_title="DTF / UV - Creador de Pliegos Pro", page_icon="logo.png", layout="wide", initial_sidebar_state="expanded")
 # Constantes
