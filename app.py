@@ -58,7 +58,7 @@ if not st.session_state.usuario_autenticado:
                 except Exception as error_db:
                     st.error(f"El error de lectura es: {error_db}") # Chismoso 3
                 
-                    st.rerun()  <-- (PONELO CON EL NUMERAL # ADELANTE TEMPORALMENTE PARA QUE NO SE RECARGUE RÁPIDO Y PODAMOS LEER EL CARTEL)
+                    st.rerun(),  <-- (PONELO CON EL NUMERAL # ADELANTE TEMPORALMENTE PARA QUE NO SE RECARGUE RÁPIDO Y PODAMOS LEER EL CARTEL)
 
             except Exception as e:
                 st.error("Email o contraseña incorrectos.")
