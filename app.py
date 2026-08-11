@@ -37,8 +37,7 @@ if not st.session_state.usuario_autenticado:
     with tab_login:
         email_login = st.text_input("Tu Email", key="email_login")
         password_login = st.text_input("Tu Contraseña", type="password", key="pass_login")
-
-        if st.button("Ingresar al Software", type="primary"):
+if st.button("Ingresar al Software", type="primary"):
             try:
                 # Inicia sesión directamente
                 respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
@@ -46,18 +45,24 @@ if not st.session_state.usuario_autenticado:
                 st.session_state.email_usuario = email_login
 
                 # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
-                respuesta_bd = supabase.table("perfiles").select("creditos").eq("email", email_login).execute()
+                try:
+                    respuesta_bd = supabase.table("perfiles").select("creditos").eq("email", email_login).execute()
+                    
+                    if len(respuesta_bd.data) > 0:
+                        st.session_state.creditos = respuesta_bd.data[0]["creditos"]
+                        st.success(f"Éxito leyendo BD. Créditos: {st.session_state.creditos}") # Chismoso 1
+                    else:
+                        st.session_state.creditos = 0
+                        st.warning("Tu email no aparece en la tabla perfiles.") # Chismoso 2
+                        
+                except Exception as error_db:
+                    st.error(f"El error de lectura es: {error_db}") # Chismoso 3
                 
-                # Si encontró al usuario, guarda sus créditos reales en la memoria
-                if len(respuesta_bd.data) > 0:
-                    st.session_state.creditos = respuesta_bd.data[0]["creditos"]
-                else:
-                    st.session_state.creditos = 0
-                
-                st.rerun() # Recarga la página para que se actualice todo
+                # st.rerun()  <-- (PONELO CON EL NUMERAL # ADELANTE TEMPORALMENTE PARA QUE NO SE RECARGUE RÁPIDO Y PODAMOS LEER EL CARTEL)
 
             except Exception as e:
                 st.error("Email o contraseña incorrectos.")
+       
 
     with tab_registro:
         st.info("Creá tu cuenta gratis. Podés armar tus pliegos y solo pagás cuando quieras descargarlos en alta calidad.")
