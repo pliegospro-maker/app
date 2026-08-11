@@ -84,7 +84,7 @@ ocultar_elementos = """
 """
 st.markdown(ocultar_elementos, unsafe_allow_html=True)
 # Configuración de página
-st.set_page_config(page_title="DTF / UV - Creador de Pliegos Pro", page_icon="logo.png", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="DTF / UV - Creador de Pliegos Pro", page_icon="favicon.png", layout="wide", initial_sidebar_state="expanded")
 # Constantes
 DPI_HIGH = 300
 DPI_LOW = 72
