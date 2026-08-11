@@ -46,7 +46,7 @@ if not st.session_state.usuario_autenticado:
                 st.session_state.email_usuario = email_login
 
                 # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
-                respuesta_bd = supabase.table("usuarios").select("creditos").eq("email", email_login).execute()
+                respuesta_bd = supabase.table("perfiles").select("creditos").eq("email", email_login).execute()
                 
                 # Si encontró al usuario, guarda sus créditos reales en la memoria
                 if len(respuesta_bd.data) > 0:
