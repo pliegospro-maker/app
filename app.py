@@ -323,26 +323,7 @@ try:
         res_billetera = sdk.preference().create(pref_data_billetera)
         link_mp_billetera = res_billetera["response"]["init_point"]
         
-        # Armamos el botón HTML inyectando tu variable link_mp_billetera
-        boton_pago = f"""
-        <a href="{link_mp_billetera}" target="_blank" style="text-decoration: none;">
-            <button style="
-                background-color: #004D4D; 
-                border: 1px solid #00FFFF; 
-                box-shadow: 0 0 8px rgba(0, 255, 255, 0.4); 
-                color: white; 
-                border-radius: 8px; 
-                padding: 10px 15px; 
-                cursor: pointer; 
-                width: 100%;
-                font-weight: bold;
-                transition: 0.3s;">
-                👉 Recargar 1 Crédito ($5.000)
-            </button>
-        </a>
-        """
-        # Mostramos el botón en Streamlit
-        st.markdown(boton_pago, unsafe_allow_html=True)
+     
 
 except Exception as e:
         st.error("Error al conectar con Mercado Pago.")
