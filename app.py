@@ -280,7 +280,7 @@ col_izq, col_der = st.columns([3, 1])
 with col_izq:
     # Aquí cargas tu banner actual
     # Asegúrate de poner el nombre correcto de tu archivo de imagen
-    st.image("bannerweb.png", use_container_width=True)
+    st.image("bannerweb.png", width="stretch")
 
 with col_der:
    with col_der:
