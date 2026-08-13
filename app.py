@@ -525,7 +525,8 @@ with col2:
                 
                 # --- SOLUCIÓN: Le ponemos el fondo de color elegido y achicamos la imagen ---
                 # Usamos tu función get_preview_with_bg para que el fondo no sea transparente y haga contraste
-                bg_for_canvas = get_preview_with_bg(img, selected_bg_hex).resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
+                # --- SOLUCIÓN: Forzamos el modo RGB para que el lienzo de Streamlit no bloquee la imagen ---
+                bg_for_canvas = get_preview_with_bg(img, selected_bg_hex).convert("RGB").resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
                 
                 # Lienzo interactivo para dibujar
                 canvas_result = st_canvas(
