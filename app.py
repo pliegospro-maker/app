@@ -280,16 +280,30 @@ with col_izq:
     st.image("bannerweb.png", use_container_width=True)
 
 with col_der:
-    # Este es el panel derecho tipo tarjeta
+   with col_der:
     st.markdown("### 👋 Bienvenido/a")
-    st.markdown(f"**{email_usuario}**")
+    st.markdown("**paqueteimpresiones@gmail.com**") 
     st.markdown("💳 **Tus Créditos:** 498")
     
-    # Botón principal que tomará el efecto "Glow" del CSS
-    st.button(
-        "👉 Recargar 1 Crédito ($5.000)", 
-        "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=384518284-e8745b6a-0301-4ba4-9e10-e2e6d99a3d2a",
-        type="primary"
+    # Botón HTML 100% funcional con estilos en línea
+    boton_pago = """
+    <a href="https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=384518284-e8745b6a-0301-4ba4-9e10-e2e6d99a3d2a" target="_blank" style="text-decoration: none;">
+        <button style="
+            background-color: #004D4D; 
+            border: 1px solid #00FFFF; 
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.4); 
+            color: white; 
+            border-radius: 8px; 
+            padding: 10px 15px; 
+            cursor: pointer; 
+            width: 100%;
+            font-weight: bold;
+            transition: 0.3s;">
+            👉 Recargar 1 Crédito ($5.000)
+        </button>
+    </a>
+    """
+    st.markdown(boton_pago, unsafe_allow_html=True)
     )
 
 # --- A partir de aquí sigue el resto de tu código normal (1. Configuración, 2. Cargar, etc.) ---
