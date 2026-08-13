@@ -558,10 +558,12 @@ with col2:
 # --- ACTUALIZAR VISOR EN VIVO ---
 if len(image_configs) > 0:
     live_packer = newPacker(mode=PackingMode.Offline, bin_algo=PackingBin.BFF, rotation=allow_rotation)
-    live_packer.add_bin(usable_sheet_w_px, usable_sheet_h_px, count=1)
+    # 1. AUMENTAMOS EL COUNT a 20 para que el algoritmo arme todos los pliegos necesarios
+    live_packer.add_bin(usable_sheet_w_px, usable_sheet_h_px, count=20) 
     
     rect_id = 0
     rect_map_live = {}
+    
     for config in image_configs:
         for _ in range(config["qty"]):
             req_w = config["w_px"] + margin_px
@@ -573,56 +575,78 @@ if len(image_configs) > 0:
     live_packer.pack()
     all_live_rects = live_packer.rect_list()
     
-    preview_scale = 0.1 
+    # 2. AGRUPAMOS LOS RESULTADOS POR PLIEGO (bin_id)
+    bins_live = {}
+    for rect in all_live_rects:
+        b_id = rect[0]
+        if b_id not in bins_live:
+            bins_live[b_id] = []
+        bins_live[b_id].append(rect)
+        
+    preview_scale = 0.1
     mini_w = int(gang_width_px * preview_scale)
     mini_h = int(gang_height_px * preview_scale)
     
-    minimap = Image.new("RGBA", (mini_w, mini_h), (240, 240, 240, 255))
-    draw = ImageDraw.Draw(minimap)
+    # 3. GENERAMOS UNA LISTA DE IMÁGENES (UNA POR CADA PLIEGO)
+    minimapas = []
     
-    if use_edge_margins:
-        safe_x0, safe_y0 = int(edge_margin_px * preview_scale), int(edge_margin_px * preview_scale)
-        safe_x1, safe_y1 = mini_w - safe_x0, mini_h - safe_y0
-        draw.rectangle([safe_x0, safe_y0, safe_x1, safe_y1], outline=(200, 200, 200, 255), width=1)
-    
-    area_usada = 0
-    for rect in all_live_rects:
-        b, x, y, w, h, rid = rect
-        conf = rect_map_live[rid]
-        area_usada += (w * h)
+    for bin_id in sorted(bins_live.keys()):
+        minimap = Image.new("RGBA", (mini_w, mini_h), (240, 240, 240, 255))
+        draw = ImageDraw.Draw(minimap)
         
-        req_w_margin = conf["w_px"] + margin_px
-        req_h_margin = conf["h_px"] + margin_px
-        is_rotated = False
-        if w == req_h_margin and h == req_w_margin and w != h:
-            is_rotated = True
-        
-        px0 = int((x + edge_margin_px) * preview_scale)
-        py0 = int((gang_height_px - (y + h) - edge_margin_px) * preview_scale)
-        pw = int(w * preview_scale)
-        ph = int(h * preview_scale)
-        
-        if pw > 0 and ph > 0:
-            thumb_w = int(conf["w_px"] * preview_scale)
-            thumb_h = int(conf["h_px"] * preview_scale)
-            if thumb_w > 0 and thumb_h > 0:
-                thumb = conf["image"].resize((thumb_w, thumb_h), Image.Resampling.LANCZOS)
-                if thumb.mode != 'RGBA':
-                    thumb = thumb.convert('RGBA')
+        if use_edge_margins:
+            safe_x0, safe_y0 = int(edge_margin_px * preview_scale), int(edge_margin_px * preview_scale)
+            safe_x1, safe_y1 = mini_w - safe_x0, mini_h - safe_y0
+            draw.rectangle([safe_x0, safe_y0, safe_x1, safe_y1], outline=(200, 200, 200, 255), width=1)
+            
+        for rect in bins_live[bin_id]:
+            b, x, y, w, h, rid = rect
+            conf = rect_map_live[rid]
+            req_w_margin = conf["w_px"] + margin_px
+            req_h_margin = conf["h_px"] + margin_px
+            is_rotated = False
+            if w == req_h_margin and h == req_w_margin and w != h:
+                is_rotated = True
                 
-                if is_rotated:
-                    thumb = thumb.rotate(90, expand=True)
-                
-                minimap.paste(thumb, (px0, py0), thumb)
-                draw.rectangle([px0, py0, px0 + pw, py0 + ph], outline=(50, 100, 200, 100), width=1)
-        
-    sidebar_visor.image(minimap, use_container_width=True)
-    
-    area_total = usable_sheet_w_px * usable_sheet_h_px
+            px0 = int((x + edge_margin_px) * preview_scale)
+            py0 = int((gang_height_px - (y + h) - edge_margin_px) * preview_scale)
+            pw = int(w * preview_scale)
+            ph = int(h * preview_scale)
+            
+            if pw > 0 and ph > 0:
+                thumb_w = int(conf["w_px"] * preview_scale)
+                thumb_h = int(conf["h_px"] * preview_scale)
+                if thumb_w > 0 and thumb_h > 0:
+                    thumb = conf["image"].resize((thumb_w, thumb_h), Image.Resampling.LANCZOS)
+                    if thumb.mode != 'RGBA':
+                        thumb = thumb.convert('RGBA')
+                    if is_rotated:
+                        thumb = thumb.rotate(90, expand=True)
+                    minimap.paste(thumb, (px0, py0), thumb)
+                    draw.rectangle([px0, py0, px0 + pw, py0 + ph], outline=(50, 100, 200, 100), width=1)
+                    
+        minimapas.append(minimap)
+
+    # 4. MOSTRAMOS LAS IMÁGENES EN PESTAÑAS DENTRO DEL SIDEBAR
+    with sidebar_visor.container():
+        if len(minimapas) > 1:
+            # Creamos los nombres dinámicos de las pestañas
+            tabs_preview = st.tabs([f"Pliego {i+1}" for i in range(len(minimapas))])
+            for i, tab in enumerate(tabs_preview):
+                with tab:
+                    st.image(minimapas[i], use_container_width=True)
+        elif len(minimapas) == 1:
+            # Si es un solo pliego, no ponemos pestañas
+            st.image(minimapas[0], use_container_width=True)
+
+    # 5. ACTUALIZAMOS LOS MENSAJES DE ESTADÍSTICAS
     if len(all_live_rects) < rect_id:
-        sidebar_stats.error(f"¡Rebasaste al Pliego 2! {rect_id - len(all_live_rects)} ítems fuera.")
+        sidebar_stats.error(f"¡Rebasaste! {rect_id - len(all_live_rects)} ítems fuera (máx. 20 pliegos).")
     else:
-        sidebar_stats.success(f"Espacio usado: {(area_usada / area_total) * 100:.1f}%")
+        if len(minimapas) > 1:
+            sidebar_stats.warning(f"⚠️ Estás utilizando {len(minimapas)} pliegos.")
+        else:
+            sidebar_stats.success(f"Todo entra en 1 solo pliego.")
 
 # 6. Generador Final
 if uploaded_files and len(image_configs) > 0:
