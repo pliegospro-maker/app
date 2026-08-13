@@ -37,6 +37,14 @@ estilos = """
         border-color: #00FFFF !important;
         box-shadow: 0 0 5px rgba(0, 255, 255, 0.3) !important;
     }
+    /* Estilo para los recuadros de las columnas (Tarjetas flotantes) */
+    [data-testid="column"] {
+        background-color: #131D26 !important; /* Fondo sutilmente más claro que el fondo general */
+        border: 1px solid #1E2D3D !important; /* Borde sutil oscuro */
+        border-radius: 12px !important; /* Bordes redondeados */
+        padding: 20px !important; /* Espacio interno para que no quede pegado al borde */
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important; /* Sombra suave para dar profundidad */
+    }
 </style>
 """
 st.markdown(estilos, unsafe_allow_html=True)
