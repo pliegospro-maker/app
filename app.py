@@ -278,7 +278,11 @@ with col_der:
     st.markdown("💳 **Tus Créditos:** 498")
     
     # Botón principal que tomará el efecto "Glow" del CSS
-    st.button("👉 Recargar 1 Crédito ($5.000)", type="primary")
+    st.button(
+        "👉 Recargar 1 Crédito ($5.000)", 
+        "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=384518284-e8745b6a-0301-4ba4-9e10-e2e6d99a3d2a",
+        type="primary"
+    )
 
 # --- A partir de aquí sigue el resto de tu código normal (1. Configuración, 2. Cargar, etc.) ---
 st.divider() # Una línea sutil para separar el header del contenido
