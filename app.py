@@ -510,7 +510,6 @@ with col2:
                         st.session_state.last_action_msg = f"✂️ Recorte manual aplicado en {file.name}."
                         st.rerun()
                 
-                st.markdown("---")
                st.markdown("---")
 
             # --- NUEVO: BORRADOR MANUAL CON PINCEL ---
