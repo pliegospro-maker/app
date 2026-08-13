@@ -523,20 +523,21 @@ with col2:
                 canvas_width = 400
                 canvas_height = int(canvas_width * (orig_h / orig_w)) if orig_w > 0 else 400
                 
-                # --- SOLUCIÓN: Achicamos la imagen de fondo solo para el visor del canvas ---
-                bg_for_canvas = img.convert("RGBA").resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
+                # --- SOLUCIÓN: Le ponemos el fondo de color elegido y achicamos la imagen ---
+                # Usamos tu función get_preview_with_bg para que el fondo no sea transparente y haga contraste
+                bg_for_canvas = get_preview_with_bg(img, selected_bg_hex).resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
                 
                 # Lienzo interactivo para dibujar
                 canvas_result = st_canvas(
                     fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=bg_for_canvas,  # <--- Usamos la miniatura liviana
+                    background_image=bg_for_canvas,
                     update_streamlit=False,
                     height=canvas_height,
                     width=canvas_width,
                     drawing_mode="freedraw",
-                    key=f"canvas_{file.name}",
+                    key=f"canvas_pincel_{file.name}",  # <--- CAMBIAMOS LA KEY PARA BORRAR EL CACHÉ TRABADO
                 ) 
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{file.name}", type="primary"):
