@@ -597,7 +597,7 @@ with col2:
                             st.session_state.last_action_msg = f"🌓 Tono eliminado (y Umbral aplicado) en {file.name}."
                             st.rerun()
 
-                image_configs.append({
+            image_configs.append({
                     "file": file, "image": img, "qty": qty,
                     "w_px": cm_to_px(new_w_cm), "h_px": cm_to_px(new_h_cm)
                 })
