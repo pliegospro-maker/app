@@ -145,7 +145,7 @@ ocultar_elementos = """
     #MainMenu {display: none !important;}
     
     /* 3. Vuelve el fondo de arriba transparente */
-    header {background-color: transparent !important;}
+   # header {background-color: transparent !important;}
     
     /* 4. Oculta la marca de agua del pie de página */
     footer {display: none !important;}
@@ -274,7 +274,7 @@ with col_izq:
 with col_der:
     # Este es el panel derecho tipo tarjeta
     st.markdown("### 👋 Bienvenido/a")
-    st.markdown("**usuario@correo.com**")
+    st.markdown("email_usuario")
     st.markdown("💳 **Tus Créditos:** 498")
     
     # Botón principal que tomará el efecto "Glow" del CSS
