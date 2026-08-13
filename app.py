@@ -297,7 +297,7 @@ try:
         res_billetera = sdk.preference().create(pref_data_billetera)
         link_mp_billetera = res_billetera["response"]["init_point"]
         st.markdown(f"[👉 Recargar 1 Crédito ($5.000)]({link_mp_billetera})")
-    except Exception as e:
+except Exception as e:
         st.error("Error al conectar con Mercado Pago.")
 # ---------------------------
 
