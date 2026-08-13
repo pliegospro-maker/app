@@ -142,6 +142,9 @@ import datetime
 import zipfile
 import requests
 from streamlit_cropper import st_cropper
+import numpy as np
+from streamlit_drawable_canvas import st_canvas
+
 # Ocultar elementos estéticos apuntando al botón exacto
 ocultar_elementos = """
     <style>
@@ -508,6 +511,54 @@ with col2:
                         st.rerun()
                 
                 st.markdown("---")
+                # --- NUEVO: BORRADOR MANUAL CON PINCEL ---
+    st.markdown("**Borrador Manual (Pincel)**")
+    if st.checkbox("🖌️ Activar Borrador Manual", key=f"erase_check_{file.name}"):
+        st.info("Dibuja con el pincel rojo sobre las áreas que quieres borrar. Luego presiona Aplicar.")
+
+        # Grosor del pincel
+        brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{file.name}")
+
+        # Ajustamos el tamaño del canvas para que sea cómodo dibujar en la pantalla
+        canvas_width = 400
+        canvas_height = int(canvas_width * (orig_h / orig_w)) if orig_w > 0 else 400
+
+        # Lienzo interactivo para dibujar
+        canvas_result = st_canvas(
+            fill_color="rgba(255, 255, 255, 0.0)",  # Fondo transparente
+            stroke_width=brush_size,
+            stroke_color="rgba(255, 0, 0, 1.0)", # Pincel rojo para ver claramente qué borramos
+            background_image=img.convert("RGBA"),
+            update_streamlit=False,
+            height=canvas_height,
+            width=canvas_width,
+            drawing_mode="freedraw",
+            key=f"canvas_{file.name}",
+        )
+
+        if st.button("✅ Aplicar Borrado", key=f"apply_erase_{file.name}", type="primary"):
+            if canvas_result.image_data is not None:
+                # El canvas devuelve una matriz. Extraemos lo dibujado.
+                drawn_mask = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
+                # La redimensionamos al tamaño real y gigante de tu imagen original
+                drawn_mask = drawn_mask.resize(img.size, Image.Resampling.NEAREST)
+
+                # Convertimos ambas a arrays de datos matemáticos
+                img_array = np.array(img.convert("RGBA"))
+                mask_array = np.array(drawn_mask)
+
+                # LA MAGIA: Donde el usuario pintó de rojo, volvemos el pixel original totalmente transparente [0, 0, 0, 0]
+                img_array[mask_array[:, :, 3] > 0] = [0, 0, 0, 0]
+
+                new_img = Image.fromarray(img_array, "RGBA")
+                st.session_state.image_history[file.name].append(new_img)
+                st.session_state.last_action_msg = f"🖌️ Borrado manual aplicado en {file.name}."
+                st.rerun()
+            else:
+                st.warning("No dibujaste nada.")
+                
+    st.markdown("---")
+    # ----------------------------------------
                 st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
                 remove_type = st.radio("Método de borrado:", ["Gotero (Color Exacto)", "Barra (Luminosidad)"], key=f"rm_type_{file.name}", horizontal=True)
 
