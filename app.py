@@ -479,7 +479,7 @@ with col2:
                         st.session_state.image_history[file.name].append(new_img)
                         st.session_state.last_action_msg = f"🌑 Asfixia aplicada correctamente a {file.name}."
                         st.rerun()
-                    if st.button("⬛ Umbral", key=f"thresh_{file.name}"):
+                    if st.button("⬛ Rellenar Semitransparencias (Umbral)", key=f"thresh_{file.name}"):
                         new_img = apply_alpha_threshold(img)
                         st.session_state.image_history[file.name].append(new_img)
                         st.session_state.last_action_msg = f"⬛ Umbral aplicado correctamente a {file.name}."
