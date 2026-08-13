@@ -555,7 +555,7 @@ with col2:
             st.markdown("---")
             # ----------------------------------------
             
-st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
+            st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
             remove_type = st.radio("Método de borrado:", ["Gotero (Color Exacto)", "Barra (Luminosidad)"], key=f"rm_type_{file.name}", horizontal=True)
             
             if remove_type == "Gotero (Color Exacto)":           
