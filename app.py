@@ -519,22 +519,25 @@ with col2:
                 # Grosor del pincel
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{file.name}")
                 
-                # Ajustamos el tamaño del canvas para que sea cómodo dibujar en la pantalla
+               # Ajustamos el tamaño del canvas para que sea cómodo dibujar en la pantalla
                 canvas_width = 400
                 canvas_height = int(canvas_width * (orig_h / orig_w)) if orig_w > 0 else 400
+                
+                # --- SOLUCIÓN: Achicamos la imagen de fondo solo para el visor del canvas ---
+                bg_for_canvas = img.convert("RGBA").resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
                 
                 # Lienzo interactivo para dibujar
                 canvas_result = st_canvas(
                     fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=img.convert("RGBA"),
+                    background_image=bg_for_canvas,  # <--- Usamos la miniatura liviana
                     update_streamlit=False,
                     height=canvas_height,
                     width=canvas_width,
                     drawing_mode="freedraw",
                     key=f"canvas_{file.name}",
-                )
+                ) 
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{file.name}", type="primary"):
                     if canvas_result.image_data is not None:
