@@ -111,7 +111,7 @@ ocultar_elementos = """
 """
 st.markdown(ocultar_elementos, unsafe_allow_html=True)
 # Configuración de página
-st.set_page_config(page_title="DTF / UV - Creador de Pliegos Pro", page_icon="favicon.png", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Pliegos Pro", page_icon="favicon.png", layout="wide", initial_sidebar_state="expanded")
 # Constantes
 DPI_HIGH = 300
 DPI_LOW = 72
@@ -222,7 +222,7 @@ else:
 
 col_titulo, col_billetera = st.columns([3, 1])
 with col_titulo:
-    st.title("🖨️ Generador Automático de Pliegos Pro")
+    st.image("bannerweb.png", use_container_width=True)
     st.markdown("TU SOLUCIÓN PROFESIONAL A LA PREPARACIÓN DE PLIEGOS")
 with col_billetera:
     st.markdown(f"👋 Bienvenido/a, **{st.session_state.email_usuario}**")
