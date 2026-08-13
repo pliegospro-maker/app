@@ -274,7 +274,7 @@ with col_izq:
 with col_der:
     # Este es el panel derecho tipo tarjeta
     st.markdown("### 👋 Bienvenido/a")
-    st.markdown("email_usuario")
+    st.markdown(f"**{email_usuario}**")
     st.markdown("💳 **Tus Créditos:** 498")
     
     # Botón principal que tomará el efecto "Glow" del CSS
