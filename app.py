@@ -509,7 +509,7 @@ with col2:
                         st.session_state.image_history[file.name].append(cropped_img)
                         st.session_state.last_action_msg = f"✂️ Recorte manual aplicado en {file.name}."
                         st.rerun()
-                
+st.markdown("---")
 
             # --- NUEVO: BORRADOR MANUAL CON PINCEL ---
             st.markdown("**Borrador Manual (Pincel)**")
@@ -557,9 +557,6 @@ with col2:
             
             st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
             remove_type = st.radio("Método de borrado:", ["Gotero (Color Exacto)", "Barra (Luminosidad)"], key=f"rm_type_{file.name}", horizontal=True)
-   
-                st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
-                remove_type = st.radio("Método de borrado:", ["Gotero (Color Exacto)", "Barra (Luminosidad)"], key=f"rm_type_{file.name}", horizontal=True)
 
                 if remove_type == "Gotero (Color Exacto)":
                     cc1, cc2 = st.columns(2)
