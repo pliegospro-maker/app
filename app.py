@@ -552,7 +552,7 @@ with col2:
                     else:
                         st.warning("No dibujaste nada.")
                         
-            st.markdown("---")
+                 st.markdown("---")
             # ----------------------------------------
             
             st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
