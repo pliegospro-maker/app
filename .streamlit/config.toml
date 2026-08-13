@@ -1,0 +1,18 @@
+[theme]
+# Cambia el tema base a oscuro
+base = "dark"
+
+# El color principal de tu marca (el dorado de "PliegosPro")
+primaryColor = "#E5B869"
+
+# El color de fondo general de la aplicación (el azul/gris muy oscuro)
+backgroundColor = "#0A1118"
+
+# El color de fondo para los recuadros y paneles
+secondaryBackgroundColor = "#131D26"
+
+# El color del texto principal
+textColor = "#E0E0E0"
+
+# La tipografía
+font = "sans serif"
