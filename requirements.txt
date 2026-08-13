@@ -1,4 +1,4 @@
-streamlit==1.33.0
+streamlit==1.36.0
 rectpack
 requests
 streamlit-cropper
