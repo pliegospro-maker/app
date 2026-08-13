@@ -284,7 +284,7 @@ with col_der:
 st.divider() # Una línea sutil para separar el header del contenido
     
 # Generamos un link automático para 1 crédito
-     try:
+try:
         sdk = mercadopago.SDK(st.secrets["MP_ACCESS_TOKEN"])
         pref_data_billetera = {
             "items": [{"title": "1 Crédito PliegosPro", "quantity": 1, "unit_price": 10.0, "currency_id": "ARS"}],
