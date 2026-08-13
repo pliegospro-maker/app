@@ -5,7 +5,7 @@ import streamlit as st
 estilos = """
 <style>
     /* Ocultar el header superior y el footer de Streamlit para que se vea más como una web app y menos como un script */
-    header {visibility: hidden;}
+    #header {visibility: hidden;}
     footer {visibility: hidden;}
 
     /* Estilos para los botones principales (Efecto Glow Cyan) */
