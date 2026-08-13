@@ -5,3 +5,5 @@ requests
 streamlit-cropper
 supabase
 mercadopago
+streamlit-drawable-canvas
+numpy
