@@ -450,7 +450,7 @@ with col2:
                     
                     if effective_dpi < 150:
                         st.warning(f"⚠️ Calidad baja: {int(effective_dpi)} DPI.")
-                        if st.button("🪄 Upscale IA", key=f"up_{file.name}"):
+                        if st.button("🪄 Mejorar Imagen ACÁ", key=f"up_{file.name}"):
                             with st.spinner("Mejorando resolución..."):
                                 new_size = (orig_w * 2, orig_h * 2)
                                 upscaled = img.resize(new_size, Image.Resampling.LANCZOS)
