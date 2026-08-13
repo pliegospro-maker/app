@@ -304,7 +304,7 @@ with col_der:
     </a>
     """
     st.markdown(boton_pago, unsafe_allow_html=True)
-    )
+    
 
 # --- A partir de aquí sigue el resto de tu código normal (1. Configuración, 2. Cargar, etc.) ---
 st.divider() # Una línea sutil para separar el header del contenido
