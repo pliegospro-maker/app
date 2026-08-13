@@ -577,7 +577,7 @@ with col2:
                             st.session_state.image_history[file.name].append(final_img)
                             st.session_state.last_action_msg = f"💧 Color eliminado (y Umbral aplicado) en {file.name}."
                             st.rerun()
-                else:
+            else:
                     cc1, cc2 = st.columns(2)
                     with cc1:
                         lum_val = st.slider("Tono (0=Negro, 255=Blanco)", 0, 255, 0, key=f"lum_{file.name}")
