@@ -269,7 +269,7 @@ col_izq, col_der = st.columns([3, 1])
 with col_izq:
     # Aquí cargas tu banner actual
     # Asegúrate de poner el nombre correcto de tu archivo de imagen
-    st.image("bannerweb.png", use_column_width=True)
+    st.image("bannerweb.png", use_container_width=True)
 
 with col_der:
     # Este es el panel derecho tipo tarjeta
