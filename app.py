@@ -1,4 +1,46 @@
 import streamlit as st
+import streamlit as st
+
+# --- INYECCIÓN DE CSS PERSONALIZADO ---
+estilos = """
+<style>
+    /* Ocultar el header superior y el footer de Streamlit para que se vea más como una web app y menos como un script */
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+
+    /* Estilos para los botones principales (Efecto Glow Cyan) */
+    button[kind="primary"] {
+        background-color: #004D4D !important; /* Cyan oscuro */
+        border: 1px solid #00FFFF !important; /* Borde brillante */
+        box-shadow: 0 0 8px rgba(0, 255, 255, 0.4) !important; /* Resplandor */
+        color: white !important;
+        border-radius: 8px !important;
+        transition: all 0.3s ease;
+    }
+    
+    /* Efecto al pasar el mouse por el botón */
+    button[kind="primary"]:hover {
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.7) !important;
+        transform: scale(1.02);
+    }
+
+    /* Estilos para las cajas de input y selectores para que se fundan con el fondo */
+    .stTextInput > div > div > input, .stSelectbox > div > div > div {
+        background-color: #0A1118 !important;
+        border: 1px solid #3A506B !important;
+        color: white !important;
+        border-radius: 6px !important;
+    }
+    
+    /* Pequeño glow al hacer foco en un input */
+    .stTextInput > div > div > input:focus, .stSelectbox > div > div > div:focus {
+        border-color: #00FFFF !important;
+        box-shadow: 0 0 5px rgba(0, 255, 255, 0.3) !important;
+    }
+</style>
+"""
+st.markdown(estilos, unsafe_allow_html=True)
+# --- FIN DE INYECCIÓN CSS ---
 import mercadopago
 from supabase import create_client, Client
 
@@ -221,12 +263,25 @@ else:
     creditos_actuales = 0
 
 col_titulo, col_billetera = st.columns([3, 1])
-with col_titulo:
-    st.image("bannerweb.png", use_container_width=True)
-    st.markdown("TU SOLUCIÓN PROFESIONAL A LA PREPARACIÓN DE PLIEGOS")
-with col_billetera:
-    st.markdown(f"👋 Bienvenido/a, **{st.session_state.email_usuario}**")
-    st.info(f"💳 **Tus Créditos: {creditos_actuales}**")
+# Crear dos columnas: la izquierda más grande (ratio 3) y la derecha más chica (ratio 1)
+col_izq, col_der = st.columns([3, 1])
+
+with col_izq:
+    # Aquí cargas tu banner actual
+    # Asegúrate de poner el nombre correcto de tu archivo de imagen
+    st.image("bannerweb.png", use_column_width=True)
+
+with col_der:
+    # Este es el panel derecho tipo tarjeta
+    st.markdown("### 👋 Bienvenido/a")
+    st.markdown("**usuario@correo.com**")
+    st.markdown("💳 **Tus Créditos:** 498")
+    
+    # Botón principal que tomará el efecto "Glow" del CSS
+    st.button("👉 Recargar 1 Crédito ($5.000)", type="primary")
+
+# --- A partir de aquí sigue el resto de tu código normal (1. Configuración, 2. Cargar, etc.) ---
+st.divider() # Una línea sutil para separar el header del contenido
     
 # Generamos un link automático para 1 crédito
     try:
