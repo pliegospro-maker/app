@@ -396,7 +396,7 @@ with col2:
             with b_col3: bulk_qty = st.number_input("Cantidad c/u", min_value=1, value=1, step=1, key="bulk_qty")
             with b_col4:
                 st.markdown("<br>", unsafe_allow_html=True)
-                if st.button("✅ Aplicar a Todas", type="primary", use_container_width=True):
+                if st.button("✅ Aplicar a Todas", type="primary", use_column_width=True):
                     for file in uploaded_files:
                         if file.name in st.session_state.deleted_images: continue
                         st.session_state[f"qty_{file.name}"] = bulk_qty
@@ -581,7 +581,7 @@ with col2:
                         st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_column_width=True)
                     with prev_col2:
                         st.markdown("<br><br>", unsafe_allow_html=True)
-                        if st.button("✅ Aplicar a la imagen", key=f"apply_c_{file.name}", type="primary", use_container_width=True):
+                        if st.button("✅ Aplicar a la imagen", key=f"apply_c_{file.name}", type="primary", use_column_width=True):
                             final_img = apply_alpha_threshold(preview_img)
                             st.session_state.image_history[file.name].append(final_img)
                             st.session_state.last_action_msg = f"💧 Color eliminado (y Umbral aplicado) en {file.name}."
@@ -600,7 +600,7 @@ with col2:
                         st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_column_width=True)
                     with prev_col2:
                         st.markdown("<br><br>", unsafe_allow_html=True)
-                        if st.button("✅ Aplicar a la imagen", key=f"apply_l_{file.name}", type="primary", use_container_width=True):
+                        if st.button("✅ Aplicar a la imagen", key=f"apply_l_{file.name}", type="primary", use_column_width=True):
                             final_img = apply_alpha_threshold(preview_img)
                             st.session_state.image_history[file.name].append(final_img)
                             st.session_state.last_action_msg = f"🌓 Tono eliminado (y Umbral aplicado) en {file.name}."
@@ -716,7 +716,7 @@ if uploaded_files and len(image_configs) > 0:
         st.session_state.proceso_iniciado = False
         
     # 2. El botón ahora solo enciende la memoria
-    if st.button("🚀 Generar Archivos Finales", type="primary", use_container_width=True):
+    if st.button("🚀 Generar Archivos Finales", type="primary", use_column_width=True):
         st.session_state.proceso_iniciado = True
         
     # 3. Todo tu código pasa a depender de la memoria
@@ -868,7 +868,7 @@ if uploaded_files and len(image_configs) > 0:
                 )
             else:
                 if creditos_actuales >= cantidad_pliegos:
-                    if st.button(f"💎 Usar {cantidad_pliegos} Créditos para Desbloquear", use_container_width=True):
+                    if st.button(f"💎 Usar {cantidad_pliegos} Créditos para Desbloquear", use_column_width=True):
                         # Restamos los créditos en Supabase
                         nuevos_creditos = creditos_actuales - cantidad_pliegos
                         supabase.table("perfiles").update({"creditos": nuevos_creditos}).eq("email", email_usuario).execute()
