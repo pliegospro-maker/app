@@ -525,7 +525,7 @@ with col2:
                 
                 # --- SOLUCIÓN: Fondo blanco forzado para que la transparencia no se vuelva negra ---
                 img_rgba = img.convert("RGBA")
-                fondo_blanco = Image.new("RGBA", img_rgba.size, (255, 255, 255, 255)) # Lienzo blanco
+                fondo_blanco = Image.new("RGBA", img_rgba.size, (255, 255, 255, 255)) # Lienzo 100% blanco
                 fondo_blanco.paste(img_rgba, (0, 0), img_rgba) # Pegamos tu imagen encima
                 
                 # Convertimos a RGB el resultado combinado para que Streamlit lo acepte
