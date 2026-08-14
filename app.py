@@ -80,7 +80,7 @@ if "usuario" in st.query_params:
 
 # 3. Pantalla de Autenticación (Modelo Freemium)
 if not st.session_state.usuario_autenticado:
-    st.title("🔐 Acceso a PliegoPro")
+    st.title("🔐 Acceso a PliegosPro")
     st.write("Iniciá sesión o creá tu cuenta gratis para probar el software.")
 
     tab_login, tab_registro = st.tabs(["Iniciar Sesión", "Crear Cuenta"])
