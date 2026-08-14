@@ -523,12 +523,12 @@ with col2:
                 canvas_width = 400
                 canvas_height = int(canvas_width * (orig_h / orig_w)) if orig_w > 0 else 400
                 
-                # --- SOLUCIÓN: Fondo blanco forzado para que la transparencia no se vuelva negra ---
+                # --- SOLUCIÓN: Fondo blanco forzado ---
                 img_rgba = img.convert("RGBA")
-                fondo_blanco = Image.new("RGBA", img_rgba.size, (255, 255, 255, 255)) # Lienzo 100% blanco
-                fondo_blanco.paste(img_rgba, (0, 0), img_rgba) # Pegamos tu imagen encima
+                fondo_blanco = Image.new("RGBA", img_rgba.size, (255, 255, 255, 255))
+                fondo_blanco.paste(img_rgba, (0, 0), img_rgba) 
                 
-                # Convertimos a RGB el resultado combinado para que Streamlit lo acepte
+                # Convertimos a RGB
                 bg_for_canvas = fondo_blanco.convert("RGB").resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
                 
                 # Lienzo interactivo para dibujar
@@ -536,12 +536,13 @@ with col2:
                     fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
+                    background_color="#FFFFFF", # <--- LE DECIMOS AL NAVEGADOR QUE EL FONDO ES BLANCO
                     background_image=bg_for_canvas,
                     update_streamlit=False,
                     height=canvas_height,
                     width=canvas_width,
                     drawing_mode="freedraw",
-                    key=f"canvas_pincel_{file.name}",
+                    key=f"canvas_definitivo_{file.name}", # <--- CAMBIAMOS LA KEY PARA QUE BORRE EL CACHÉ NEGRO
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{file.name}", type="primary"):
