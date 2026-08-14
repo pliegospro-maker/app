@@ -280,7 +280,7 @@ col_izq, col_der = st.columns([3, 1])
 with col_izq:
     # Aquí cargas tu banner actual
     # Asegúrate de poner el nombre correcto de tu archivo de imagen
-    st.image("bannerweb.png", use_container_width=True)
+    st.image("bannerweb.png", use_column_width=True)
 
 with col_der:
    with col_der:
@@ -448,7 +448,7 @@ with col2:
 
                 with c_img:
                     img_for_preview = get_preview_with_bg(img, selected_bg_hex)
-                    st.image(img_for_preview, use_container_width=True)
+                    st.image(img_for_preview, use_column_width=True)
                     qty = st.number_input(f"Cantidad", min_value=1, value=1, key=f"qty_{file.name}")
                     
                     if effective_dpi < 150:
@@ -578,7 +578,7 @@ with col2:
                     
                     prev_col1, prev_col2 = st.columns([2, 1])
                     with prev_col1:
-                        st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_container_width=True)
+                        st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_column_width=True)
                     with prev_col2:
                         st.markdown("<br><br>", unsafe_allow_html=True)
                         if st.button("✅ Aplicar a la imagen", key=f"apply_c_{file.name}", type="primary", use_container_width=True):
@@ -597,7 +597,7 @@ with col2:
                     
                     prev_col1, prev_col2 = st.columns([2, 1])
                     with prev_col1:
-                        st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_container_width=True)
+                        st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_column_width=True)
                     with prev_col2:
                         st.markdown("<br><br>", unsafe_allow_html=True)
                         if st.button("✅ Aplicar a la imagen", key=f"apply_l_{file.name}", type="primary", use_container_width=True):
@@ -690,10 +690,10 @@ if len(image_configs) > 0:
             tabs_preview = st.tabs([f"Pliego {i+1}" for i in range(len(minimapas))])
             for i, tab in enumerate(tabs_preview):
                 with tab:
-                    st.image(minimapas[i], use_container_width=True)
+                    st.image(minimapas[i], use_column_width=True)
         elif len(minimapas) == 1:
             # Si es un solo pliego, no ponemos pestañas
-            st.image(minimapas[0], use_container_width=True)
+            st.image(minimapas[0], use_column_width=True)
 
     # 5. ACTUALIZAMOS LOS MENSAJES DE ESTADÍSTICAS
     if len(all_live_rects) < rect_id:
