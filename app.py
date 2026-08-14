@@ -523,10 +523,13 @@ with col2:
                 canvas_width = 400
                 canvas_height = int(canvas_width * (orig_h / orig_w)) if orig_w > 0 else 400
                 
-                # --- SOLUCIÓN: Le ponemos el fondo de color elegido y achicamos la imagen ---
-                # Usamos tu función get_preview_with_bg para que el fondo no sea transparente y haga contraste
-                # --- SOLUCIÓN: Forzamos el modo RGB para que el lienzo de Streamlit no bloquee la imagen ---
-                bg_for_canvas = get_preview_with_bg(img, selected_bg_hex).convert("RGB").resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
+                # --- SOLUCIÓN: Fondo blanco forzado para que la transparencia no se vuelva negra ---
+                img_rgba = img.convert("RGBA")
+                fondo_blanco = Image.new("RGBA", img_rgba.size, (255, 255, 255, 255)) # Lienzo blanco
+                fondo_blanco.paste(img_rgba, (0, 0), img_rgba) # Pegamos tu imagen encima
+                
+                # Convertimos a RGB el resultado combinado para que Streamlit lo acepte
+                bg_for_canvas = fondo_blanco.convert("RGB").resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
                 
                 # Lienzo interactivo para dibujar
                 canvas_result = st_canvas(
@@ -538,8 +541,8 @@ with col2:
                     height=canvas_height,
                     width=canvas_width,
                     drawing_mode="freedraw",
-                    key=f"canvas_pincel_{file.name}",  # <--- CAMBIAMOS LA KEY PARA BORRAR EL CACHÉ TRABADO
-                ) 
+                    key=f"canvas_pincel_{file.name}",
+                )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{file.name}", type="primary"):
                     if canvas_result.image_data is not None:
