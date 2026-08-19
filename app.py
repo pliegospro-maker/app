@@ -514,6 +514,7 @@ with col2:
 # --- NUEVO: BORRADOR MANUAL CON PINCEL ---
             st.markdown("**Borrador Manual (Pincel)**")
             
+            # 1. Clave purificada
             safe_key = "".join(c for c in file.name if c.isalnum())
             
             if st.checkbox("🖌️ Activar Borrador Manual", key=f"erase_check_{safe_key}"):
@@ -521,46 +522,45 @@ with col2:
                 
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{safe_key}")
                 
-                # --- LAVADO DE METADATOS (LA OPCIÓN NUCLEAR) ---
-                import io # Importamos esto para crear una memoria virtual
+                # --- EXTRACCIÓN DE PÍXELES PUROS CON NUMPY ---
+                # Calculamos el tamaño exacto
+                ancho_orig, alto_orig = img.size
+                nuevo_ancho = 400
+                nuevo_alto = int((400 / ancho_orig) * alto_orig) if ancho_orig > 0 else 400
                 
-                # 1. Copiamos y forzamos RGB
-                img_temp = img.copy().convert("RGB")
-                img_temp.thumbnail((400, 400))
+                # Achicamos la imagen original
+                img_chica = img.resize((nuevo_ancho, nuevo_alto))
                 
-                # 2. Guardamos la imagen en la "memoria virtual" como PNG puro
-                # (Esto destruye cualquier metadato, error de WhatsApp o corrupción)
-                buffer = io.BytesIO()
-                img_temp.save(buffer, format="PNG")
+                # Convertimos la imagen a matriz matemática (destruye cualquier error de archivo)
+                matriz_pixeles = np.array(img_chica.convert("RGBA"))
                 
-                # 3. La volvemos a abrir totalmente virgen y limpia
-                img_clean = Image.open(buffer)
+                # Volvemos a armar la imagen desde la matriz pura
+                img_pura = Image.fromarray(matriz_pixeles, "RGBA")
                 
                 # Lienzo interactivo
                 canvas_result = st_canvas(
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_color="#FFFFFF", # Forzamos blanco por si acaso
-                    background_image=img_clean,
+                    background_image=img_pura, # Le pasamos la imagen purificada
                     update_streamlit=False,
-                    height=img_clean.height, 
-                    width=img_clean.width,   
+                    height=nuevo_alto,
+                    width=nuevo_ancho,
                     drawing_mode="freedraw",
-                    key=f"canvas_nuclear_{safe_key}", # <-- Nueva key
+                    key=f"canvas_numpy_{safe_key}", # <-- Nueva key
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{safe_key}", type="primary"):
                     if canvas_result.image_data is not None:
                         drawn_mask = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
-                        drawn_mask = drawn_mask.resize(img.size, Image.Resampling.NEAREST)
+                        drawn_mask = drawn_mask.resize((ancho_orig, alto_orig), Image.Resampling.NEAREST)
                         
-                        img_array = np.array(img.convert("RGBA"))
+                        img_array_final = np.array(img.convert("RGBA"))
                         mask_array = np.array(drawn_mask)
                         
                         # Borramos todo lo pintado
-                        img_array[mask_array[:, :, 3] > 0] = [0, 0, 0, 0]
+                        img_array_final[mask_array[:, :, 3] > 0] = [0, 0, 0, 0]
                         
-                        new_img = Image.fromarray(img_array, "RGBA")
+                        new_img = Image.fromarray(img_array_final, "RGBA")
                         st.session_state.image_history[file.name].append(new_img)
                         st.session_state.last_action_msg = f"🖌️ Borrado manual aplicado en {file.name}."
                         st.rerun()
