@@ -521,31 +521,22 @@ with col2:
                 
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{safe_key}")
                 
-                # --- GUARDADO EN DISCO DURO (INFALIBLE) ---
-                ruta_temp = f"temp_bg_{safe_key}.png"
+                # --- VERSIÓN SÚPER LIMPIA DEL CANVAS ---
+                # Hacemos una copia en RGB puro y la achicamos suavemente
+                img_bg = img.copy().convert("RGB")
+                img_bg.thumbnail((400, 400))
                 
-                # Preparamos las medidas
-                ancho_orig, alto_orig = img.size
-                nuevo_ancho = 400
-                nuevo_alto = int((400 / ancho_orig) * alto_orig) if ancho_orig > 0 else 400
-                
-                # Forzamos RGB, la achicamos y la GUARDAMOS FÍSICAMENTE
-                img_para_guardar = img.convert("RGB").resize((nuevo_ancho, nuevo_alto))
-                img_para_guardar.save(ruta_temp, format="PNG")
-                
-                # La abrimos desde el archivo real que acabamos de crear
-                img_fisica = Image.open(ruta_temp)
-                
-                # Lienzo interactivo
+                # Lienzo interactivo (update_streamlit=True para forzar que cargue la imagen)
                 canvas_result = st_canvas(
+                    fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=img_fisica,
-                    update_streamlit=False,
-                    height=nuevo_alto,
-                    width=nuevo_ancho,
+                    background_image=img_bg,
+                    update_streamlit=True,
+                    height=img_bg.height,
+                    width=img_bg.width,
                     drawing_mode="freedraw",
-                    key=f"canvas_disco_{safe_key}", 
+                    key=f"canvas_limpio_{safe_key}", 
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{safe_key}", type="primary"):
@@ -566,54 +557,24 @@ with col2:
                         st.warning("No dibujaste nada.")
                         
             st.markdown("---")
-            # ----------------------------------------
-            
-            st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
-            remove_type = st.radio("Método de borrado:", ["Gotero (Color Exacto)", "Barra (Luminosidad)"], key=f"rm_type_{file.name}", horizontal=True)
-            
-            if remove_type == "Gotero (Color Exacto)":           
-                    cc1, cc2 = st.columns(2)
-                    with cc1:
-                        target_color = st.color_picker("Color (Clica para usar el gotero)", "#000000", key=f"cp_{file.name}")
-                    with cc2:
-                        tol_val = st.slider("Tolerancia", 0, 100, 30, key=f"tol_exact_{file.name}")
-                    
-                    preview_img = remove_specific_color(img, target_color, tol_val)
-                    
-                    prev_col1, prev_col2 = st.columns([2, 1])
-                    with prev_col1:
-                        st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_column_width=True)
-                    with prev_col2:
-                        st.markdown("<br><br>", unsafe_allow_html=True)
-                        if st.button("✅ Aplicar a la imagen", key=f"apply_c_{file.name}", type="primary", use_container_width=True):
-                            final_img = apply_alpha_threshold(preview_img)
-                            st.session_state.image_history[file.name].append(final_img)
-                            st.session_state.last_action_msg = f"💧 Color eliminado (y Umbral aplicado) en {file.name}."
-                            st.rerun()
-            else:
-                    cc1, cc2 = st.columns(2)
-                    with cc1:
-                        lum_val = st.slider("Tono (0=Negro, 255=Blanco)", 0, 255, 0, key=f"lum_{file.name}")
-                    with cc2:
-                        tol_val = st.slider("Tolerancia", 0, 100, 30, key=f"tol_lum_{file.name}")
-                        
-                    preview_img = remove_luminance(img, lum_val, tol_val)
-                    
-                    prev_col1, prev_col2 = st.columns([2, 1])
-                    with prev_col1:
-                        st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_column_width=True)
-                    with prev_col2:
-                        st.markdown("<br><br>", unsafe_allow_html=True)
-                        if st.button("✅ Aplicar a la imagen", key=f"apply_l_{file.name}", type="primary", use_container_width=True):
-                            final_img = apply_alpha_threshold(preview_img)
-                            st.session_state.image_history[file.name].append(final_img)
-                            st.session_state.last_action_msg = f"🌓 Tono eliminado (y Umbral aplicado) en {file.name}."
-                            st.rerun()
 
-            image_configs.append({
-                    "file": file, "image": img, "qty": qty,
-                    "w_px": cm_to_px(new_w_cm), "h_px": cm_to_px(new_h_cm)
-                })
+            # ----------------------------------------
+            st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
+            
+            remove_type = st.radio("Método de borrado:", ["Gotero (Color Exacto)", "Barra (Luminosidad)"], key=f"rm_type_{safe_key}", horizontal=True)
+            
+            if remove_type == "Gotero (Color Exacto)":
+                cc1, cc2 = st.columns(2)
+                with cc1:
+                    target_color = st.color_picker("Color (Clica para usar el gotero)", "#000000", key=f"cp_{safe_key}")
+                with cc2:
+                    tol_val = st.slider("Tolerancia", 0, 100, 30, key=f"tol_exact_{safe_key}")
+                
+                preview_img = remove_specific_color(img, target_color, tol_val)
+                
+                prev_col1, prev_col2 = st.columns([2, 1])
+                with prev_col1:
+                    st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_column_width=True)
 
 # --- ACTUALIZAR VISOR EN VIVO ---
 if len(image_configs) > 0:
