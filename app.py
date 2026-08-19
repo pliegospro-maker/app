@@ -519,39 +519,40 @@ with col2:
                 # Grosor del pincel
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{file.name}")
                 
-                orig_w, orig_h = int(img.width), int(img.height)
+                # --- SOLUCIÓN MILIMÉTRICA: thumbnail() ---
+                # 1. Armamos un cartón blanco del tamaño de la imagen original
+                img_segura = Image.new("RGB", img.size, (255, 255, 255))
                 
-                # Ajustamos el tamaño del canvas
-                canvas_width = 400
-                canvas_height = int(canvas_width * (orig_h / orig_w)) if orig_w > 0 else 400
-                
-                # --- PREPARACIÓN DE LA IMAGEN ---
-                img_redimensionada = img.resize((canvas_width, canvas_height))
-                fondo_blanco = Image.new("RGB", (canvas_width, canvas_height), (255, 255, 255))
-                
-                if img_redimensionada.mode in ("RGBA", "LA") or (img_redimensionada.mode == "P" and "transparency" in img_redimensionada.info):
-                    fondo_blanco.paste(img_redimensionada, mask=img_redimensionada.convert("RGBA").split()[3])
+                # 2. Pegamos la imagen arriba (detectando si tiene transparencia)
+                if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
+                    img_segura.paste(img, mask=img.convert("RGBA").split()[3])
                 else:
-                    fondo_blanco.paste(img_redimensionada)
+                    img_segura.paste(img)
+                
+                # 3. Achicamos la imagen (máximo 400x400) manteniendo la proporción perfecta
+                img_segura.thumbnail((400, 400), Image.Resampling.LANCZOS)
+                
+                # 4. Le pedimos a la imagen resultante sus medidas EXACTAS
+                canvas_width, canvas_height = img_segura.size
                 
                 # Lienzo interactivo para dibujar
                 canvas_result = st_canvas(
                     fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    # ELIMINAMOS background_color para que no tape la imagen
-                    background_image=fondo_blanco,
+                    background_image=img_segura,
                     update_streamlit=False,
-                    height=canvas_height,
-                    width=canvas_width,
+                    height=canvas_height, # <-- Ahora encaja 100% perfecto
+                    width=canvas_width,   # <-- Ahora encaja 100% perfecto
                     drawing_mode="freedraw",
-                    key=f"canvas_descubierto_{file.name}", # <-- KEY NUEVA
+                    key=f"canvas_perfecto_{file.name}", # <-- NUEVA KEY 
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{file.name}", type="primary"):
                     if canvas_result.image_data is not None:
                         drawn_mask = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
-                        drawn_mask = drawn_mask.resize((orig_w, orig_h), Image.Resampling.NEAREST)
+                        # Volvemos al tamaño original antes de recortar
+                        drawn_mask = drawn_mask.resize(img.size, Image.Resampling.NEAREST)
                         
                         img_array = np.array(img.convert("RGBA"))
                         mask_array = np.array(drawn_mask)
