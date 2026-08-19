@@ -514,7 +514,7 @@ with col2:
 # --- NUEVO: BORRADOR MANUAL CON PINCEL ---
             st.markdown("**Borrador Manual (Pincel)**")
             
-            # 1. Creamos una clave segura (sin espacios ni paréntesis) para que el lienzo no se rompa
+            # Clave segura sin espacios
             safe_key = "".join(c for c in file.name if c.isalnum())
             
             if st.checkbox("🖌️ Activar Borrador Manual", key=f"erase_check_{safe_key}"):
@@ -522,41 +522,43 @@ with col2:
                 
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{safe_key}")
                 
-                # --- PREPARACIÓN SÚPER SIMPLE ---
-                img_canvas = img.convert("RGBA")
-                ancho_orig, alto_orig = img_canvas.size
+                # --- PREPARACIÓN BLINDADA PARA EL CANVAS ---
+                w_orig, h_orig = img.width, img.height
                 
-                # Achicamos para el lienzo
-                nuevo_ancho = 400
-                nuevo_alto = int((400 / ancho_orig) * alto_orig) if ancho_orig > 0 else 400
-                img_canvas = img_canvas.resize((nuevo_ancho, nuevo_alto))
+                # 1. Creamos un fondo gris neutro RGB (sin transparencia)
+                fondo_gris = Image.new("RGB", (w_orig, h_orig), (128, 128, 128))
                 
-                # IMAGEN ESPÍA: Esto nos mostrará la imagen justo arriba del lienzo para confirmar que existe
-                st.caption("🔍 Imagen espía (si la ves acá, tiene que verse en el lienzo):")
-                st.image(img_canvas)
+                # 2. Pegamos tu diseño arriba
+                if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
+                    fondo_gris.paste(img, mask=img.convert("RGBA").split()[3])
+                else:
+                    fondo_gris.paste(img)
                 
-                # Lienzo interactivo para dibujar
+                # 3. Redimensionamos exactamente al tamaño del lienzo
+                w_canvas = 400
+                h_canvas = int((w_canvas / w_orig) * h_orig) if w_orig > 0 else 400
+                img_fondo = fondo_gris.resize((w_canvas, h_canvas))
+                
+                # Lienzo interactivo (limpio de configuraciones extra que lo rompen)
                 canvas_result = st_canvas(
-                    fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_color="#333333", # Fondo gris oscuro de fallback
-                    background_image=img_canvas,
-                    update_streamlit=False,
-                    height=nuevo_alto,
-                    width=nuevo_ancho,
+                    background_image=img_fondo, # Pasamos la imagen en RGB puro
+                    height=h_canvas,
+                    width=w_canvas,
                     drawing_mode="freedraw",
-                    key=f"canvas_seguro_{safe_key}", # <-- CLAVE PURIFICADA
+                    key=f"canvas_gris_{safe_key}", # <-- Nueva key para resetearlo
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{safe_key}", type="primary"):
                     if canvas_result.image_data is not None:
                         drawn_mask = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
-                        drawn_mask = drawn_mask.resize((ancho_orig, alto_orig), Image.Resampling.NEAREST)
+                        drawn_mask = drawn_mask.resize((w_orig, h_orig), Image.Resampling.NEAREST)
                         
                         img_array = np.array(img.convert("RGBA"))
                         mask_array = np.array(drawn_mask)
                         
+                        # Todo lo pintado lo hacemos transparente en la imagen real
                         img_array[mask_array[:, :, 3] > 0] = [0, 0, 0, 0]
                         
                         new_img = Image.fromarray(img_array, "RGBA")
