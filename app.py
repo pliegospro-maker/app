@@ -530,17 +530,20 @@ with col2:
                 
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{safe_key}")
                 
-                # --- LA TÉCNICA DEL CROPPER (LA IDEA DEL MILLÓN) ---
-                # Calculamos solo qué tamaño queremos que tenga el cuadro en pantalla
+                # --- LA CORRECCIÓN FINAL ---
+                # 1. Calculamos el tamaño para la pantalla (400px de ancho)
                 ancho_lienzo = 400
                 alto_lienzo = int(400 * (img.height / img.width)) if img.width > 0 else 400
-
-                # Le pasamos la imagen original DIRECTA, exactamente igual que hace st_cropper
+                
+                # 2. ACHICAMOS LA IMAGEN EXACTAMENTE A ESE TAMAÑO ANTES DE PASARLA
+                img_para_lienzo = img.resize((ancho_lienzo, alto_lienzo))
+                
+                # 3. Lienzo interactivo (Ahora sí: la imagen y el lienzo miden igual)
                 canvas_result = st_canvas(
                     fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=img, # <--- ACÁ ESTÁ LA MAGIA, pura y directa
+                    background_image=img_para_lienzo, # <--- Pasamos la imagen ya achicada
                     update_streamlit=True,
                     height=alto_lienzo,
                     width=ancho_lienzo,
@@ -551,6 +554,7 @@ with col2:
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{safe_key}", type="primary"):
                     if canvas_result.image_data is not None:
                         drawn_mask = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
+                        # Volvemos a agrandar la máscara al tamaño real de la imagen
                         drawn_mask = drawn_mask.resize(img.size, Image.Resampling.NEAREST)
                         
                         img_array_final = np.array(img.convert("RGBA"))
