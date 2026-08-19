@@ -519,7 +519,7 @@ with col2:
                 # Grosor del pincel
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{file.name}")
                 
-orig_w, orig_h = int(img.width), int(img.height)
+            orig_w, orig_h = int(img.width), int(img.height)
                 
                 # Ajustamos el tamaño del canvas
                 canvas_width = 400
