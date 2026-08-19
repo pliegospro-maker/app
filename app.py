@@ -521,34 +521,31 @@ with col2:
                 
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{safe_key}")
                 
-                # --- EL ANCLA DE MEMORIA ---
-                bg_key = f"memoria_canvas_{safe_key}"
+                # --- GUARDADO EN DISCO DURO (INFALIBLE) ---
+                ruta_temp = f"temp_bg_{safe_key}.png"
                 
-                # Solo preparamos la imagen si no está guardada en la memoria todavía
-                if bg_key not in st.session_state:
-                    ancho_orig, alto_orig = img.size
-                    nuevo_ancho = 400
-                    nuevo_alto = int((400 / ancho_orig) * alto_orig) if ancho_orig > 0 else 400
-                    
-                    # Forzamos RGB y redimensionamos
-                    img_temp = img.convert("RGB").resize((nuevo_ancho, nuevo_alto))
-                    
-                    # ¡LA ANCLAMOS EN LA MEMORIA PARA QUE NO LA BORREN!
-                    st.session_state[bg_key] = img_temp
+                # Preparamos las medidas
+                ancho_orig, alto_orig = img.size
+                nuevo_ancho = 400
+                nuevo_alto = int((400 / ancho_orig) * alto_orig) if ancho_orig > 0 else 400
                 
-                # Le pasamos al lienzo la imagen directamente desde la memoria segura
-                img_segura = st.session_state[bg_key]
+                # Forzamos RGB, la achicamos y la GUARDAMOS FÍSICAMENTE
+                img_para_guardar = img.convert("RGB").resize((nuevo_ancho, nuevo_alto))
+                img_para_guardar.save(ruta_temp, format="PNG")
+                
+                # La abrimos desde el archivo real que acabamos de crear
+                img_fisica = Image.open(ruta_temp)
                 
                 # Lienzo interactivo
                 canvas_result = st_canvas(
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=img_segura,
+                    background_image=img_fisica,
                     update_streamlit=False,
-                    height=img_segura.height,
-                    width=img_segura.width,
+                    height=nuevo_alto,
+                    width=nuevo_ancho,
                     drawing_mode="freedraw",
-                    key=f"canvas_final_{safe_key}", 
+                    key=f"canvas_disco_{safe_key}", 
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{safe_key}", type="primary"):
@@ -559,17 +556,11 @@ with col2:
                         img_array_final = np.array(img.convert("RGBA"))
                         mask_array = np.array(drawn_mask)
                         
-                        # Borramos todo lo pintado
                         img_array_final[mask_array[:, :, 3] > 0] = [0, 0, 0, 0]
                         
                         new_img = Image.fromarray(img_array_final, "RGBA")
                         st.session_state.image_history[file.name].append(new_img)
                         st.session_state.last_action_msg = f"🖌️ Borrado manual aplicado en {file.name}."
-                        
-                        # Limpiamos la memoria para no ocupar espacio de más
-                        if bg_key in st.session_state:
-                            del st.session_state[bg_key]
-                            
                         st.rerun()
                     else:
                         st.warning("No dibujaste nada.")
