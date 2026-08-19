@@ -519,49 +519,46 @@ with col2:
                 # Grosor del pincel
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{file.name}")
                 
-                # Aseguramos que las dimensiones originales sean correctas y en números enteros
                 orig_w, orig_h = int(img.width), int(img.height)
                 
                 # Ajustamos el tamaño del canvas
                 canvas_width = 400
                 canvas_height = int(canvas_width * (orig_h / orig_w)) if orig_w > 0 else 400
                 
-                # --- SOLUCIÓN MEJORADA: Preparar imagen para el Canvas ---
-                # 1. Creamos un fondo blanco sólido del tamaño original
-                img_para_canvas = Image.new("RGB", (orig_w, orig_h), (255, 255, 255))
+                # --- SOLUCIÓN DEFINITIVA: RGBA Estricto y Redimensionado Previo ---
+                # 1. Convertimos a RGBA y redimensionamos PRIMERO al tamaño exacto del canvas
+                img_rgba = img.convert("RGBA").resize((canvas_width, canvas_height))
                 
-                # 2. Pegamos la imagen de forma segura (respeta transparencia si es PNG, la ignora si es JPG)
-                if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
-                    img_para_canvas.paste(img, mask=img.convert("RGBA").split()[3])
-                else:
-                    img_para_canvas.paste(img)
-                    
-                # 3. Redimensionamos exactamente al tamaño que pide el canvas
-                bg_for_canvas = img_para_canvas.resize((canvas_width, canvas_height), Image.Resampling.LANCZOS)
+                # 2. Creamos un fondo totalmente blanco y RGBA del tamaño del canvas
+                bg_for_canvas = Image.new("RGBA", (canvas_width, canvas_height), (255, 255, 255, 255))
+                
+                # 3. Pegamos la imagen (si es PNG respeta transparencia, si es JPG tapa todo)
+                bg_for_canvas.paste(img_rgba, (0, 0), img_rgba)
                 
                 # Lienzo interactivo para dibujar
                 canvas_result = st_canvas(
                     fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=bg_for_canvas, # Pasamos la imagen limpia
-                    # (ELIMINAMOS background_color para que no haya conflictos)
+                    background_image=bg_for_canvas, # Imagen blindada en formato correcto
                     update_streamlit=False,
                     height=canvas_height,
                     width=canvas_width,
                     drawing_mode="freedraw",
-                    key=f"canvas_limpio_{file.name}", # <-- CAMBIAMOS LA KEY PARA FORZAR UN RESET
+                    key=f"canvas_blindado_{file.name}", # <-- NUEVA KEY PARA ROMPER EL CACHÉ
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{file.name}", type="primary"):
                     if canvas_result.image_data is not None:
+                        # Extraemos lo que el usuario dibujó
                         drawn_mask = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
+                        # Lo agrandamos al tamaño de la imagen original
                         drawn_mask = drawn_mask.resize((orig_w, orig_h), Image.Resampling.NEAREST)
                         
                         img_array = np.array(img.convert("RGBA"))
                         mask_array = np.array(drawn_mask)
                         
-                        # Todo lo pintado (alpha > 0) lo hacemos transparente
+                        # Borramos (hacemos transparente) donde se pintó
                         img_array[mask_array[:, :, 3] > 0] = [0, 0, 0, 0]
                         
                         new_img = Image.fromarray(img_array, "RGBA")
