@@ -514,7 +514,6 @@ with col2:
 # --- NUEVO: BORRADOR MANUAL CON PINCEL ---
             st.markdown("**Borrador Manual (Pincel)**")
             
-            # 1. Clave purificada
             safe_key = "".join(c for c in file.name if c.isalnum())
             
             if st.checkbox("🖌️ Activar Borrador Manual", key=f"erase_check_{safe_key}"):
@@ -522,37 +521,40 @@ with col2:
                 
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{safe_key}")
                 
-                # --- EXTRACCIÓN DE PÍXELES PUROS CON NUMPY ---
-                # Calculamos el tamaño exacto
-                ancho_orig, alto_orig = img.size
-                nuevo_ancho = 400
-                nuevo_alto = int((400 / ancho_orig) * alto_orig) if ancho_orig > 0 else 400
+                # --- EL ANCLA DE MEMORIA ---
+                bg_key = f"memoria_canvas_{safe_key}"
                 
-                # Achicamos la imagen original
-                img_chica = img.resize((nuevo_ancho, nuevo_alto))
+                # Solo preparamos la imagen si no está guardada en la memoria todavía
+                if bg_key not in st.session_state:
+                    ancho_orig, alto_orig = img.size
+                    nuevo_ancho = 400
+                    nuevo_alto = int((400 / ancho_orig) * alto_orig) if ancho_orig > 0 else 400
+                    
+                    # Forzamos RGB y redimensionamos
+                    img_temp = img.convert("RGB").resize((nuevo_ancho, nuevo_alto))
+                    
+                    # ¡LA ANCLAMOS EN LA MEMORIA PARA QUE NO LA BORREN!
+                    st.session_state[bg_key] = img_temp
                 
-                # Convertimos la imagen a matriz matemática (destruye cualquier error de archivo)
-                matriz_pixeles = np.array(img_chica.convert("RGBA"))
-                
-                # Volvemos a armar la imagen desde la matriz pura
-                img_pura = Image.fromarray(matriz_pixeles, "RGBA")
+                # Le pasamos al lienzo la imagen directamente desde la memoria segura
+                img_segura = st.session_state[bg_key]
                 
                 # Lienzo interactivo
                 canvas_result = st_canvas(
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=img_pura, # Le pasamos la imagen purificada
+                    background_image=img_segura,
                     update_streamlit=False,
-                    height=nuevo_alto,
-                    width=nuevo_ancho,
+                    height=img_segura.height,
+                    width=img_segura.width,
                     drawing_mode="freedraw",
-                    key=f"canvas_numpy_{safe_key}", # <-- Nueva key
+                    key=f"canvas_final_{safe_key}", 
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{safe_key}", type="primary"):
                     if canvas_result.image_data is not None:
                         drawn_mask = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
-                        drawn_mask = drawn_mask.resize((ancho_orig, alto_orig), Image.Resampling.NEAREST)
+                        drawn_mask = drawn_mask.resize(img.size, Image.Resampling.NEAREST)
                         
                         img_array_final = np.array(img.convert("RGBA"))
                         mask_array = np.array(drawn_mask)
@@ -563,6 +565,11 @@ with col2:
                         new_img = Image.fromarray(img_array_final, "RGBA")
                         st.session_state.image_history[file.name].append(new_img)
                         st.session_state.last_action_msg = f"🖌️ Borrado manual aplicado en {file.name}."
+                        
+                        # Limpiamos la memoria para no ocupar espacio de más
+                        if bg_key in st.session_state:
+                            del st.session_state[bg_key]
+                            
                         st.rerun()
                     else:
                         st.warning("No dibujaste nada.")
