@@ -530,26 +530,26 @@ with col2:
                 
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{safe_key}")
                 
-                # --- LA SOLUCIÓN DEFINITIVA ---
-                # 1. Usamos la imagen con el fondo gris de la barra lateral (Garantiza que se vea)
-                img_para_canvas = get_preview_with_bg(img, selected_bg_hex).copy()
+                # --- EL GOLPE DE GRACIA A LA TRANSPARENCIA ---
+                # 1. Usamos la imagen con el fondo gris, pero la forzamos a RGB PURO (sin canal Alfa)
+                img_para_canvas = get_preview_with_bg(img, selected_bg_hex).convert("RGB")
                 
                 # 2. La achicamos proporcionalmente
                 img_para_canvas.thumbnail((400, 400))
                 
-                # 3. La anclamos en la memoria de la sesión para que la nube no la borre
+                # 3. La anclamos en la memoria
                 bg_key = f"canvas_bg_{safe_key}"
                 if bg_key not in st.session_state:
                     st.session_state[bg_key] = img_para_canvas
                 
                 bg_seguro = st.session_state[bg_key]
                 
-                # 4. Lienzo interactivo (ahora sí, a prueba de fallos)
+                # 4. Lienzo interactivo
                 canvas_result = st_canvas(
                     fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=bg_seguro,
+                    background_image=bg_seguro, # ¡Ahora es 100% RGB!
                     update_streamlit=True,
                     height=bg_seguro.height,
                     width=bg_seguro.width,
@@ -573,7 +573,6 @@ with col2:
                         st.session_state.image_history[file.name].append(new_img)
                         st.session_state.last_action_msg = f"🖌️ Borrado manual aplicado en {file.name}."
                         
-                        # Limpiamos el caché de la imagen anterior
                         if bg_key in st.session_state:
                             del st.session_state[bg_key]
                             
