@@ -530,52 +530,38 @@ with col2:
                 
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{safe_key}")
                 
-                # --- EL GOLPE DE GRACIA A LA TRANSPARENCIA ---
-                # 1. Usamos la imagen con el fondo gris, pero la forzamos a RGB PURO (sin canal Alfa)
-                img_para_canvas = get_preview_with_bg(img, selected_bg_hex).convert("RGB")
-                
-                # 2. La achicamos proporcionalmente
-                img_para_canvas.thumbnail((400, 400))
-                
-                # 3. La anclamos en la memoria
-                bg_key = f"canvas_bg_{safe_key}"
-                if bg_key not in st.session_state:
-                    st.session_state[bg_key] = img_para_canvas
-                
-                bg_seguro = st.session_state[bg_key]
-                
-                # 4. Lienzo interactivo
+                # --- LA TÉCNICA DEL CROPPER (LA IDEA DEL MILLÓN) ---
+                # Calculamos solo qué tamaño queremos que tenga el cuadro en pantalla
+                ancho_lienzo = 400
+                alto_lienzo = int(400 * (img.height / img.width)) if img.width > 0 else 400
+
+                # Le pasamos la imagen original DIRECTA, exactamente igual que hace st_cropper
                 canvas_result = st_canvas(
                     fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=bg_seguro, # ¡Ahora es 100% RGB!
+                    background_image=img, # <--- ACÁ ESTÁ LA MAGIA, pura y directa
                     update_streamlit=True,
-                    height=bg_seguro.height,
-                    width=bg_seguro.width,
+                    height=alto_lienzo,
+                    width=ancho_lienzo,
                     drawing_mode="freedraw",
-                    key=f"canvas_final_{safe_key}", 
+                    key=f"canvas_directo_{safe_key}", 
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{safe_key}", type="primary"):
                     if canvas_result.image_data is not None:
-                        # Extraemos lo que dibujaste
                         drawn_mask = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
                         drawn_mask = drawn_mask.resize(img.size, Image.Resampling.NEAREST)
                         
                         img_array_final = np.array(img.convert("RGBA"))
                         mask_array = np.array(drawn_mask)
                         
-                        # Hacemos transparente todo lo que pintaste de rojo
+                        # Hacemos transparente lo que se pintó
                         img_array_final[mask_array[:, :, 3] > 0] = [0, 0, 0, 0]
                         
                         new_img = Image.fromarray(img_array_final, "RGBA")
                         st.session_state.image_history[file.name].append(new_img)
                         st.session_state.last_action_msg = f"🖌️ Borrado manual aplicado en {file.name}."
-                        
-                        if bg_key in st.session_state:
-                            del st.session_state[bg_key]
-                            
                         st.rerun()
                     else:
                         st.warning("No dibujaste nada.")
