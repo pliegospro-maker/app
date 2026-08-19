@@ -513,46 +513,46 @@ with col2:
 
 # --- NUEVO: BORRADOR MANUAL CON PINCEL ---
             st.markdown("**Borrador Manual (Pincel)**")
-            if st.checkbox("🖌️ Activar Borrador Manual", key=f"erase_check_{file.name}"):
+            
+            # 1. Creamos una clave segura (sin espacios ni paréntesis) para que el lienzo no se rompa
+            safe_key = "".join(c for c in file.name if c.isalnum())
+            
+            if st.checkbox("🖌️ Activar Borrador Manual", key=f"erase_check_{safe_key}"):
                 st.info("Dibuja con el pincel rojo sobre las áreas que quieres borrar. Luego presiona Aplicar.")
                 
-                # Grosor del pincel
-                brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{file.name}")
+                brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{safe_key}")
                 
-                # --- SOLUCIÓN MILIMÉTRICA: thumbnail() ---
-                # 1. Armamos un cartón blanco del tamaño de la imagen original
-                img_segura = Image.new("RGB", img.size, (255, 255, 255))
+                # --- PREPARACIÓN SÚPER SIMPLE ---
+                img_canvas = img.convert("RGBA")
+                ancho_orig, alto_orig = img_canvas.size
                 
-                # 2. Pegamos la imagen arriba (detectando si tiene transparencia)
-                if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
-                    img_segura.paste(img, mask=img.convert("RGBA").split()[3])
-                else:
-                    img_segura.paste(img)
+                # Achicamos para el lienzo
+                nuevo_ancho = 400
+                nuevo_alto = int((400 / ancho_orig) * alto_orig) if ancho_orig > 0 else 400
+                img_canvas = img_canvas.resize((nuevo_ancho, nuevo_alto))
                 
-                # 3. Achicamos la imagen (máximo 400x400) manteniendo la proporción perfecta
-                img_segura.thumbnail((400, 400), Image.Resampling.LANCZOS)
-                
-                # 4. Le pedimos a la imagen resultante sus medidas EXACTAS
-                canvas_width, canvas_height = img_segura.size
+                # IMAGEN ESPÍA: Esto nos mostrará la imagen justo arriba del lienzo para confirmar que existe
+                st.caption("🔍 Imagen espía (si la ves acá, tiene que verse en el lienzo):")
+                st.image(img_canvas)
                 
                 # Lienzo interactivo para dibujar
                 canvas_result = st_canvas(
                     fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=img_segura,
+                    background_color="#333333", # Fondo gris oscuro de fallback
+                    background_image=img_canvas,
                     update_streamlit=False,
-                    height=canvas_height, # <-- Ahora encaja 100% perfecto
-                    width=canvas_width,   # <-- Ahora encaja 100% perfecto
+                    height=nuevo_alto,
+                    width=nuevo_ancho,
                     drawing_mode="freedraw",
-                    key=f"canvas_perfecto_{file.name}", # <-- NUEVA KEY 
+                    key=f"canvas_seguro_{safe_key}", # <-- CLAVE PURIFICADA
                 )
                 
-                if st.button("✅ Aplicar Borrado", key=f"apply_erase_{file.name}", type="primary"):
+                if st.button("✅ Aplicar Borrado", key=f"apply_erase_{safe_key}", type="primary"):
                     if canvas_result.image_data is not None:
                         drawn_mask = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
-                        # Volvemos al tamaño original antes de recortar
-                        drawn_mask = drawn_mask.resize(img.size, Image.Resampling.NEAREST)
+                        drawn_mask = drawn_mask.resize((ancho_orig, alto_orig), Image.Resampling.NEAREST)
                         
                         img_array = np.array(img.convert("RGBA"))
                         mask_array = np.array(drawn_mask)
