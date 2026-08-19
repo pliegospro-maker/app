@@ -525,31 +525,27 @@ with col2:
                 canvas_width = 400
                 canvas_height = int(canvas_width * (orig_h / orig_w)) if orig_w > 0 else 400
                 
-                # --- SOLUCIÓN ANTI MODO OSCURO: RGB PURO ---
-                # 1. Redimensionamos la imagen original
+                # --- PREPARACIÓN DE LA IMAGEN ---
                 img_redimensionada = img.resize((canvas_width, canvas_height))
+                fondo_blanco = Image.new("RGB", (canvas_width, canvas_height), (255, 255, 255))
                 
-                # 2. Creamos un fondo de cartón 100% blanco y RGB (SIN transparencia)
-                fondo_blanco_rgb = Image.new("RGB", (canvas_width, canvas_height), (255, 255, 255))
-                
-                # 3. Pegamos la imagen sobre el cartón blanco
                 if img_redimensionada.mode in ("RGBA", "LA") or (img_redimensionada.mode == "P" and "transparency" in img_redimensionada.info):
-                    fondo_blanco_rgb.paste(img_redimensionada, mask=img_redimensionada.convert("RGBA").split()[3])
+                    fondo_blanco.paste(img_redimensionada, mask=img_redimensionada.convert("RGBA").split()[3])
                 else:
-                    fondo_blanco_rgb.paste(img_redimensionada)
+                    fondo_blanco.paste(img_redimensionada)
                 
                 # Lienzo interactivo para dibujar
                 canvas_result = st_canvas(
                     fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_color="#FFFFFF",
-                    background_image=fondo_blanco_rgb,
+                    # ELIMINAMOS background_color para que no tape la imagen
+                    background_image=fondo_blanco,
                     update_streamlit=False,
                     height=canvas_height,
                     width=canvas_width,
                     drawing_mode="freedraw",
-                    key=f"canvas_rgb_puro_{file.name}", 
+                    key=f"canvas_descubierto_{file.name}", # <-- KEY NUEVA
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{file.name}", type="primary"):
