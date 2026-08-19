@@ -519,7 +519,7 @@ with col2:
                 # Grosor del pincel
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{file.name}")
                 
-            orig_w, orig_h = int(img.width), int(img.height)
+                orig_w, orig_h = int(img.width), int(img.height)
                 
                 # Ajustamos el tamaño del canvas
                 canvas_width = 400
@@ -534,7 +534,6 @@ with col2:
                 
                 # 3. Pegamos la imagen sobre el cartón blanco
                 if img_redimensionada.mode in ("RGBA", "LA") or (img_redimensionada.mode == "P" and "transparency" in img_redimensionada.info):
-                    # Si tiene transparencia, usamos su propio canal alfa como máscara para no pegar los bordes negros
                     fondo_blanco_rgb.paste(img_redimensionada, mask=img_redimensionada.convert("RGBA").split()[3])
                 else:
                     fondo_blanco_rgb.paste(img_redimensionada)
@@ -544,26 +543,23 @@ with col2:
                     fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_color="#FFFFFF", # Reforzamos que el fondo del componente sea blanco
-                    background_image=fondo_blanco_rgb, # Imagen en RGB puro
+                    background_color="#FFFFFF",
+                    background_image=fondo_blanco_rgb,
                     update_streamlit=False,
                     height=canvas_height,
                     width=canvas_width,
                     drawing_mode="freedraw",
-                    key=f"canvas_rgb_puro_{file.name}", # <-- NUEVA KEY CLAVE PARA LIMPIAR MEMORIA
+                    key=f"canvas_rgb_puro_{file.name}", 
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{file.name}", type="primary"):
                     if canvas_result.image_data is not None:
-                        # Extraemos lo que el usuario dibujó
                         drawn_mask = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
-                        # Lo agrandamos al tamaño de la imagen original
                         drawn_mask = drawn_mask.resize((orig_w, orig_h), Image.Resampling.NEAREST)
                         
                         img_array = np.array(img.convert("RGBA"))
                         mask_array = np.array(drawn_mask)
                         
-                        # Borramos (hacemos transparente) donde se pintó
                         img_array[mask_array[:, :, 3] > 0] = [0, 0, 0, 0]
                         
                         new_img = Image.fromarray(img_array, "RGBA")
