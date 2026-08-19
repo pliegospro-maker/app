@@ -519,33 +519,38 @@ with col2:
                 # Grosor del pincel
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{file.name}")
                 
-                orig_w, orig_h = int(img.width), int(img.height)
+orig_w, orig_h = int(img.width), int(img.height)
                 
                 # Ajustamos el tamaño del canvas
                 canvas_width = 400
                 canvas_height = int(canvas_width * (orig_h / orig_w)) if orig_w > 0 else 400
                 
-                # --- SOLUCIÓN DEFINITIVA: RGBA Estricto y Redimensionado Previo ---
-                # 1. Convertimos a RGBA y redimensionamos PRIMERO al tamaño exacto del canvas
-                img_rgba = img.convert("RGBA").resize((canvas_width, canvas_height))
+                # --- SOLUCIÓN ANTI MODO OSCURO: RGB PURO ---
+                # 1. Redimensionamos la imagen original
+                img_redimensionada = img.resize((canvas_width, canvas_height))
                 
-                # 2. Creamos un fondo totalmente blanco y RGBA del tamaño del canvas
-                bg_for_canvas = Image.new("RGBA", (canvas_width, canvas_height), (255, 255, 255, 255))
+                # 2. Creamos un fondo de cartón 100% blanco y RGB (SIN transparencia)
+                fondo_blanco_rgb = Image.new("RGB", (canvas_width, canvas_height), (255, 255, 255))
                 
-                # 3. Pegamos la imagen (si es PNG respeta transparencia, si es JPG tapa todo)
-                bg_for_canvas.paste(img_rgba, (0, 0), img_rgba)
+                # 3. Pegamos la imagen sobre el cartón blanco
+                if img_redimensionada.mode in ("RGBA", "LA") or (img_redimensionada.mode == "P" and "transparency" in img_redimensionada.info):
+                    # Si tiene transparencia, usamos su propio canal alfa como máscara para no pegar los bordes negros
+                    fondo_blanco_rgb.paste(img_redimensionada, mask=img_redimensionada.convert("RGBA").split()[3])
+                else:
+                    fondo_blanco_rgb.paste(img_redimensionada)
                 
                 # Lienzo interactivo para dibujar
                 canvas_result = st_canvas(
                     fill_color="rgba(255, 255, 255, 0.0)",
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=bg_for_canvas, # Imagen blindada en formato correcto
+                    background_color="#FFFFFF", # Reforzamos que el fondo del componente sea blanco
+                    background_image=fondo_blanco_rgb, # Imagen en RGB puro
                     update_streamlit=False,
                     height=canvas_height,
                     width=canvas_width,
                     drawing_mode="freedraw",
-                    key=f"canvas_blindado_{file.name}", # <-- NUEVA KEY PARA ROMPER EL CACHÉ
+                    key=f"canvas_rgb_puro_{file.name}", # <-- NUEVA KEY CLAVE PARA LIMPIAR MEMORIA
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{file.name}", type="primary"):
