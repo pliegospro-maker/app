@@ -521,22 +521,32 @@ with col2:
                 
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{safe_key}")
                 
-                # --- LA SOLUCIÓN SÚPER SIMPLE ---
-                # 1. Hacemos una copia de la imagen y la forzamos a RGB clásico
-                img_canvas = img.copy().convert("RGB")
+                # --- LAVADO DE METADATOS (LA OPCIÓN NUCLEAR) ---
+                import io # Importamos esto para crear una memoria virtual
                 
-                # 2. La achicamos automáticamente (thumbnail no deforma y calcula todo solo)
-                img_canvas.thumbnail((400, 400))
+                # 1. Copiamos y forzamos RGB
+                img_temp = img.copy().convert("RGB")
+                img_temp.thumbnail((400, 400))
                 
-                # 3. Lienzo interactivo: ¡Las medidas se las pedimos directamente a la imagen!
+                # 2. Guardamos la imagen en la "memoria virtual" como PNG puro
+                # (Esto destruye cualquier metadato, error de WhatsApp o corrupción)
+                buffer = io.BytesIO()
+                img_temp.save(buffer, format="PNG")
+                
+                # 3. La volvemos a abrir totalmente virgen y limpia
+                img_clean = Image.open(buffer)
+                
+                # Lienzo interactivo
                 canvas_result = st_canvas(
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=img_canvas,
-                    height=img_canvas.height, # <-- Infalible: mide exactamente lo mismo que la foto
-                    width=img_canvas.width,   # <-- Infalible: mide exactamente lo mismo que la foto
+                    background_color="#FFFFFF", # Forzamos blanco por si acaso
+                    background_image=img_clean,
+                    update_streamlit=False,
+                    height=img_clean.height, 
+                    width=img_clean.width,   
                     drawing_mode="freedraw",
-                    key=f"canvas_simple_{safe_key}", # <-- Renovamos la key
+                    key=f"canvas_nuclear_{safe_key}", # <-- Nueva key
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{safe_key}", type="primary"):
@@ -547,7 +557,7 @@ with col2:
                         img_array = np.array(img.convert("RGBA"))
                         mask_array = np.array(drawn_mask)
                         
-                        # Todo lo pintado lo hacemos transparente en la imagen real
+                        # Borramos todo lo pintado
                         img_array[mask_array[:, :, 3] > 0] = [0, 0, 0, 0]
                         
                         new_img = Image.fromarray(img_array, "RGBA")
