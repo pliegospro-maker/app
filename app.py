@@ -522,32 +522,32 @@ with col2:
                 
                 brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{safe_key}")
                 
-                # --- PREPARACIÓN BLINDADA PARA EL CANVAS ---
+                # --- LA TRAMPA FINAL: RGBA 100% OPACO ---
                 w_orig, h_orig = img.width, img.height
                 
-                # 1. Creamos un fondo gris neutro RGB (sin transparencia)
-                fondo_gris = Image.new("RGB", (w_orig, h_orig), (128, 128, 128))
+                # 1. Creamos un fondo gris en formato RGBA, totalmente sólido/opaco (255)
+                fondo_gris_opaco = Image.new("RGBA", (w_orig, h_orig), (128, 128, 128, 255))
                 
                 # 2. Pegamos tu diseño arriba
                 if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
-                    fondo_gris.paste(img, mask=img.convert("RGBA").split()[3])
+                    fondo_gris_opaco.paste(img, mask=img.convert("RGBA").split()[3])
                 else:
-                    fondo_gris.paste(img)
+                    fondo_gris_opaco.paste(img)
                 
                 # 3. Redimensionamos exactamente al tamaño del lienzo
                 w_canvas = 400
                 h_canvas = int((w_canvas / w_orig) * h_orig) if w_orig > 0 else 400
-                img_fondo = fondo_gris.resize((w_canvas, h_canvas))
+                img_fondo = fondo_gris_opaco.resize((w_canvas, h_canvas))
                 
-                # Lienzo interactivo (limpio de configuraciones extra que lo rompen)
+                # Lienzo interactivo (ahora JS recibe los 4 canales que exige)
                 canvas_result = st_canvas(
                     stroke_width=brush_size,
                     stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=img_fondo, # Pasamos la imagen en RGB puro
+                    background_image=img_fondo, 
                     height=h_canvas,
                     width=w_canvas,
                     drawing_mode="freedraw",
-                    key=f"canvas_gris_{safe_key}", # <-- Nueva key para resetearlo
+                    key=f"canvas_rgba_{safe_key}", # <-- Nueva key clave
                 )
                 
                 if st.button("✅ Aplicar Borrado", key=f"apply_erase_{safe_key}", type="primary"):
