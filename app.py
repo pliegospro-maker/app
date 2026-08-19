@@ -55,9 +55,6 @@ from supabase import create_client, Client
 import streamlit.components.v1 as components # <--- AGREGAR ESTA LÍNEA
 
 
-components.html(codigo_bot, height=0, width=0)
-# --- FIN DEL ASISTENTE ---
-
 # 1. Conectar a Supabase
 url_supabase: str = st.secrets["SUPABASE_URL"]
 clave_supabase: str = st.secrets["SUPABASE_KEY"]
