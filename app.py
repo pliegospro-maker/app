@@ -54,30 +54,7 @@ import mercadopago
 from supabase import create_client, Client
 import streamlit.components.v1 as components # <--- AGREGAR ESTA LÍNEA
 
-# --- INYECCIÓN DEL ASISTENTE VIRTUAL FLOTANTE (CHATBASE) ---
-codigo_bot = """
-<script>
-    var parentDoc = window.parent.document;
-    
-    // Verificamos que el bot no esté ya cargado para no duplicarlo
-    if (!parentDoc.getElementById('chatbase-script')) {
-        // 1. Configuracion del bot con tu ID exacto
-        var configScript = parentDoc.createElement('script');
-        configScript.innerHTML = "window.embeddedChatbotConfig = { chatbotId: 'qBw1nKTt9az-7COIOZRzd', domain: 'www.chatbase.co' }";
-        parentDoc.body.appendChild(configScript);
 
-        // 2. Script principal de Chatbase que dibuja la burbuja
-        var mainScript = parentDoc.createElement('script');
-        mainScript.id = 'chatbase-script';
-        mainScript.src = "https://www.chatbase.co/embed.min.js";
-        mainScript.setAttribute("chatbotId", "qBw1nKTt9az-7COIOZRzd");
-        mainScript.setAttribute("domain", "www.chatbase.co");
-        mainScript.defer = true;
-        parentDoc.body.appendChild(mainScript);
-    }
-</script>
-"""
-# Ejecutamos el script de forma invisible en el fondo
 components.html(codigo_bot, height=0, width=0)
 # --- FIN DEL ASISTENTE ---
 
@@ -397,17 +374,24 @@ usable_sheet_w_px = gang_width_px - (2 * edge_margin_px)
 usable_sheet_h_px = gang_height_px - (2 * edge_margin_px)
 
 with st.sidebar:
-    
     st.markdown("---")
     st.markdown("**Personalización**")
     bg_color_choice = st.selectbox("🎨 Color de fondo para recuadros:", list(BACKGROUND_COLORS.keys()), index=1)
     selected_bg_hex = BACKGROUND_COLORS[bg_color_choice]
-
+    
     st.markdown("---")
     st.markdown("**Optimización de Espacio**")
     allow_rotation = st.checkbox("🔄 Permitir rotar imágenes (Tetris)", value=True, help="El sistema evaluará si rotar 90° la imagen ahorra material en el pliego.")
-
+    
     st.markdown("---")
+    
+    # --- NUEVO ASISTENTE INTEGRADO ---
+    with st.expander("🤖 Asistente Virtual 24/7", expanded=False):
+        # Usamos el enlace oficial (iframe) de tu bot de Chatbase
+        components.iframe("https://www.chatbase.co/chatbot-iframe/qBw1nKTt9az-7COIOZRzd", height=480)
+    
+    st.markdown("---")
+
     # El visor vuelve a la barra lateral, pero con su propio botón desplegable
     with st.expander("🔍 VISOR DE VISTA PREVIA", expanded=True):
         sidebar_visor = st.empty()
