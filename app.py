@@ -402,6 +402,10 @@ with col2:
                 # 3. Leemos puramente de la memoria (ignora si la caja de subida se vacía)
                 archivos_vivos = [ArchivoRecuperado(nombre) for nombre in st.session_state.image_history.keys() if nombre not in st.session_state.deleted_images]
 
+                # --- LA SOLUCIÓN: Declaramos la variable ACÁ AFUERA ---
+                # Así, aunque no haya imágenes, el visor sabe que está vacía y no colapsa
+                image_configs = []
+
                 # 4. Mostrar el panel de edición SOLO si hay archivos vivos
                 if len(archivos_vivos) > 0:
                     with st.expander("🛠️ Edición Masiva", expanded=False):
@@ -425,6 +429,10 @@ with col2:
                                         st.session_state[f"h_{file.name}"] = float(bulk_val)
                                 st.session_state.last_action_msg = "✅ Edición masiva aplicada correctamente."
                                 st.rerun()
+
+                    # (Fijate que borramos el image_configs = [] que estaba acá adentro)
+                    for idx, file in enumerate(archivos_vivos):
+                        img = st.session_state.image_history[file.name][-1]
 
                     image_configs = []
                     for idx, file in enumerate(archivos_vivos):
