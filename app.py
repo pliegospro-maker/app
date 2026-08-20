@@ -64,12 +64,18 @@ supabase: Client = create_client(url_supabase, clave_supabase)
 if 'usuario_autenticado' not in st.session_state:
     st.session_state.usuario_autenticado = False
 
-# === NUEVO: RECUPERAR SESIÓN TRAS APRETAR F5 ===
-if "usuario" in st.query_params:
-    st.session_state.usuario_autenticado = True
-    st.session_state.email_usuario = st.query_params["usuario"]
-    
-    # Recuperar los créditos de Supabase al recargar la página
+if st.button("Ingresar al Software", type="primary"):
+                try:
+                    # Inicia sesión directamente
+                    respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
+                    st.session_state.usuario_autenticado = True
+                    st.session_state.email_usuario = email_login
+                    
+                    # --- LA MAGIA CONTRA EL F5 ---
+                    # Escribimos el email en la URL para que el navegador no te olvide al recargar
+                    st.query_params["usuario"] = email_login
+
+                    # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
     if "creditos" not in st.session_state:
         try:
             respuesta_bd = supabase.table("perfiles").select("creditos").eq("email", st.session_state.email_usuario).execute()
