@@ -135,22 +135,23 @@ from streamlit_cropper import st_cropper
 import numpy as np
 from streamlit_drawable_canvas import st_canvas
 
-# Ocultar elementos estéticos apuntando al botón exacto
+# Ocultar elementos estéticos (Header completo, GitHub, etc.)
 ocultar_elementos = """
-    <style>
-    /* 1. Oculta exactamente el ícono/botón que encontraste */
-    .stToolbarActionButtonIcon {display: none !important;}
-    [data-testid="stToolbarActionButton"] {display: none !important;}
-    
-    /* 2. Oculta el menú de los 3 puntitos */
-    #MainMenu {display: none !important;}
-    
-    /* 3. Vuelve el fondo de arriba transparente */
-   # header {background-color: transparent !important;}
-    
-    /* 4. Oculta la marca de agua del pie de página */
-    footer {display: none !important;}
-    </style>
+<style>
+/* 1. Oculta la barra superior completa (stHeader) y sus botones (GitHub, Share, Deploy) */
+[data-testid="stHeader"] {display: none !important;}
+header {visibility: hidden !important; display: none !important;}
+.stApp > header {display: none !important;}
+
+/* 2. Oculta el contenedor de herramientas (Toolbar) por si acaso */
+[data-testid="stToolbar"] {display: none !important;}
+
+/* 3. Oculta el menú de los 3 puntitos */
+#MainMenu {display: none !important;}
+
+/* 4. Oculta la marca de agua del pie de página */
+footer {display: none !important;}
+</style>
 """
 st.markdown(ocultar_elementos, unsafe_allow_html=True)
 
