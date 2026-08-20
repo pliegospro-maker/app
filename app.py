@@ -385,42 +385,52 @@ with st.sidebar:
         sidebar_stats = st.empty()
 
 with col2:
-    st.subheader("3. Edición de Imágenes")
-    
-    if uploaded_files:
-        with st.expander("🛠️ Edición Masiva", expanded=False):
-            b_col1, b_col2, b_col3, b_col4 = st.columns([1.5, 1, 1, 1])
-            with b_col1: bulk_dim = st.radio("Ajustar todas por:", ["Ancho", "Alto"], horizontal=True, key="bulk_dim")
-            with b_col2: bulk_val = st.number_input("Medida (cm)", min_value=0.1, value=5.0, step=0.5, key="bulk_val")
-            with b_col3: bulk_qty = st.number_input("Cantidad c/u", min_value=1, value=1, step=1, key="bulk_qty")
-            with b_col4:
-                st.markdown("<br>", unsafe_allow_html=True)
-                if st.button("✅ Aplicar a Todas", type="primary", use_container_width=True):
+                st.subheader("3. Edición de Imágenes")
+
+                # --- ESCUDO ANTI-CORTES ---
+                # 1. Guardamos lo que se sube directamente a la caja fuerte de memoria
+                if uploaded_files:
                     for file in uploaded_files:
-                        if file.name in st.session_state.deleted_images: continue
-                        st.session_state[f"qty_{file.name}"] = bulk_qty
-                        if bulk_dim == "Ancho":
-                            st.session_state[f"dim_{file.name}"] = "Ancho"
-                            st.session_state[f"w_{file.name}"] = float(bulk_val)
-                        else:
-                            st.session_state[f"dim_{file.name}"] = "Alto"
-                            st.session_state[f"h_{file.name}"] = float(bulk_val)
-                    st.session_state.last_action_msg = "✅ Edición masiva aplicada correctamente."
-                    st.rerun()
-    
-    image_configs = []
-    
-    if uploaded_files:
-        for idx, file in enumerate(uploaded_files):
-            if file.name in st.session_state.deleted_images: continue
-            
-            if file.name not in st.session_state.image_history:
-                st.session_state.image_history[file.name] = [Image.open(file)]
-                
-            img = st.session_state.image_history[file.name][-1]
-            
-            orig_w, orig_h = img.size
-            aspect_ratio = orig_w / orig_h if orig_h != 0 else 1
+                        if file.name not in st.session_state.image_history:
+                            st.session_state.image_history[file.name] = [Image.open(file)]
+
+                # 2. Simulamos la estructura de archivos para no romper tu código inferior
+                class ArchivoRecuperado:
+                    def __init__(self, name):
+                        self.name = name
+
+                # 3. Leemos puramente de la memoria (ignora si la caja de subida se vacía)
+                archivos_vivos = [ArchivoRecuperado(nombre) for nombre in st.session_state.image_history.keys() if nombre not in st.session_state.deleted_images]
+
+                # 4. Mostrar el panel de edición SOLO si hay archivos vivos
+                if len(archivos_vivos) > 0:
+                    with st.expander("🛠️ Edición Masiva", expanded=False):
+                        b_col1, b_col2, b_col3, b_col4 = st.columns([1.5, 1, 1, 1])
+                        with b_col1:
+                            bulk_dim = st.radio("Ajustar todas por:", ["Ancho", "Alto"], horizontal=True, key="bulk_dim")
+                        with b_col2:
+                            bulk_val = st.number_input("Medida (cm)", min_value=0.1, value=5.0, step=0.5, key="bulk_val")
+                        with b_col3:
+                            bulk_qty = st.number_input("Cantidad c/u", min_value=1, value=1, step=1, key="bulk_qty")
+                        with b_col4:
+                            st.markdown("<br>", unsafe_allow_html=True)
+                            if st.button("✅ Aplicar a Todas", type="primary", use_container_width=True):
+                                for file in archivos_vivos:
+                                    st.session_state[f"qty_{file.name}"] = bulk_qty
+                                    if bulk_dim == "Ancho":
+                                        st.session_state[f"dim_{file.name}"] = "Ancho"
+                                        st.session_state[f"w_{file.name}"] = float(bulk_val)
+                                    else:
+                                        st.session_state[f"dim_{file.name}"] = "Alto"
+                                        st.session_state[f"h_{file.name}"] = float(bulk_val)
+                                st.session_state.last_action_msg = "✅ Edición masiva aplicada correctamente."
+                                st.rerun()
+
+                    image_configs = []
+                    for idx, file in enumerate(archivos_vivos):
+                        img = st.session_state.image_history[file.name][-1]
+                        orig_w, orig_h = img.size
+                        aspect_ratio = orig_w / orig_h if orig_h != 0 else 1
             
             with st.expander(f"⚙️ {file.name}", expanded=False):
                                 if len(st.session_state.image_history[file.name]) > 1:
