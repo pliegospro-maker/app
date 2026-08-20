@@ -345,6 +345,8 @@ with col1:
         st.session_state.deleted_images = set()
         st.session_state.image_history = {}
         st.session_state.last_action_msg = "♻️ Papelera limpiada correctamente."
+        st.session_state.pliegos_desbloqueados = False # Candado extra
+        st.session_state.proceso_iniciado = False # Reiniciamos el proceso
         st.rerun()
 
 # --- PANEL LATERAL Y CLAVES API Y FONDOS ---
@@ -654,12 +656,16 @@ if uploaded_files and len(image_configs) > 0:
     st.markdown("---")
     
     # 1. Creamos la memoria
-    if "proceso_iniciado" not in st.session_state:
-        st.session_state.proceso_iniciado = False
-        
-    # 2. El botón ahora solo enciende la memoria
-    if st.button("🚀 Generar Archivos Finales", type="primary", use_container_width=True):
-        st.session_state.proceso_iniciado = True
+        if "proceso_iniciado" not in st.session_state:
+            st.session_state.proceso_iniciado = False
+
+        # 2. El botón ahora solo enciende la memoria y BLOQUEA las descargas nuevas
+        if st.button("🚀 Generar Archivos Finales", type="primary", use_container_width=True):
+            st.session_state.proceso_iniciado = True
+            
+            # --- EL CANDADO (MAGIA ACÁ) ---
+            # Forzamos a que vuelva a cobrar cada vez que se genera un pliego nuevo
+            st.session_state.pliegos_desbloqueados = False
         
     # 3. Todo tu código pasa a depender de la memoria
     if st.session_state.proceso_iniciado:
