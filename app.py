@@ -274,8 +274,8 @@ with col_izq:
 with col_der:
    with col_der:
     st.markdown("### 👋 Bienvenido/a")
-    st.markdown("**paqueteimpresiones@gmail.com**") 
-    st.markdown("💳 **Tus Créditos:** 498")
+    st.markdown(f"**{email_usuario}**")
+    st.markdown(f"💳 **Tus Créditos:** {creditos_actuales}")
     
     # Botón HTML 100% funcional con estilos en línea
     boton_pago = """
