@@ -650,22 +650,22 @@ if len(image_configs) > 0:
         else:
             sidebar_stats.success(f"Todo entra en 1 solo pliego.")
 
+# 6. Generador Final
+        if uploaded_files and len(image_configs) > 0:
+            st.markdown("---")
 
-   # 6. Generador Final
-if uploaded_files and len(image_configs) > 0:
-    st.markdown("---")
-    
-    # 1. Creamos la memoria
-        if "proceso_iniciado" not in st.session_state:
-            st.session_state.proceso_iniciado = False
+            # 1. Creamos la memoria
+            if "proceso_iniciado" not in st.session_state:
+                st.session_state.proceso_iniciado = False
 
-        # 2. El botón ahora solo enciende la memoria y BLOQUEA las descargas nuevas
-        if st.button("🚀 Generar Archivos Finales", type="primary", use_container_width=True):
-            st.session_state.proceso_iniciado = True
-            
-            # --- EL CANDADO (MAGIA ACÁ) ---
-            # Forzamos a que vuelva a cobrar cada vez que se genera un pliego nuevo
-            st.session_state.pliegos_desbloqueados = False
+            # 2. El botón ahora solo enciende la memoria y BLOQUEA las descargas nuevas
+            if st.button("🚀 Generar Archivos Finales", type="primary", use_container_width=True):
+                st.session_state.proceso_iniciado = True
+                
+                # --- EL CANDADO (MAGIA ACÁ) ---
+                # Forzamos a que vuelva a cobrar cada vez que se genera un pliego nuevo
+                st.session_state.pliegos_desbloqueados = False
+   
         
     # 3. Todo tu código pasa a depender de la memoria
     if st.session_state.proceso_iniciado:
