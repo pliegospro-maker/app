@@ -1,4 +1,4 @@
-streamlit==1.36.0
+streamlit==1.28.0
 rectpack
 requests
 streamlit-cropper
@@ -6,3 +6,4 @@ supabase
 mercadopago
 streamlit-drawable-canvas==0.9.3
 numpy
+pillow
