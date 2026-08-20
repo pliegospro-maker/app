@@ -648,9 +648,7 @@ if len(image_configs) > 0:
         else:
             sidebar_stats.success(f"Todo entra en 1 solo pliego.")
 
-# 6. Generador Final
-if uploaded_files and len(image_configs) > 0:
-    st.markdown("---")
+
    # 6. Generador Final
 if uploaded_files and len(image_configs) > 0:
     st.markdown("---")
