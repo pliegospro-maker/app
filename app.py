@@ -64,27 +64,6 @@ supabase: Client = create_client(url_supabase, clave_supabase)
 if 'usuario_autenticado' not in st.session_state:
     st.session_state.usuario_autenticado = False
 
-if st.button("Ingresar al Software", type="primary"):
-                try:
-                    # Inicia sesión directamente
-                    respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
-                    st.session_state.usuario_autenticado = True
-                    st.session_state.email_usuario = email_login
-                    
-                    # --- LA MAGIA CONTRA EL F5 ---
-                    # Escribimos el email en la URL para que el navegador no te olvide al recargar
-                    st.query_params["usuario"] = email_login
-
-                    # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
-    if "creditos" not in st.session_state:
-        try:
-            respuesta_bd = supabase.table("perfiles").select("creditos").eq("email", st.session_state.email_usuario).execute()
-            if len(respuesta_bd.data) > 0:
-                st.session_state.creditos = respuesta_bd.data[0]["creditos"]
-            else:
-                st.session_state.creditos = 0
-        except:
-            st.session_state.creditos = 0
 
 # 3. Pantalla de Autenticación (Modelo Freemium)
 if not st.session_state.usuario_autenticado:
@@ -94,33 +73,32 @@ if not st.session_state.usuario_autenticado:
     tab_login, tab_registro = st.tabs(["Iniciar Sesión", "Crear Cuenta"])
 
     with tab_login:
-        email_login = st.text_input("Tu Email", key="email_login").strip().lower()
-        password_login = st.text_input("Tu Contraseña", type="password", key="pass_login")
-        if st.button("Ingresar al Software", type="primary"):
-            try:
-                # Inicia sesión directamente
-                respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
-                st.session_state.usuario_autenticado = True
-                st.session_state.email_usuario = email_login
-
-                # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
+            email_login = st.text_input("Tu Email", key="email_login").strip().lower()
+            password_login = st.text_input("Tu Contraseña", type="password", key="pass_login")
+            
+            if st.button("Ingresar al Software", type="primary"):
                 try:
-                    respuesta_bd = supabase.table("perfiles").select("creditos").eq("email", email_login).execute()
+                    # Inicia sesión directamente
+                    respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
+                    st.session_state.usuario_autenticado = True
+                    st.session_state.email_usuario = email_login
                     
-                    if len(respuesta_bd.data) > 0:
-                        st.session_state.creditos = respuesta_bd.data[0]["creditos"]
-                    else:
+                    # --- LA MAGIA CONTRA EL F5 ---
+                    st.query_params["usuario"] = email_login
+
+                    # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
+                    try:
+                        respuesta_bd = supabase.table("perfiles").select("creditos").eq("email", email_login).execute()
+                        if len(respuesta_bd.data) > 0:
+                            st.session_state.creditos = respuesta_bd.data[0]["creditos"]
+                        else:
+                            st.session_state.creditos = 0
+                    except Exception as error_db:
                         st.session_state.creditos = 0
                         
-                except Exception as error_db:
-                    st.session_state.creditos = 0 
-                
-                st.rerun() 
-
-            except Exception as e:
-                st.error("Email o contraseña incorrectos.")        
-            except Exception as e:
-                st.error("Email o contraseña incorrectos.")
+                    st.rerun()
+                except Exception as e:
+                    st.error("Email o contraseña incorrectos.")
        
 
     with tab_registro:
