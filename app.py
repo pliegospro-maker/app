@@ -534,27 +534,27 @@ with col2:
                                 st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
                                 
                                 remove_type = st.radio("Método de borrado:", ["Gotero (Color Exacto)", "Barra (Luminosidad)"], key=f"rm_type_{safe_key}", horizontal=True)
-            
-            if remove_type == "Gotero (Color Exacto)":
-                cc1, cc2 = st.columns(2)
-                with cc1:
-                    target_color = st.color_picker("Color (Clica para usar el gotero)", "#000000", key=f"cp_{safe_key}")
-                with cc2:
-                    tol_val = st.slider("Tolerancia", 0, 100, 30, key=f"tol_exact_{safe_key}")
-                
-                preview_img = remove_specific_color(img, target_color, tol_val)
-                
-                prev_col1, prev_col2 = st.columns([2, 1])
-                with prev_col1:
-                    st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_column_width=True)
-                with prev_col2:
-                    st.markdown("<br><br>", unsafe_allow_html=True)
-                    if st.button("✅ Aplicar Color", key=f"apply_color_{safe_key}", type="primary"):
-                        st.session_state.image_history[file.name].append(preview_img)
-                        st.session_state.last_action_msg = f"✅ Color eliminado de {file.name}."
-                        st.rerun()
-
-            else: # Opción de la Barra de Luminosidad
+                                
+                                if remove_type == "Gotero (Color Exacto)":
+                                    cc1, cc2 = st.columns(2)
+                                    with cc1:
+                                        target_color = st.color_picker("Color (Clica para usar el gotero)", "#000000", key=f"cp_{safe_key}")
+                                    with cc2:
+                                        tol_val = st.slider("Tolerancia", 0, 100, 30, key=f"tol_exact_{safe_key}")
+                                        
+                                    preview_img = remove_specific_color(img, target_color, tol_val)
+                                    
+                                    prev_col1, prev_col2 = st.columns([2, 1])
+                                    with prev_col1:
+                                        st.image(get_preview_with_bg(preview_img, selected_bg_hex), caption="Previsualización en tiempo real", use_column_width=True)
+                                    with prev_col2:
+                                        st.markdown("<br><br>", unsafe_allow_html=True)
+                                        if st.button("✅ Aplicar Color", key=f"apply_color_{safe_key}", type="primary"):
+                                            st.session_state.image_history[file.name].append(preview_img)
+                                            st.session_state.last_action_msg = f"✅ Color eliminado de {file.name}."
+                                            st.rerun()
+                                else:
+                                    # Opción de la Barra de Luminosidad
                 lum_target = st.slider("Luminosidad a borrar (0=Negro, 255=Blanco)", 0, 255, 255, key=f"lum_{safe_key}")
                 tol_lum = st.slider("Tolerancia", 0, 100, 30, key=f"tol_lum_{safe_key}")
                 
