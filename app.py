@@ -569,14 +569,14 @@ with col2:
                                             st.session_state.last_action_msg = f"✅ Luminosidad eliminada de {file.name}."
                                             st.rerun()
 
-            # --- LA PIEZA VITAL QUE FALTABA ---
+                        # --- LA PIEZA VITAL QUE FALTABA ---
             # Esto registra la imagen para que el Visor la muestre en el pliego
-            image_configs.append({
-                "image": img,
-                "w_px": cm_to_px(new_w_cm),
-                "h_px": cm_to_px(new_h_cm),
-                "qty": qty
-            })
+                        image_configs.append({
+                            "image": img,
+                            "w_px": cm_to_px(new_w_cm),
+                            "h_px": cm_to_px(new_h_cm),
+                            "qty": qty
+                        })
             
 # --- ACTUALIZAR VISOR EN VIVO ---
 if len(image_configs) > 0:
