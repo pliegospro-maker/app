@@ -520,57 +520,6 @@ with col2:
                         st.rerun()
                     st.markdown("---")
 
-# --- NUEVO: BORRADOR MANUAL CON PINCEL ---
-            st.markdown("**Borrador Manual (Pincel)**")
-            
-            safe_key = "".join(c for c in file.name if c.isalnum())
-            
-            if st.checkbox("🖌️ Activar Borrador Manual", key=f"erase_check_{safe_key}"):
-                st.info("Dibuja con el pincel rojo sobre las áreas que quieres borrar. Luego presiona Aplicar.")
-                
-                brush_size = st.slider("Tamaño del pincel", 5, 100, 20, key=f"brush_size_{safe_key}")
-                
-                # --- LA CORRECCIÓN FINAL ---
-                # 1. Calculamos el tamaño para la pantalla (400px de ancho)
-                ancho_lienzo = 400
-                alto_lienzo = int(400 * (img.height / img.width)) if img.width > 0 else 400
-                
-                # 2. ACHICAMOS LA IMAGEN EXACTAMENTE A ESE TAMAÑO ANTES DE PASARLA
-                img_para_lienzo = img.resize((ancho_lienzo, alto_lienzo))
-                
-                # 3. Lienzo interactivo (Ahora sí: la imagen y el lienzo miden igual)
-                canvas_result = st_canvas(
-                    fill_color="rgba(255, 255, 255, 0.0)",
-                    stroke_width=brush_size,
-                    stroke_color="rgba(255, 0, 0, 1.0)",
-                    background_image=img_para_lienzo, # <--- Pasamos la imagen ya achicada
-                    update_streamlit=True,
-                    height=alto_lienzo,
-                    width=ancho_lienzo,
-                    drawing_mode="freedraw",
-                    key=f"canvas_directo_{safe_key}", 
-                )
-                
-                if st.button("✅ Aplicar Borrado", key=f"apply_erase_{safe_key}", type="primary"):
-                    if canvas_result.image_data is not None:
-                        drawn_mask = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
-                        # Volvemos a agrandar la máscara al tamaño real de la imagen
-                        drawn_mask = drawn_mask.resize(img.size, Image.Resampling.NEAREST)
-                        
-                        img_array_final = np.array(img.convert("RGBA"))
-                        mask_array = np.array(drawn_mask)
-                        
-                        # Hacemos transparente lo que se pintó
-                        img_array_final[mask_array[:, :, 3] > 0] = [0, 0, 0, 0]
-                        
-                        new_img = Image.fromarray(img_array_final, "RGBA")
-                        st.session_state.image_history[file.name].append(new_img)
-                        st.session_state.last_action_msg = f"🖌️ Borrado manual aplicado en {file.name}."
-                        st.rerun()
-                    else:
-                        st.warning("No dibujaste nada.")
-                        
-            st.markdown("---")
 
             # ----------------------------------------
             st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
