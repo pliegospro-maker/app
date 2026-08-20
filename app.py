@@ -526,12 +526,14 @@ with col2:
                                         st.rerun()
                                 st.markdown("---")
         
-
-            # --- AGREGAMOS ESTA LÍNEA QUE SE HABÍA BORRADO ---
-            safe_key = "".join(c for c in file.name if c.isalnum())
-            st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
-            
-            remove_type = st.radio("Método de borrado:", ["Gotero (Color Exacto)", "Barra (Luminosidad)"], key=f"rm_type_{safe_key}", horizontal=True)
+                                # --- AGREGAMOS ESTA LÍNEA QUE SE HABÍA BORRADO ---
+                                st.markdown("---")
+                                
+                                safe_key = "".join(c for c in file.name if c.isalnum())
+                                
+                                st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
+                                
+                                remove_type = st.radio("Método de borrado:", ["Gotero (Color Exacto)", "Barra (Luminosidad)"], key=f"rm_type_{safe_key}", horizontal=True)
             
             if remove_type == "Gotero (Color Exacto)":
                 cc1, cc2 = st.columns(2)
@@ -576,6 +578,7 @@ with col2:
                 "h_px": cm_to_px(new_h_cm),
                 "qty": qty
             })
+            
 # --- ACTUALIZAR VISOR EN VIVO ---
 if len(image_configs) > 0:
     live_packer = newPacker(mode=PackingMode.Offline, bin_algo=PackingBin.BFF, rotation=allow_rotation)
