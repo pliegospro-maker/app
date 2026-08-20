@@ -422,84 +422,89 @@ with col2:
             aspect_ratio = orig_w / orig_h if orig_h != 0 else 1
             
             with st.expander(f"⚙️ {file.name}", expanded=False):
-                
-                if len(st.session_state.image_history[file.name]) > 1:
-                    if st.button("↩️ Deshacer último cambio", key=f"undo_{file.name}"):
-                        st.session_state.image_history[file.name].pop()
-                        st.session_state.last_action_msg = f"↩️ Último cambio deshecho en {file.name}."
-                        st.rerun()
-                
-                c_img, c_size, c_act1, c_act2 = st.columns([1, 1.5, 1, 1])
-                
-                with c_size:
-                    dim_choice = st.radio("Ajustar:", ["Ancho", "Alto"], horizontal=True, key=f"dim_{file.name}")
-                    if dim_choice == "Ancho":
-                        new_w_cm = st.number_input("Ancho (cm)", min_value=0.1, value=round(px_to_cm(orig_w), 2), key=f"w_{file.name}")
-                        new_h_cm = new_w_cm / aspect_ratio
-                        st.caption(f"Alto: {new_h_cm:.2f} cm")
-                        effective_dpi = orig_w / (new_w_cm / 2.54) if new_w_cm > 0 else 300
-                    else:
-                        new_h_cm = st.number_input("Alto (cm)", min_value=0.1, value=round(px_to_cm(orig_h), 2), key=f"h_{file.name}")
-                        new_w_cm = new_h_cm * aspect_ratio
-                        st.caption(f"Ancho: {new_w_cm:.2f} cm")
-                        effective_dpi = orig_h / (new_h_cm / 2.54) if new_h_cm > 0 else 300
+                                if len(st.session_state.image_history[file.name]) > 1:
+                                    if st.button("↩️ Deshacer último cambio", key=f"undo_{file.name}"):
+                                        st.session_state.image_history[file.name].pop()
+                                        st.session_state.last_action_msg = f"↩️ Último cambio deshecho en {file.name}."
+                                        st.rerun()
 
-                with c_img:
-                    img_for_preview = get_preview_with_bg(img, selected_bg_hex)
-                    st.image(img_for_preview, use_column_width=True)
-                    qty = st.number_input(f"Cantidad", min_value=1, value=1, key=f"qty_{file.name}")
-                    
-                    if effective_dpi < 150:
-                        st.warning(f"⚠️ Calidad baja: {int(effective_dpi)} DPI.")
-                        if st.button("🪄 Mejorar Imagen ACÁ", key=f"up_{file.name}"):
-                            with st.spinner("Mejorando resolución..."):
-                                new_size = (orig_w * 2, orig_h * 2)
-                                upscaled = img.resize(new_size, Image.Resampling.LANCZOS)
-                                st.session_state.image_history[file.name].append(upscaled)
-                                st.session_state.last_action_msg = f"🪄 Upscale aplicado correctamente a {file.name}."
-                                st.rerun()
-            
-                            
-                    if st.button("✂️ Recortar Bordes Automático", key=f"crop_{file.name}"):
-                        bbox = img.getbbox()
-                        if bbox:
-                            new_img = img.crop(bbox)
-                            st.session_state.image_history[file.name].append(new_img)
-                            st.session_state.last_action_msg = f"✂️ Bordes vacíos recortados correctamente en {file.name}."
-                            st.rerun()
-                            
-                    if st.button("🗑️ Borrar Imagen", key=f"del_{file.name}"):
-                        st.session_state.deleted_images.add(file.name)
-                        st.session_state.last_action_msg = f"🗑️ Imagen {file.name} borrada correctamente."
-                        st.rerun()
+                                # --- ELIMINAMOS LA COLUMNA FANTASMA ---
+                                # Pasamos a 3 columnas bien proporcionadas
+                                c_img, c_size, c_act = st.columns([1, 1.2, 1.2])
 
-                with c_act2:
-                    st.markdown("**Avanzadas (RIP)**")
-                    if st.button("🌑 Asfixia (-1px)", key=f"choke_{file.name}"):
-                        new_img = apply_white_choke(img)
-                        st.session_state.image_history[file.name].append(new_img)
-                        st.session_state.last_action_msg = f"🌑 Asfixia aplicada correctamente a {file.name}."
-                        st.rerun()
-                    if st.button("⬛ Rellenar Semitransparencias (Umbral)", key=f"thresh_{file.name}"):
-                        new_img = apply_alpha_threshold(img)
-                        st.session_state.image_history[file.name].append(new_img)
-                        st.session_state.last_action_msg = f"⬛ Umbral aplicado correctamente a {file.name}."
-                        st.rerun()
-                    
-                    if "DTF UV" in sheet_choice:
-                        st.markdown("**Estilo Sticker UV**")
-                        s_col1, s_col2 = st.columns([1, 1])
-                        with s_col1:
-                            stroke_size = st.number_input("Grosor px", min_value=1, max_value=50, value=15, key=f"stroke_size_{file.name}")
-                        with s_col2:
-                            st.markdown("<br>", unsafe_allow_html=True)
-                            if st.button("⚪ Reborde", key=f"stroke_{file.name}"):
-                                new_img = apply_white_stroke(img, size=stroke_size)
-                                st.session_state.image_history[file.name].append(new_img)
-                                st.session_state.last_action_msg = f"⚪ Reborde blanco aplicado correctamente a {file.name}."
-                                st.rerun()
+                                with c_size:
+                                    st.markdown("**📏 Dimensiones**")
+                                    dim_choice = st.radio("Ajustar:", ["Ancho", "Alto"], horizontal=True, key=f"dim_{file.name}")
+                                    
+                                    if dim_choice == "Ancho":
+                                        new_w_cm = st.number_input("Ancho (cm)", min_value=0.1, value=round(px_to_cm(orig_w), 2), key=f"w_{file.name}")
+                                        new_h_cm = new_w_cm / aspect_ratio
+                                        st.caption(f"Alto: {new_h_cm:.2f} cm")
+                                        effective_dpi = orig_w / (new_w_cm / 2.54) if new_w_cm > 0 else 300
+                                    else:
+                                        new_h_cm = st.number_input("Alto (cm)", min_value=0.1, value=round(px_to_cm(orig_h), 2), key=f"h_{file.name}")
+                                        new_w_cm = new_h_cm * aspect_ratio
+                                        st.caption(f"Ancho: {new_w_cm:.2f} cm")
+                                        effective_dpi = orig_h / (new_h_cm / 2.54) if new_h_cm > 0 else 300
 
-                st.markdown("---")
+                                    st.markdown("<br>", unsafe_allow_html=True)
+                                    if st.button("🪄 Mejorar Resolución", key=f"up_{file.name}", use_container_width=True):
+                                        with st.spinner("Mejorando resolución..."):
+                                            new_size = (orig_w * 2, orig_h * 2)
+                                            upscaled = img.resize(new_size, Image.Resampling.LANCZOS)
+                                            st.session_state.image_history[file.name].append(upscaled)
+                                            st.session_state.last_action_msg = f"🪄 Upscale aplicado correctamente a {file.name}."
+                                            st.rerun()
+                                            
+                                    if st.button("✂️ Recortar Bordes Auto", key=f"crop_{file.name}", use_container_width=True):
+                                        bbox = img.getbbox()
+                                        if bbox:
+                                            new_img = img.crop(bbox)
+                                            st.session_state.image_history[file.name].append(new_img)
+                                            st.session_state.last_action_msg = f"✂️ Bordes vacíos recortados en {file.name}."
+                                            st.rerun()
+
+                                with c_img:
+                                    img_for_preview = get_preview_with_bg(img, selected_bg_hex)
+                                    st.image(img_for_preview, use_column_width=True)
+                                    qty = st.number_input(f"Cantidad", min_value=1, value=1, key=f"qty_{file.name}")
+                                    if effective_dpi < 150:
+                                        st.warning(f"⚠️ Calidad baja: {int(effective_dpi)} DPI.")
+
+                                with c_act:
+                                    st.markdown("**⚙️ Avanzadas (RIP)**")
+                                    if st.button("🌑 Asfixia (-1px)", key=f"choke_{file.name}", use_container_width=True):
+                                        new_img = apply_white_choke(img)
+                                        st.session_state.image_history[file.name].append(new_img)
+                                        st.session_state.last_action_msg = f"🌑 Asfixia aplicada a {file.name}."
+                                        st.rerun()
+                                        
+                                    if st.button("⬛ Rellenar Umbral", key=f"thresh_{file.name}", use_container_width=True):
+                                        new_img = apply_alpha_threshold(img)
+                                        st.session_state.image_history[file.name].append(new_img)
+                                        st.session_state.last_action_msg = f"⬛ Umbral aplicado a {file.name}."
+                                        st.rerun()
+                                        
+                                    if "DTF UV" in sheet_choice:
+                                        st.markdown("**Estilo Sticker UV**")
+                                        s_col1, s_col2 = st.columns([1, 1])
+                                        with s_col1:
+                                            stroke_size = st.number_input("Grosor px", min_value=1, max_value=50, value=15, key=f"stroke_size_{file.name}")
+                                        with s_col2:
+                                            st.markdown("<br>", unsafe_allow_html=True)
+                                            if st.button("⚪ Reborde", key=f"stroke_{file.name}"):
+                                                new_img = apply_white_stroke(img, size=stroke_size)
+                                                st.session_state.image_history[file.name].append(new_img)
+                                                st.session_state.last_action_msg = f"⚪ Reborde blanco aplicado a {file.name}."
+                                                st.rerun()
+                                                
+                                    st.markdown("<br>", unsafe_allow_html=True)
+                                    if st.button("🗑️ Borrar Imagen", key=f"del_{file.name}", use_container_width=True):
+                                        st.session_state.deleted_images.add(file.name)
+                                        st.session_state.last_action_msg = f"🗑️ Imagen {file.name} borrada."
+                                        st.rerun()
+
+                                st.markdown("---")
                 if st.checkbox("✂️ Recorte Manual (Cropper Avanzado)", key=f"manual_crop_check_{file.name}"):
                     st.info("Ajusta el recuadro azul para enmarcar el área que deseas conservar. Al terminar, presiona Aplicar.")
                     cropped_img = st_cropper(img, realtime_update=True, box_color='#0000FF', aspect_ratio=None, key=f"cropper_{file.name}")
