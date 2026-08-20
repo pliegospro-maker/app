@@ -505,17 +505,17 @@ with col2:
                                         st.rerun()
 
                                 st.markdown("---")
-                if st.checkbox("✂️ Recorte Manual (Cropper Avanzado)", key=f"manual_crop_check_{file.name}"):
-                    st.info("Ajusta el recuadro azul para enmarcar el área que deseas conservar. Al terminar, presiona Aplicar.")
-                    cropped_img = st_cropper(img, realtime_update=True, box_color='#0000FF', aspect_ratio=None, key=f"cropper_{file.name}")
-                    if st.button("✅ Aplicar Recorte Manual", key=f"apply_manual_crop_{file.name}", type="primary"):
-                        st.session_state.image_history[file.name].append(cropped_img)
-                        st.session_state.last_action_msg = f"✂️ Recorte manual aplicado en {file.name}."
-                        st.rerun()
-                    st.markdown("---")
+                                if st.checkbox("✂️ Recorte Manual (Cropper Avanzado)", key=f"manual_crop_check_{file.name}"):
+                                    st.info("Ajusta el recuadro azul para enmarcar el área que deseas conservar. Al terminar, presiona Aplicar.")
+                                    cropped_img = st_cropper(img, realtime_update=True, box_color='#0000FF', aspect_ratio=None, key=f"cropper_{file.name}")
+                           
+                                    if st.button("✅ Aplicar Recorte Manual", key=f"apply_manual_crop_{file.name}", type="primary"):
+                                        st.session_state.image_history[file.name].append(cropped_img)
+                                        st.session_state.last_action_msg = f"✂️ Recorte manual aplicado en {file.name}."
+                                        st.rerun()
+                                st.markdown("---")
+        
 
-
-            # ----------------------------------------
             # --- AGREGAMOS ESTA LÍNEA QUE SE HABÍA BORRADO ---
             safe_key = "".join(c for c in file.name if c.isalnum())
             st.markdown("**Quitar Fondos o Colores (Vista Previa en Vivo + Auto-Umbral)**")
