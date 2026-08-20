@@ -488,16 +488,16 @@ with col2:
                                         
                                     if "DTF UV" in sheet_choice:
                                         st.markdown("**Estilo Sticker UV**")
-                                        s_col1, s_col2 = st.columns([1, 1])
-                                        with s_col1:
-                                            stroke_size = st.number_input("Grosor px", min_value=1, max_value=50, value=15, key=f"stroke_size_{file.name}")
-                                        with s_col2:
-                                            st.markdown("<br>", unsafe_allow_html=True)
-                                            if st.button("⚪ Reborde", key=f"stroke_{file.name}"):
-                                                new_img = apply_white_stroke(img, size=stroke_size)
-                                                st.session_state.image_history[file.name].append(new_img)
-                                                st.session_state.last_action_msg = f"⚪ Reborde blanco aplicado a {file.name}."
-                                                st.rerun()
+                                        
+                                        # --- CHAU COLUMNAS ANIDADAS ---
+                                        # Ponemos el input y el botón uno debajo del otro
+                                        stroke_size = st.number_input("Grosor px", min_value=1, max_value=50, value=15, key=f"stroke_size_{file.name}")
+                                        
+                                        if st.button("⚪ Reborde", key=f"stroke_{file.name}", use_container_width=True):
+                                            new_img = apply_white_stroke(img, size=stroke_size)
+                                            st.session_state.image_history[file.name].append(new_img)
+                                            st.session_state.last_action_msg = f"⚪ Reborde blanco aplicado a {file.name}."
+                                            st.rerun()
                                                 
                                     st.markdown("<br>", unsafe_allow_html=True)
                                     if st.button("🗑️ Borrar Imagen", key=f"del_{file.name}", use_container_width=True):
