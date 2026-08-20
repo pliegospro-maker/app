@@ -64,10 +64,11 @@ supabase: Client = create_client(url_supabase, clave_supabase)
 if 'usuario_autenticado' not in st.session_state:
     st.session_state.usuario_autenticado = False
 
-# === NUEVO: RECUPERAR SESIÓN TRAS APRETAR F5 ===
-if "usuario" in st.query_params:
+# === NUEVO: RECUPERAR SESIÓN TRAS APRETAR F5 (Versión 1.28) ===
+params = st.experimental_get_query_params()
+if "usuario" in params:
     st.session_state.usuario_autenticado = True
-    st.session_state.email_usuario = st.query_params["usuario"]
+    st.session_state.email_usuario = params["usuario"][0]
     
     # Recuperar los créditos de Supabase al recargar la página
     if "creditos" not in st.session_state:
