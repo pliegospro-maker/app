@@ -79,11 +79,6 @@ if "session" in st.query_params:
     except:
         st.session_state.usuario_autenticado = False
 
-# --- RECUPERAR SESIÓN TRAS APRETAR F5 (¡La pieza que faltaba!) ---
-if "usuario" in st.query_params:
-    st.session_state.usuario_autenticado = True
-    st.session_state.email_usuario = st.query_params["usuario"]
-
 # 3. Pantalla de Autenticación (Modelo Freemium)
 if not st.session_state.usuario_autenticado:
     st.title("🔐 Acceso a PliegosPro")
