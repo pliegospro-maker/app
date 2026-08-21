@@ -865,13 +865,15 @@ if len(image_configs) > 0:
             else:
                 if creditos_actuales >= cantidad_pliegos:
                     if st.button(f"💎 Usar {cantidad_pliegos} Créditos para Desbloquear", use_container_width=True):
-                        # Restamos los créditos en Supabase
-                        nuevos_creditos = creditos_actuales - cantidad_pliegos
-                        supabase.table("perfiles").update({"creditos": nuevos_creditos}).eq("id", st.session_state.user_id).execute()
-                        st.session_state.pliegos_desbloqueados = True
-                        st.rerun() # Recargamos para mostrar el botón de descarga
-                else:
-                    st.error("❌ No tenés créditos suficientes.")
+                            
+                       # --- NUEVO DESCUENTO BLINDADO (Transacción Atómica en Supabase) ---
+                       respuesta_rpc = supabase.rpc("descontar_creditos", {"usuario_id": st.session_state.user_id, "cantidad": cantidad_pliegos}).execute()
+                            
+                       if respuesta_rpc.data == True:
+                           st.session_state.pliegos_desbloqueados = True
+                           st.rerun() # Recargamos para mostrar el botón de descarga
+                       else:
+                           st.error("❌ No tenés créditos suficientes o la sesion expiró.")
                     
                     # Generamos el link por el total de créditos que le faltan
                     try:
