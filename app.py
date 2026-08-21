@@ -64,6 +64,21 @@ supabase: Client = create_client(url_supabase, clave_supabase)
 if 'usuario_autenticado' not in st.session_state:
     st.session_state.usuario_autenticado = False
 
+# --- NUEVO SISTEMA DE SESIÓN SEGURO (CON UUID) ---
+if "session" in st.query_params:
+    token_usuario = st.query_params["session"]
+    try:
+        # Buscamos quién es el dueño de este token secreto
+        respuesta_perfil = supabase.table("perfiles").select("email, creditos").eq("id", token_usuario).execute()
+        if len(respuesta_perfil.data) > 0:
+            st.session_state.usuario_autenticado = True
+            st.session_state.user_id = token_usuario
+            st.session_state.email_usuario = respuesta_perfil.data[0]["email"]
+        else:
+            st.session_state.usuario_autenticado = False
+    except:
+        st.session_state.usuario_autenticado = False
+
 # --- RECUPERAR SESIÓN TRAS APRETAR F5 (¡La pieza que faltaba!) ---
 if "usuario" in st.query_params:
     st.session_state.usuario_autenticado = True
@@ -81,13 +96,21 @@ if not st.session_state.usuario_autenticado:
             
             if st.button("Ingresar al Software", type="primary"):
                 try:
-                    # Inicia sesión directamente
+            # Inicia sesión directamente
                     respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
+                    user_id = respuesta.user.id # Obtenemos el UUID secreto
+            
                     st.session_state.usuario_autenticado = True
+                    st.session_state.user_id = user_id
                     st.session_state.email_usuario = email_login
-                    
-                    # --- LA MAGIA CONTRA EL F5 ---
-                    st.query_params["usuario"] = email_login
+            
+                    # --- MAGIA SEGURA CONTRA EL F5 ---
+                    st.query_params.clear() # Limpiamos basura vieja de la URL
+                    st.query_params["session"] = user_id # Guardamos el UUID, no el email
+            
+                    st.rerun()
+                except Exception as e:
+                    st.error("Email o contraseña incorrectos.")
 
                     # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
                     try:
@@ -255,9 +278,10 @@ if "image_history" not in st.session_state: st.session_state.image_history = {}
 if "last_action_msg" not in st.session_state: st.session_state.last_action_msg = "" 
 
 # --- LECTURA DE CRÉDITOS ---
+user_id = st.session_state.user_id
 email_usuario = st.session_state.email_usuario
 
-respuesta_perfil = supabase.table("perfiles").select("creditos").eq("email", email_usuario).execute()
+respuesta_perfil = supabase.table("perfiles").select("creditos").eq("id", user_id).execute()
 if respuesta_perfil.data:
     creditos_actuales = respuesta_perfil.data[0].get("creditos", 0)
 else:
@@ -848,7 +872,7 @@ if len(image_configs) > 0:
                     if st.button(f"💎 Usar {cantidad_pliegos} Créditos para Desbloquear", use_container_width=True):
                         # Restamos los créditos en Supabase
                         nuevos_creditos = creditos_actuales - cantidad_pliegos
-                        supabase.table("perfiles").update({"creditos": nuevos_creditos}).eq("email", email_usuario).execute()
+                        supabase.table("perfiles").update({"creditos": nuevos_creditos}).eq("id", st.session_state.user_id).execute()
                         st.session_state.pliegos_desbloqueados = True
                         st.rerun() # Recargamos para mostrar el botón de descarga
                 else:
