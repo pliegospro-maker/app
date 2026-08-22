@@ -753,8 +753,8 @@ if len(image_configs) > 0:
             rect_map = {} 
             for config in image_configs:
                 for _ in range(config["qty"]):
-                    req_w = config["w_px"] + margin_px
-                    req_h = config["h_px"] + margin_px
+                    req_w = config["w_px"] + (margin_px * 2)
+                    req_h = config["h_px"] + (margin_px * 2)
                     packer.add_rect(req_w, req_h, rect_id)
                     rect_map[rect_id] = config
                     rect_id += 1
@@ -783,20 +783,21 @@ if len(image_configs) > 0:
                     _, x, y, w, h, rid = rect
                     conf = rect_map[rid]
                     
-                    req_w_margin = conf["w_px"] + margin_px
-                    req_h_margin = conf["h_px"] + margin_px
+                    req_w_margin = conf["w_px"] + (margin_px * 2)
+                    req_h_margin = conf["h_px"] + (margin_px * 2)
                     is_rotated = False
                     if w == req_h_margin and h == req_w_margin and w != h:
                         is_rotated = True
-                    
+                            
                     resized_img = conf["image"].resize((conf["w_px"], conf["h_px"]), Image.Resampling.LANCZOS)
-                    if resized_img.mode != 'RGBA': resized_img = resized_img.convert('RGBA')
-
+                    if resized_img.mode != 'RGBA':
+                        resized_img = resized_img.convert('RGBA')
                     if is_rotated:
                         resized_img = resized_img.rotate(90, expand=True)
 
-                    paste_x = x + edge_margin_px
-                    paste_y = gang_height_px - (y + h) - edge_margin_px
+                    paste_x = x + edge_margin_px + margin_px
+                    paste_y = gang_height_px - (y + h) - edge_margin_px + margin_px
+                    
                     gang_high_res.paste(resized_img, (paste_x, paste_y), resized_img)
                 
                 high_filename = os.path.join(folder_name, f"pliego_{i+1}_alta.png")
@@ -813,17 +814,17 @@ if len(image_configs) > 0:
                 for rect in bins_rects[bin_id]:
                     _, x, y, w, h, rid = rect
                     conf = rect_map[rid]
-                    req_w_margin = conf["w_px"] + margin_px
-                    req_h_margin = conf["h_px"] + margin_px
+                    req_w_margin = conf["w_px"] + (margin_px * 2)
+                    req_h_margin = conf["h_px"] + (margin_px * 2)
                     is_rotated = (w == req_h_margin and h == req_w_margin and w != h)
                             
                     low_w, low_h = int(conf["w_px"] * scale_factor), int(conf["h_px"] * scale_factor)
                     low_img = conf["image"].resize((max(1, low_w), max(1, low_h)), Image.Resampling.LANCZOS).convert('RGBA')
                     if is_rotated:
-                         low_img = low_img.rotate(90, expand=True)
-                            
-                    paste_x = int((x + edge_margin_px) * scale_factor)
-                    paste_y = int((gang_height_px - (y + h) - edge_margin_px) * scale_factor)
+                        low_img = low_img.rotate(90, expand=True)
+
+                    paste_x = int((x + edge_margin_px + margin_px) * scale_factor)
+                    paste_y = int((gang_height_px - (y + h) - edge_margin_px + margin_px) * scale_factor)
                     final_sheet_low.paste(low_img, (paste_x, paste_y), low_img)
                             
                 preview_sheet.paste(final_sheet_low, (0, 0), final_sheet_low)
