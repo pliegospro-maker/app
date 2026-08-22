@@ -568,8 +568,13 @@ with col2:
                                     with prev_col2:
                                         st.markdown("<br><br>", unsafe_allow_html=True)
                                         if st.button("✅ Aplicar Color", key=f"apply_color_{safe_key}", type="primary"):
-                                            st.session_state.image_history[file.name].append(preview_img)
-                                            st.session_state.last_action_msg = f"✅ Color eliminado de {file.name}."
+                                            # Auto-recorte inteligente de bordes fantasma
+                                            img_rgba = preview_img.convert("RGBA")
+                                            bbox = img_rgba.split()[3].getbbox()
+                                            final_img = preview_img.crop(bbox) if bbox else preview_img
+                                    
+                                            st.session_state.image_history[file.name].append(final_img)
+                                            st.session_state.last_action_msg = f"✅ Color borrado y bordes auto-recortados."
                                             st.rerun()
                                 else:
                                     # Opción de la Barra de Luminosidad
@@ -583,8 +588,13 @@ with col2:
                                     with prev_col2:
                                         st.markdown("<br><br>", unsafe_allow_html=True)
                                         if st.button("✅ Aplicar Lum", key=f"apply_lum_{safe_key}", type="primary"):
-                                            st.session_state.image_history[file.name].append(preview_img)
-                                            st.session_state.last_action_msg = f"✅ Luminosidad eliminada de {file.name}."
+                                            # Auto-recorte inteligente de bordes fantasma
+                                            img_rgba = preview_img.convert("RGBA")
+                                            bbox = img_rgba.split()[3].getbbox()
+                                            final_img = preview_img.crop(bbox) if bbox else preview_img
+                                    
+                                            st.session_state.image_history[file.name].append(final_img)
+                                            st.session_state.last_action_msg = f"✅ Luminosidad borrada y bordes auto-recortados."
                                             st.rerun()
 
 # --- LA PIEZA VITAL QUE FALTABA ---
