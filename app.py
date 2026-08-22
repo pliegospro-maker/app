@@ -715,12 +715,12 @@ with st.sidebar:
 
     # 5. ACTUALIZAMOS LOS MENSAJES DE ESTADÍSTICAS
     if len(all_live_rects) < rect_id:
-        sidebar_stats.error(f"¡Rebasaste! {rect_id - len(all_live_rects)} ítems fuera (máx. 20 pliegos).")
+        st.error(f"¡Rebasaste! {rect_id - len(all_live_rects)} ítems fuera (máx. 20 pliegos).")
     else:
         if len(minimapas) > 1:
             st.error(f"⚠️ Estás utilizando {len(minimapas)} pliegos.")
         else:
-            sidebar_stats.success(f"Todo entra en 1 solo pliego.")
+            st.success(f"Todo entra en 1 solo pliego.")
 
 # 6. Generador Final
         if uploaded_files and len(image_configs) > 0:
