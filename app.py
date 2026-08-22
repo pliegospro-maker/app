@@ -373,7 +373,7 @@ gang_height_px = cm_to_px(sheet_height_cm)
 usable_sheet_w_px = gang_width_px - (2 * edge_margin_px)
 usable_sheet_h_px = gang_height_px - (2 * edge_margin_px)
 
-with st.sidebar:
+with col1:
     st.markdown("---")
     st.markdown("**Personalización**")
     bg_color_choice = st.selectbox("🎨 Color de fondo para recuadros:", list(BACKGROUND_COLORS.keys()), index=1)
@@ -674,7 +674,7 @@ if len(image_configs) > 0:
 
     # 4. MOSTRAMOS LAS IMÁGENES EN PESTAÑAS DENTRO DEL SIDEBAR
     # Todo este bloque ahora está empujado a la derecha para ocultarse si no hay imágenes
-    with st.sidebar:
+    with col1:
         with st.expander("🔍 VISOR DE VISTA PREVIA", expanded=True):
             if len(minimapas) > 1:
                 # Creamos los nombres dinámicos de las pestañas
