@@ -678,7 +678,8 @@ if len(image_configs) > 0:
         minimapas.append(minimap)
 
     # 4. MOSTRAMOS LAS IMÁGENES EN PESTAÑAS DENTRO DEL SIDEBAR
-    with st.sidebar("🔍 VISOR DE VISTA PREVIA", expanded=True):
+with st.sidebar:
+    with st.expander("🔍 VISOR DE VISTA PREVIA", expanded=True):
         if len(minimapas) > 1:
             # Creamos los nombres dinámicos de las pestañas
             tabs_preview = st.tabs([f"Pliego {i+1}" for i in range(len(minimapas))])
