@@ -493,14 +493,21 @@ with col2:
                                             st.session_state.image_history[file.name].append(upscaled)
                                             st.session_state.last_action_msg = f"🪄 Upscale aplicado correctamente a {file.name}."
                                             st.rerun()
-                                            
+                                    
                                     if st.button("✂️ Recortar Bordes Auto", key=f"crop_{file.name}", use_container_width=True):
-                                        bbox = img.getbbox()
+                                        # --- RECORTE INTELIGENTE DTF (Canal Alpha) ---
+                                        # Detecta solo donde hay tinta real, ignorando las transparencias fantasma
+                                        img_rgba = img.convert("RGBA")
+                                        bbox = img_rgba.split()[3].getbbox() 
+                                        
                                         if bbox:
                                             new_img = img.crop(bbox)
                                             st.session_state.image_history[file.name].append(new_img)
                                             st.session_state.last_action_msg = f"✂️ Bordes vacíos recortados en {file.name}."
                                             st.rerun()
+                                        else:
+                                            st.toast("⚠️ La imagen está vacía o ya está ajustada.")        
+                                    
 
                                 with c_img:
                                     img_for_preview = get_preview_with_bg(img, selected_bg_hex)
@@ -691,6 +698,29 @@ if len(image_configs) > 0:
         elif len(minimapas) == 1:
             # Si es un solo pliego, no ponemos pestañas
             st.image(minimapas[0], use_column_width=True)
+       
+            
+        # --- NUEVA FICHA TÉCNICA PROFESIONAL ---
+        st.markdown("---")
+        st.markdown("### 📋 Ficha Técnica")
+                            
+        total_designs = sum([c["qty"] for c in image_configs])
+                            
+        # Calculamos el % de uso del material
+        area_total_pliego = sheet_width_cm * sheet_height_cm * len(minimapas)
+        area_usada = 0
+        for conf in image_configs:
+            # Convertimos los píxeles de vuelta a CM para calcular el área
+            area_usada += (conf["w_px"] / PX_PER_CM) * (conf["h_px"] / PX_PER_CM) * conf["qty"]
+                            
+        porcentaje_uso = (area_usada / area_total_pliego) * 100 if area_total_pliego > 0 else 0
+                            
+        st.markdown(f"""
+        * **Medida:** {sheet_width_cm} × {sheet_height_cm} cm
+        * **Diseños totales:** {total_designs}
+        * **Aprovechamiento:** {porcentaje_uso:.1f}%
+        * **Resolución Final:** 300 DPI
+        """)     
 
     # 5. ACTUALIZAMOS LOS MENSAJES DE ESTADÍSTICAS
     if len(all_live_rects) < rect_id:
