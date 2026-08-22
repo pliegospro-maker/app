@@ -442,12 +442,7 @@ with col2:
                     # (Fijate que borramos el image_configs = [] que estaba acá adentro)
                     for idx, file in enumerate(archivos_vivos):
                         img = st.session_state.image_history[file.name][-1]
-
-                    image_configs = []
-                    for idx, file in enumerate(archivos_vivos):
-                        img = st.session_state.image_history[file.name][-1]
                         orig_w, orig_h = img.size
-                        aspect_ratio = orig_w / orig_h if orig_h != 0 else 1
             
                         with st.expander(f"⚙️ {file.name}", expanded=False):
                                 if len(st.session_state.image_history[file.name]) > 1:
@@ -677,7 +672,7 @@ if len(image_configs) > 0:
                     
         minimapas.append(minimap)
 
-# 4. MOSTRAMOS LAS IMÁGENES EN PESTAÑAS DENTRO DEL SIDEBAR
+    # 4. MOSTRAMOS LAS IMÁGENES EN PESTAÑAS DENTRO DEL SIDEBAR
     # Todo este bloque ahora está empujado a la derecha para ocultarse si no hay imágenes
     with st.sidebar:
         with st.expander("🔍 VISOR DE VISTA PREVIA", expanded=True):
@@ -722,7 +717,7 @@ if len(image_configs) > 0:
                 else:
                     st.success(f"Todo entra en 1 solo pliego.")
 
-# 6. Generador Final
+        # 6. Generador Final
         if uploaded_files and len(image_configs) > 0:
             st.markdown("---")
 
