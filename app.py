@@ -155,14 +155,18 @@ from streamlit_drawable_canvas import st_canvas
 # Ocultar elementos estéticos (Header completo, GitHub, etc.)
 ocultar_elementos = """
 <style>
-/* 1. Oculta las herramientas de desarrollo (Deploy, Share) */
+/* 1. Oculta las herramientas de desarrollo, GitHub y menú superior derecho */
 [data-testid="stToolbar"] {display: none !important;}
-/* 2. Oculta el menú de los 3 puntitos */
+[data-testid="stHeaderActionElements"] {display: none !important;}
+
+/* 🔥 EL DESCUBRIMIENTO DETECTIVE: Adiós al ícono de GitHub */
+.st-emotion-cache-1h3aped {display: none !important;}
+
+/* 2. Oculta el menú de los 3 puntitos (versiones viejas) */
 #MainMenu {display: none !important;}
+
 /* 3. Oculta la marca de agua del pie de página */
 footer {display: none !important;}
-/* 4. Hace transparente la barra superior pero DEJA el botón del menú lateral */
-
 </style>
 """
 st.markdown(ocultar_elementos, unsafe_allow_html=True)
