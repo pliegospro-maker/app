@@ -226,44 +226,37 @@ def apply_white_stroke(img, size=5):
     return Image.alpha_composite(stroke_img, img)
 
 def remove_specific_color(img, target_hex, tolerance=30):
-    if img.mode != 'RGBA': img = img.convert('RGBA')
+    if img.mode != 'RGBA':
+        img = img.convert('RGBA')
     target_hex = target_hex.lstrip('#')
     tr, tg, tb = tuple(int(target_hex[i:i+2], 16) for i in (0, 2, 4))
     
-    data = img.getdata()
-    new_data = []
-    for item in data:
-        r, g, b, a = item
-        if a > 0:
-            if abs(r - tr) <= tolerance and abs(g - tg) <= tolerance and abs(b - tb) <= tolerance:
-                new_data.append((r, g, b, 0)) 
-            else:
-                new_data.append(item)
-        else:
-            new_data.append(item)
-            
-    new_img = Image.new("RGBA", img.size)
-    new_img.putdata(new_data)
-    return new_img
+    # --- ACELERACIÓN EXTREMA CON NUMPY ---
+    data = np.array(img)
+    # Extraemos los canales y los pasamos a formato numérico amplio para evitar errores matemáticos
+    r, g, b, a = data[:,:,0].astype(int), data[:,:,1].astype(int), data[:,:,2].astype(int), data[:,:,3]
+    
+    # Buscamos de golpe todos los píxeles que coinciden con la tolerancia
+    mask = (a > 0) & (np.abs(r - tr) <= tolerance) & (np.abs(g - tg) <= tolerance) & (np.abs(b - tb) <= tolerance)
+    
+    # Volvemos invisibles a todos los seleccionados al mismo tiempo
+    data[mask, 3] = 0
+    return Image.fromarray(data)
 
 def remove_luminance(img, lum_target, tolerance=30):
-    if img.mode != 'RGBA': img = img.convert('RGBA')
-    data = img.getdata()
-    new_data = []
-    for item in data:
-        r, g, b, a = item
-        if a > 0: 
-            luma = int(0.299 * r + 0.587 * g + 0.114 * b)
-            if abs(luma - lum_target) <= tolerance:
-                new_data.append((r, g, b, 0)) 
-            else:
-                new_data.append(item)
-        else:
-            new_data.append(item)
-            
-    new_img = Image.new("RGBA", img.size)
-    new_img.putdata(new_data)
-    return new_img
+    if img.mode != 'RGBA':
+        img = img.convert('RGBA')
+        
+    # --- ACELERACIÓN EXTREMA CON NUMPY ---
+    data = np.array(img)
+    r, g, b, a = data[:,:,0].astype(int), data[:,:,1].astype(int), data[:,:,2].astype(int), data[:,:,3]
+    
+    # Calculamos la luz de toda la imagen en una fracción de segundo
+    luma = (0.299 * r + 0.587 * g + 0.114 * b).astype(int)
+    mask = (a > 0) & (np.abs(luma - lum_target) <= tolerance)
+    
+    data[mask, 3] = 0
+    return Image.fromarray(data)
 
 # Inicializar estados de memoria
 if "deleted_images" not in st.session_state: st.session_state.deleted_images = set()
