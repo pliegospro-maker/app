@@ -80,8 +80,11 @@ if "session" in st.query_params:
 
 # 3. Pantalla de Autenticación (Modelo Freemium)
 if not st.session_state.usuario_autenticado:
+    # --- NUEVO BANNER DE INICIO DE SESIÓN ---
+    st.image("bannerweb.png", use_container_width=True)
+    st.markdown("<br>", unsafe_allow_html=True) # Un pequeño espacio invisible para que respire el diseño
+    
     st.title("🔐 Acceso a PliegosPro")
-
     tab_login, tab_registro = st.tabs(["Iniciar Sesión", "Crear Cuenta"])
 
     with tab_login:
