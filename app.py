@@ -158,16 +158,20 @@ from streamlit_drawable_canvas import st_canvas
 # Ocultar elementos estéticos (Header completo, GitHub, etc.)
 ocultar_elementos = """
 <style>
-/* 1. LA BALA DE PLATA: Oculta toda la mitad derecha del encabezado (Share, GitHub, Menú) */
-.stApp > header > div:last-child {display: none !important;}
+/* 1. LA OPCIÓN NUCLEAR: Hace invisible TODO el contenido de la barra superior */
+header {visibility: hidden !important; background-color: transparent !important;}
+
+/* 2. LA EXCEPCIÓN: Rescata y vuelve a hacer visible ÚNICAMENTE el botón del menú (>) */
+header [data-testid="collapsedControl"] {visibility: visible !important;}
+
+/* 3. Por las dudas, eliminamos el espacio físico de las herramientas de Streamlit */
 [data-testid="stToolbar"] {display: none !important;}
 [data-testid="stHeaderActionElements"] {display: none !important;}
 
-/* 2. Oculta el globito flotante de "Manage app" de abajo a la derecha */
+/* 4. Oculta el globito flotante de "Manage app" de abajo a la derecha */
 .viewerBadge_container {display: none !important;}
-.viewerBadge_link {display: none !important;}
 
-/* 3. Oculta la marca de agua del pie de página */
+/* 5. Oculta la marca de agua del pie de página */
 footer {display: none !important;}
 </style>
 """
