@@ -626,8 +626,8 @@ if len(image_configs) > 0:
     
     for config in image_configs:
         for _ in range(config["qty"]):
-            req_w = config["w_px"] + margin_px
-            req_h = config["h_px"] + margin_px
+            req_w = config["w_px"] + (margin_px * 2)
+            req_h = config["h_px"] + (margin_px * 2)
             live_packer.add_rect(req_w, req_h, rect_id)
             rect_map_live[rect_id] = config
             rect_id += 1
@@ -662,8 +662,8 @@ if len(image_configs) > 0:
         for rect in bins_live[bin_id]:
             b, x, y, w, h, rid = rect
             conf = rect_map_live[rid]
-            req_w_margin = conf["w_px"] + margin_px
-            req_h_margin = conf["h_px"] + margin_px
+            req_w_margin = conf["w_px"] + (margin_px * 2)
+            req_h_margin = conf["h_px"] + (margin_px * 2)
             is_rotated = False
             if w == req_h_margin and h == req_w_margin and w != h:
                 is_rotated = True
