@@ -398,11 +398,6 @@ with st.sidebar:
     
     st.markdown("---")
 
-    # El visor vuelve a la barra lateral, pero con su propio botón desplegable
-    with st.expander("🔍 VISOR DE VISTA PREVIA", expanded=True):
-        sidebar_visor = st.empty()
-        sidebar_stats = st.empty()
-
 with col2:
                 st.subheader("3. Edición de Imágenes")
 
@@ -688,7 +683,7 @@ if len(image_configs) > 0:
         minimapas.append(minimap)
 
     # 4. MOSTRAMOS LAS IMÁGENES EN PESTAÑAS DENTRO DEL SIDEBAR
-    with sidebar_visor.container():
+    with st.sidebar("🔍 VISOR DE VISTA PREVIA", expanded=True):
         if len(minimapas) > 1:
             # Creamos los nombres dinámicos de las pestañas
             tabs_preview = st.tabs([f"Pliego {i+1}" for i in range(len(minimapas))])
@@ -727,7 +722,7 @@ if len(image_configs) > 0:
         sidebar_stats.error(f"¡Rebasaste! {rect_id - len(all_live_rects)} ítems fuera (máx. 20 pliegos).")
     else:
         if len(minimapas) > 1:
-            sidebar_stats.warning(f"⚠️ Estás utilizando {len(minimapas)} pliegos.")
+            st.error(f"⚠️ Estás utilizando {len(minimapas)} pliegos.")
         else:
             sidebar_stats.success(f"Todo entra en 1 solo pliego.")
 
