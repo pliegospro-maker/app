@@ -780,30 +780,30 @@ if len(image_configs) > 0:
                 gang_files_high.append(high_filename)
                 
                 scale_factor = DPI_LOW / DPI_HIGH
-                        prev_w, prev_h = int(gang_width_px * scale_factor), int(gang_height_px * scale_factor)
-                        preview_sheet = Image.new("RGBA", (prev_w, prev_h), MUESTRA_BG_COLOR)
-                        final_sheet_low = Image.new("RGBA", (prev_w, prev_h), (255, 255, 255, 0))
+                prev_w, prev_h = int(gang_width_px * scale_factor), int(gang_height_px * scale_factor)
+                preview_sheet = Image.new("RGBA", (prev_w, prev_h), MUESTRA_BG_COLOR)
+                final_sheet_low = Image.new("RGBA", (prev_w, prev_h), (255, 255, 255, 0))
 
-                        # --- OPTIMIZACIÓN EXTREMA DE RAM ---
-                        # Armamos la muestra gratis reduciendo imágenes individuales en vez de todo el lienzo gigante
-                        for rect in bins_rects[bin_id]:
-                            _, x, y, w, h, rid = rect
-                            conf = rect_map[rid]
-                            req_w_margin = conf["w_px"] + margin_px
-                            req_h_margin = conf["h_px"] + margin_px
-                            is_rotated = (w == req_h_margin and h == req_w_margin and w != h)
+                # --- OPTIMIZACIÓN EXTREMA DE RAM ---
+                # Armamos la muestra gratis reduciendo imágenes individuales en vez de todo el lienzo gigante
+                for rect in bins_rects[bin_id]:
+                     _, x, y, w, h, rid = rect
+                    conf = rect_map[rid]
+                    req_w_margin = conf["w_px"] + margin_px
+                    req_h_margin = conf["h_px"] + margin_px
+                    is_rotated = (w == req_h_margin and h == req_w_margin and w != h)
                             
-                            low_w, low_h = int(conf["w_px"] * scale_factor), int(conf["h_px"] * scale_factor)
-                            low_img = conf["image"].resize((max(1, low_w), max(1, low_h)), Image.Resampling.LANCZOS).convert('RGBA')
-                            if is_rotated:
-                                low_img = low_img.rotate(90, expand=True)
+                    low_w, low_h = int(conf["w_px"] * scale_factor), int(conf["h_px"] * scale_factor)
+                    low_img = conf["image"].resize((max(1, low_w), max(1, low_h)), Image.Resampling.LANCZOS).convert('RGBA')
+                    if is_rotated:
+                         low_img = low_img.rotate(90, expand=True)
                             
-                            paste_x = int((x + edge_margin_px) * scale_factor)
-                            paste_y = int((gang_height_px - (y + h) - edge_margin_px) * scale_factor)
-                            final_sheet_low.paste(low_img, (paste_x, paste_y), low_img)
+                    paste_x = int((x + edge_margin_px) * scale_factor)
+                    paste_y = int((gang_height_px - (y + h) - edge_margin_px) * scale_factor)
+                    final_sheet_low.paste(low_img, (paste_x, paste_y), low_img)
                             
-                        preview_sheet.paste(final_sheet_low, (0, 0), final_sheet_low)
-                        watermark_file = None
+                preview_sheet.paste(final_sheet_low, (0, 0), final_sheet_low)
+                watermark_file = None
 
          # --- INICIO MARCA DE AGUA AUTOMÁTICA ---
                 ruta_logo = "logo.png"
