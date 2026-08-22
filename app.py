@@ -176,8 +176,10 @@ DPI_HIGH = 300
 DPI_LOW = 72
 PX_PER_CM = int(DPI_HIGH / 2.54)
 SHEET_TYPES = {
-    "DTF Textil (58x100 cm)": {"width_cm": 58, "height_cm": 100},
-    "DTF UV (57x100 cm)": {"width_cm": 57, "height_cm": 100}
+    "DTF Textil - Estándar (58x100 cm)": {"width_cm": 58, "height_cm": 100},
+    "DTF Textil - Angosto (30x100 cm)": {"width_cm": 30, "height_cm": 100},
+    "DTF UV - Estándar (57x100 cm)": {"width_cm": 57, "height_cm": 100},
+    "DTF UV - Medio Metro (57x50 cm)": {"width_cm": 57, "height_cm": 50}
 }
 MUESTRA_BG_COLOR = (169, 169, 169, 255) 
 HISTORY_BASE_FOLDER = "historial_pliegos"
