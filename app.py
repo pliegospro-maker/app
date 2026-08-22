@@ -670,49 +670,48 @@ if len(image_configs) > 0:
             draw.rectangle([px0, py0, px0 + pw, py0 + ph], outline=(50, 100, 200, 100), width=1)
                     
         minimapas.append(minimap)
+# 4. MOSTRAMOS EL VISOR AL FINAL DEL RECORRIDO (Para Celulares y PC)
+    with st.expander("🔍 VISOR DE VISTA PREVIA Y FICHA TÉCNICA", expanded=True):
+        if len(minimapas) > 1:
+            # Creamos los nombres dinámicos de las pestañas
+            tabs_preview = st.tabs([f"Pliego {i+1}" for i in range(len(minimapas))])
+            for i, tab in enumerate(tabs_preview):
+                with tab:
+                    st.image(minimapas[i], use_container_width=True)
+        elif len(minimapas) == 1:
+            # Si es un solo pliego, no ponemos pestañas
+            st.image(minimapas[0], use_container_width=True)
+            
+        # --- NUEVA FICHA TÉCNICA PROFESIONAL ---
+        st.markdown("---")
+        st.markdown("### 📋 Ficha Técnica")
+        
+        total_designs = sum([c["qty"] for c in image_configs])
+        
+        # Calculamos el % de uso del material
+        area_total_pliego = sheet_width_cm * sheet_height_cm * len(minimapas)
+        area_usada = 0
+        for conf in image_configs:
+            # Convertimos los píxeles de vuelta a CM para calcular el área
+            area_usada += (conf["w_px"] / PX_PER_CM) * (conf["h_px"] / PX_PER_CM) * conf["qty"]
+        
+        porcentaje_uso = (area_usada / area_total_pliego) * 100 if area_total_pliego > 0 else 0
+        
+        st.markdown(f"""
+        * **Medida:** {sheet_width_cm} × {sheet_height_cm} cm
+        * **Diseños totales:** {total_designs}
+        * **Aprovechamiento:** {porcentaje_uso:.1f}%
+        * **Resolución Final:** 300 DPI
+        """)
 
-    # 4. MOSTRAMOS EL VISOR AL FINAL DEL RECORRIDO (Para Celulares y PC)
-                        with st.expander("🔍 VISOR DE VISTA PREVIA Y FICHA TÉCNICA", expanded=True):
-                            if len(minimapas) > 1:
-                                # Creamos los nombres dinámicos de las pestañas
-                                tabs_preview = st.tabs([f"Pliego {i+1}" for i in range(len(minimapas))])
-                                for i, tab in enumerate(tabs_preview):
-                                    with tab:
-                                        st.image(minimapas[i], use_container_width=True)
-                            elif len(minimapas) == 1:
-                                # Si es un solo pliego, no ponemos pestañas
-                                st.image(minimapas[0], use_container_width=True)
-                                
-                            # --- NUEVA FICHA TÉCNICA PROFESIONAL ---
-                            st.markdown("---")
-                            st.markdown("### 📋 Ficha Técnica")
-                            
-                            total_designs = sum([c["qty"] for c in image_configs])
-                            
-                            # Calculamos el % de uso del material
-                            area_total_pliego = sheet_width_cm * sheet_height_cm * len(minimapas)
-                            area_usada = 0
-                            for conf in image_configs:
-                                # Convertimos los píxeles de vuelta a CM para calcular el área
-                                area_usada += (conf["w_px"] / PX_PER_CM) * (conf["h_px"] / PX_PER_CM) * conf["qty"]
-                            
-                            porcentaje_uso = (area_usada / area_total_pliego) * 100 if area_total_pliego > 0 else 0
-                            
-                            st.markdown(f"""
-                            * **Medida:** {sheet_width_cm} × {sheet_height_cm} cm
-                            * **Diseños totales:** {total_designs}
-                            * **Aprovechamiento:** {porcentaje_uso:.1f}%
-                            * **Resolución Final:** 300 DPI
-                            """)
-
-                            # 5. ACTUALIZAMOS LOS MENSAJES DE ESTADÍSTICAS
-                            if len(all_live_rects) < rect_id:
-                                st.warning(f"⚠️ Límite alcanzado: {rect_id - len(all_live_rects)} ítems quedaron fuera (máx. 20 pliegos).")
-                            else:
-                                if len(minimapas) > 1:
-                                    st.info(f"ℹ️ Estás utilizando {len(minimapas)} pliegos.")
-                                else:
-                                    st.success(f"✅ Todo entra perfecto en 1 pliego.")
+        # 5. ACTUALIZAMOS LOS MENSAJES DE ESTADÍSTICAS
+        if len(all_live_rects) < rect_id:
+            st.warning(f"⚠️ Límite alcanzado: {rect_id - len(all_live_rects)} ítems quedaron fuera (máx. 20 pliegos).")
+        else:
+            if len(minimapas) > 1:
+                st.info(f"ℹ️ Estás utilizando {len(minimapas)} pliegos.")
+            else:
+                st.success(f"✅ Todo entra perfecto en 1 pliego.")
 
         # 6. Generador Final
         if uploaded_files and len(image_configs) > 0:
