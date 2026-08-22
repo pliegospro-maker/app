@@ -787,7 +787,7 @@ if len(image_configs) > 0:
                 # --- OPTIMIZACIÓN EXTREMA DE RAM ---
                 # Armamos la muestra gratis reduciendo imágenes individuales en vez de todo el lienzo gigante
                 for rect in bins_rects[bin_id]:
-                     _, x, y, w, h, rid = rect
+                    _, x, y, w, h, rid = rect
                     conf = rect_map[rid]
                     req_w_margin = conf["w_px"] + margin_px
                     req_h_margin = conf["h_px"] + margin_px
