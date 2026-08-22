@@ -470,14 +470,16 @@ with col2:
                                         st.caption(f"Ancho: {new_w_cm:.2f} cm")
                                         effective_dpi = orig_h / (new_h_cm / 2.54) if new_h_cm > 0 else 300
 
-                                    st.markdown("<br>", unsafe_allow_html=True)
-                                    if st.button("🪄 Mejorar Resolución", key=f"up_{file.name}", use_container_width=True):
-                                        with st.spinner("Mejorando resolución..."):
-                                            new_size = (orig_w * 2, orig_h * 2)
-                                            upscaled = img.resize(new_size, Image.Resampling.LANCZOS)
-                                            st.session_state.image_history[file.name].append(upscaled)
-                                            st.session_state.last_action_msg = f"🪄 Upscale aplicado correctamente a {file.name}."
-                                            st.rerun()
+                                    # El botón MÁGICO: Solo aparece si la resolución cae por debajo de 250 DPI
+                            if effective_dpi < 250:
+                                st.markdown("<br>", unsafe_allow_html=True)
+                                if st.button("🪄 Mejorar Resolución", key=f"up_{file.name}", use_container_width=True):
+                                    with st.spinner("Mejorando resolución..."):
+                                        new_size = (orig_w * 2, orig_h * 2)
+                                        upscaled = img.resize(new_size, Image.Resampling.LANCZOS)
+                                        st.session_state.image_history[file.name].append(upscaled)
+                                        st.session_state.last_action_msg = f"🪄 Upscale aplicado correctamente a {file.name}."
+                                        st.rerun()
                                     
                                     if st.button("✂️ Recortar Bordes Auto", key=f"crop_{file.name}", use_container_width=True):
                                         # --- RECORTE INTELIGENTE DTF (Canal Alpha) ---
@@ -710,12 +712,12 @@ if len(image_configs) > 0:
 
             # 5. ACTUALIZAMOS LOS MENSAJES DE ESTADÍSTICAS
             if len(all_live_rects) < rect_id:
-                st.error(f"¡Rebasaste! {rect_id - len(all_live_rects)} ítems fuera (máx. 20 pliegos).")
+                st.warning(f"⚠️ Límite alcanzado: {rect_id - len(all_live_rects)} ítems quedaron fuera (máx. 20 pliegos).")
             else:
                 if len(minimapas) > 1:
-                    st.error(f"⚠️ Estás utilizando {len(minimapas)} pliegos.")
+                    st.info(f"ℹ️ Estás utilizando {len(minimapas)} pliegos.")
                 else:
-                    st.success(f"Todo entra en 1 solo pliego.")
+                    st.success(f"✅ Todo entra perfecto en 1 pliego.")
 
         # 6. Generador Final
         if uploaded_files and len(image_configs) > 0:
