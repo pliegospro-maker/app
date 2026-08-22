@@ -483,7 +483,7 @@ with col2:
                                                 upscaled = img.resize(new_size, Image.Resampling.LANCZOS)
                                                 st.session_state.image_history[file.name].append(upscaled)
                                                 st.session_state.last_action_msg = f"🪄 Upscale aplicado correctamente a {file.name}."
-                                                st.rerun())
+                                                st.rerun()
                                     
                                     if st.button("✂️ Recortar Bordes Auto", key=f"crop_{file.name}", use_container_width=True):
                                         # --- RECORTE INTELIGENTE DTF (Canal Alpha) ---
