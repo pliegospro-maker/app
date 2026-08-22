@@ -285,9 +285,14 @@ with col_izq:
     st.image("bannerweb.png", use_container_width=True)
 
 with col_der:
-   with col_der:
     st.markdown("### 👋 Bienvenido/a")
     st.markdown(f"**{email_usuario}**")
+
+    # --- BOTÓN DE CERRAR SESIÓN ---
+    if st.button("🚪 Cerrar Sesión", use_container_width=True):
+        st.session_state.clear() # Borra toda la memoria de la sesión
+        st.query_params.clear() # Limpia el token secreto de la URL
+        st.rerun() # Recarga la página y te devuelve al inicio
     st.markdown(f"💳 **Tus Créditos:** {creditos_actuales}")
     
     # Botón HTML 100% funcional con estilos en línea
