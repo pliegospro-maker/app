@@ -443,7 +443,8 @@ with col2:
                     for idx, file in enumerate(archivos_vivos):
                         img = st.session_state.image_history[file.name][-1]
                         orig_w, orig_h = img.size
-            
+                        aspect_ratio = orig_w / orig_h if orig_h != 0 else 1
+                        
                         with st.expander(f"⚙️ {file.name}", expanded=False):
                                 if len(st.session_state.image_history[file.name]) > 1:
                                     if st.button("↩️ Deshacer último cambio", key=f"undo_{file.name}"):
