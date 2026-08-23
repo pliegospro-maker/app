@@ -6,8 +6,23 @@ st.set_page_config(page_title="Pliegos Pro", page_icon="favicon.png", layout="wi
 # --- INYECCIÓN DE CSS PERSONALIZADO ---
 estilos = """
 <style>
-    /* Ocultar el header superior y el footer de Streamlit para que se vea más como una web app y menos como un script */
-    footer {visibility: hidden;}
+    # --- OCULTAR BARRA SUPERIOR DE STREAMLIT ---
+st.markdown(
+    """
+    <style>
+    /* Ocultar el Header completo (Toolbar y Menú Hamburguesa) */
+    [data-testid="stHeader"] {
+        display: none !important;
+    }
+    
+    /* Opcional: Eliminar el espacio en blanco que deja la barra arriba */
+    .block-container {
+        padding-top: 2rem !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
     /* Estilos para los botones principales (Efecto Glow Cyan) */
     button[kind="primary"] {
