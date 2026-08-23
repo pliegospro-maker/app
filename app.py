@@ -326,50 +326,50 @@ st.markdown("### 💳 Recargar Créditos")
 st.markdown("Elegí tu método de pago según tu país de residencia:")
 
 # Creamos dos columnas
-        col_mp, col_pp = st.columns(2)
-        
-        with col_mp:
-            st.info("🇦🇷 **Para Argentina**")
-            st.markdown("### $5.000 ARS")
+col_mp, col_pp = st.columns(2)
+
+with col_mp:
+    st.info("🇦🇷 **Para Argentina**")
+    st.markdown("### $5.000 ARS")
+    
+    # --- EL BOTÓN DE MERCADO PAGO CON LOGO ---
+    mp_html = """
+    <a href="https://mpago.li/2GESomZ" target="_blank" style="text-decoration: none;">
+        <div style="background-color: #FFE600; color: #009EE3; border: none; padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="20" style="margin:0;">
+            Pagar con MercadoPago
+        </div>
+    </a>
+    """
+    st.markdown(mp_html, unsafe_allow_html=True)
+    
+with col_pp:
+    st.success("🌎 **Internacional**")
+    st.markdown("### $3.00 USD")
+    
+    # --- EL BOTÓN MÁGICO DE PAYPAL CON LOGO ---
+    paypal_html = f"""
+    <div style="display: flex; justify-content: center; width: 100%;">
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="width: 100%;">
+            <input type="hidden" name="cmd" value="_xclick">
+            <input type="hidden" name="business" value="PLIEGOSPRO@GMAIL.COM">
+            <input type="hidden" name="item_name" value="Créditos PliegosPro">
+            <input type="hidden" name="amount" value="3.00">
+            <input type="hidden" name="currency_code" value="USD">
             
-            # --- EL BOTÓN DE MERCADO PAGO CON LOGO ---
-            mp_html = """
-            <a href="https://link.mercadopago.com.ar/TULINK" target="_blank" style="text-decoration: none;">
-                <div style="background-color: #FFE600; color: #009EE3; border: none; padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                    <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="20" style="margin:0;">
-                    Pagar con MercadoPago
-                </div>
-            </a>
-            """
-            st.markdown(mp_html, unsafe_allow_html=True)
+            <input type="hidden" name="custom" value="{email_usuario}">
+            <input type="hidden" name="notify_url" value="https://hook.us2.make.com/e1hpm35sdb5bmjv09kj9fiq4ztbj6atb">
             
-        with col_pp:
-            st.success("🌎 **Internacional**")
-            st.markdown("### $3.00 USD")
-            
-            # --- EL BOTÓN MÁGICO DE PAYPAL CON LOGO ---
-            paypal_html = f"""
-            <div style="display: flex; justify-content: center; width: 100%;">
-                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="width: 100%;">
-                    <input type="hidden" name="cmd" value="_xclick">
-                    <input type="hidden" name="business" value="PLIEGOSPRO@GMAIL.COM">
-                    <input type="hidden" name="item_name" value="Créditos PliegosPro">
-                    <input type="hidden" name="amount" value="3.00">
-                    <input type="hidden" name="currency_code" value="USD">
-                    
-                    <input type="hidden" name="custom" value="{email_usuario}">
-                    <input type="hidden" name="notify_url" value="https://hook.us2.make.com/e1hpm35sdb5bmjv09kj9fiq4ztbj6atb">
-                    
-                    <!-- Diseño del botón modificado para tener LOGO y color oficial -->
-                    <button type="submit" style="background-color: #FFC439; color: #003087; border: none; padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" height="20" style="margin:0;">
-                        Pagar con PayPal
-                    </button>
-                </form>
-            </div>
-            """
-            # Aumentamos un poquito la altura a 60 para que no se corte la sombra
-            components.html(paypal_html, height=60)
+            <!-- Diseño del botón modificado para tener LOGO y color oficial -->
+            <button type="submit" style="background-color: #FFC439; color: #003087; border: none; padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" height="20" style="margin:0;">
+                Pagar con PayPal
+            </button>
+        </form>
+    </div>
+    """
+    # Aumentamos un poquito la altura a 60 para que no se corte la sombra
+    components.html(paypal_html, height=60)
     
 
 # --- A partir de aquí sigue el resto de tu código normal (1. Configuración, 2. Cargar, etc.) ---
