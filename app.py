@@ -768,20 +768,21 @@ if len(image_configs) > 0:
             draw.rectangle([safe_x0, safe_y0, safe_x1, safe_y1], outline=(200, 200, 200, 255), width=1)
             
         for rect in bins_live[bin_id]:
-            b, x, y, w, h, rid = rect
-            conf = rect_map_live[rid]
-            req_w_margin = conf["w_px"] + (margin_px * 2)
-            req_h_margin = conf["h_px"] + (margin_px * 2)
-            is_rotated = False
-            if w == req_h_margin and h == req_w_margin and w != h:
-                is_rotated = True
+                b, x, y, w, h, rid = rect
+                conf = rect_map_live[rid]
+                req_w_margin = conf["w_px"] + (margin_px * 2)
+                req_h_margin = conf["h_px"] + (margin_px * 2)
                 
-            px0 = int((x + edge_margin_px) * preview_scale)
-            py0 = int((gang_height_px - (y + h) - edge_margin_px) * preview_scale)
-            pw = int(w * preview_scale)
-            ph = int(h * preview_scale)
-            
-            if pw > 0 and ph > 0:
+                is_rotated = False
+                if w == req_h_margin and h == req_w_margin and w != h:
+                    is_rotated = True
+                    
+                px0 = int((x + edge_margin_px) * preview_scale)
+                py0 = int((gang_height_px - (y + h) - edge_margin_px) * preview_scale)
+                pw = int(w * preview_scale)
+                ph = int(h * preview_scale)
+                
+                if pw > 0 and ph > 0:
                     thumb = conf["thumb"]
                     if is_rotated:
                         thumb = thumb.rotate(90, expand=True)
@@ -808,7 +809,7 @@ if len(image_configs) > 0:
                 except Exception:
                     pass
             # --------------------------------------------------------
-
+            
             minimapas.append(minimap)
         
 # 4. MOSTRAMOS EL VISOR AL FINAL DEL RECORRIDO (Para Celulares y PC)
