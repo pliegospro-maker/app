@@ -1,3 +1,4 @@
+import streamlit.components.v1 as components
 import streamlit as st
 # Configuración de página
 st.set_page_config(page_title="Pliegos Pro", page_icon="favicon.png", layout="wide", initial_sidebar_state="expanded")
@@ -320,6 +321,44 @@ with col_der:
     </a>
     """
     st.markdown(boton_pago, unsafe_allow_html=True)
+    st.markdown("---")
+        st.markdown("### 💳 Recargar Créditos")
+        st.markdown("Elegí tu método de pago según tu país de residencia:")
+        
+        # Creamos dos columnas
+        col_mp, col_pp = st.columns(2)
+        
+        with col_mp:
+            st.info("🇦🇷 **Para Argentina**")
+            st.markdown("### $5.000 ARS")
+            st.link_button("Pagar con MercadoPago", "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=384518284-e8745b6a-0301-4ba4-9e10-e2e6d99a3d2a", use_container_width=True)
+            
+        with col_pp:
+            st.success("🌎 **Internacional**")
+            st.markdown("### $3.00 USD")
+            
+            # --- EL BOTÓN MÁGICO DE PAYPAL ---
+            # Este código crea un botón que manda el pago y el email oculto
+            paypal_html = f"""
+            <div style="display: flex; justify-content: center; width: 100%;">
+                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="width: 100%;">
+                    <!-- Comando de "Comprar Ahora" -->
+                    <input type="hidden" name="cmd" value="_xclick">
+                    <!-- ACÁ PONÉ TU EMAIL DE PAYPAL: -->
+                    <input type="hidden" name="business" value="PLIEGOSPRO@GMAIL.COM">
+                    <input type="hidden" name="item_name" value="Créditos PliegosPro">
+                    <input type="hidden" name="amount" value="3.00">
+                    <input type="hidden" name="currency_code" value="USD">
+                    
+                    <!-- EL CAMPO SECRETO: Le mandamos el email del usuario para que Make.com lo lea -->
+                    <input type="hidden" name="custom" value="{email_usuario}">
+                    
+                    <!-- Diseño del botón -->
+                    <input type="submit" value="Pagar con PayPal" style="background-color: #0070ba; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; transition: 0.3s;">
+                </form>
+            </div>
+            """
+            components.html(paypal_html, height=50)
     
 
 # --- A partir de aquí sigue el resto de tu código normal (1. Configuración, 2. Cargar, etc.) ---
