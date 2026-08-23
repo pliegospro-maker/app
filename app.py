@@ -505,7 +505,9 @@ with col2:
                         with b_col1:
                             bulk_dim = st.radio("Ajustar todas por:", ["Ancho", "Alto"], horizontal=True, key="bulk_dim")
                         with b_col2:
-                            bulk_val = st.number_input("Medida (cm)", min_value=0.1, value=5.0, step=0.5, key="bulk_val")
+                            # Calculamos cuál es la medida más grande del lienzo elegido (Ej: 100cm)
+                            max_sheet_dim = float(max(sheet_width_cm, sheet_height_cm))
+                            bulk_val = st.number_input("Medida (cm)", min_value=0.1, max_value=max_sheet_dim, value=5.0, step=0.5, key="bulk_val")
                         with b_col3:
                             bulk_qty = st.number_input("Cantidad c/u", min_value=1, value=1, step=1, key="bulk_qty")
                         with b_col4:
@@ -539,21 +541,33 @@ with col2:
                                 # Pasamos a 3 columnas bien proporcionadas
                                 c_img, c_size, c_act = st.columns([1, 1.2, 1.2])
 
-                                with c_size:
-                                    st.markdown("**📏 Dimensiones**")
-                                    dim_choice = st.radio("Ajustar:", ["Ancho", "Alto"], horizontal=True, key=f"dim_{file.name}")
-                                    
-                                    if dim_choice == "Ancho":
-                                        new_w_cm = st.number_input("Ancho (cm)", min_value=0.1, value=round(px_to_cm(orig_w), 2), key=f"w_{file.name}")
-                                        new_h_cm = new_w_cm / aspect_ratio
-                                        st.caption(f"Alto: {new_h_cm:.2f} cm")
-                                        effective_dpi = orig_w / (new_w_cm / 2.54) if new_w_cm > 0 else 300
-                                    else:
-                                        new_h_cm = st.number_input("Alto (cm)", min_value=0.1, value=round(px_to_cm(orig_h), 2), key=f"h_{file.name}")
-                                        new_w_cm = new_h_cm * aspect_ratio
-                                        st.caption(f"Ancho: {new_w_cm:.2f} cm")
-                                        effective_dpi = orig_h / (new_h_cm / 2.54) if new_h_cm > 0 else 300
-
+                        with c_size:
+                            st.markdown("**📏 Dimensiones**")
+                            dim_choice = st.radio("Ajustar:", ["Ancho", "Alto"], horizontal=True, key=f"dim_{file.name}")
+                
+                            # Buscamos la medida límite absoluta del pliego
+                            max_sheet_dim = float(max(sheet_width_cm, sheet_height_cm))
+                
+                            if dim_choice == "Ancho":
+                                 # Tope: El ancho no puede superar el pliego, NI hacer que el alto lo supere
+                                 max_w_permitido = min(max_sheet_dim, max_sheet_dim * aspect_ratio)
+                                 # Si suben una foto gigante, el valor por defecto se auto-corta al máximo permitido
+                                 valor_defecto_w = min(max_w_permitido, round(px_to_cm(orig_w), 2))
+                    
+                                 new_w_cm = st.number_input("Ancho (cm)", min_value=0.1, max_value=float(max_w_permitido), value=float(valor_defecto_w), key=f"w_{file.name}")
+                                 new_h_cm = new_w_cm / aspect_ratio
+                                 st.caption(f"Alto: {new_h_cm:.2f} cm")
+                                 effective_dpi = orig_w / (new_w_cm / 2.54) if new_w_cm > 0 else 300
+                            else:
+                                # Tope: El alto no puede superar el pliego, NI hacer que el ancho lo supere
+                                max_h_permitido = min(max_sheet_dim, max_sheet_dim / aspect_ratio)
+                                valor_defecto_h = min(max_h_permitido, round(px_to_cm(orig_h), 2))
+                    
+                                new_h_cm = st.number_input("Alto (cm)", min_value=0.1, max_value=float(max_h_permitido), value=float(valor_defecto_h), key=f"h_{file.name}")
+                                new_w_cm = new_h_cm * aspect_ratio
+                                st.caption(f"Ancho: {new_w_cm:.2f} cm")
+                                effective_dpi = orig_h / (new_h_cm / 2.54) if new_h_cm > 0 else 300
+                    
                                     # El botón MÁGICO: Solo aparece si la resolución cae por debajo de 250 DPI
                                     if effective_dpi < 250:
                                         st.markdown("<br>", unsafe_allow_html=True)
@@ -684,7 +698,7 @@ with col2:
                                             st.session_state.last_action_msg = f"✅ Luminosidad borrada y bordes auto-recortados."
                                             st.rerun()
 
-# --- LA PIEZA VITAL QUE FALTABA ---
+                                # --- LA PIEZA VITAL QUE FALTABA ---
                                 # Pre-calculamos una miniatura ultraliviana acá para no sobrecargar la RAM después
                                 preview_scale = 0.1
                                 thumb_w = max(1, int(cm_to_px(new_w_cm) * preview_scale))
