@@ -1008,7 +1008,7 @@ if len(image_configs) > 0:
                         pref_data_peaje = {
                             "items": [{"title": f"{creditos_faltantes} Créditos PliegosPro", "quantity": 1, "unit_price": precio_total, "currency_id": "ARS"}],
                             "payer": {"email": email_usuario},
-                            "back_urls": {"success": "TU_LINK_DE_STREAMLIT_AQUI"},
+                            "back_urls": {"success": "https://pliegospro.streamlit.app/"},
                             "auto_return": "approved",
                             "external_reference": email_usuario,
                             "notification_url": "https://hook.us2.make.com/r5og8gzq9xaj9vwbma93aff51ahsx5jb"
