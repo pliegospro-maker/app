@@ -6,65 +6,62 @@ st.set_page_config(page_title="Pliegos Pro", page_icon="favicon.png", layout="wi
 # --- INYECCIÓN DE CSS PERSONALIZADO ---
 estilos = """
 <style>
-    # --- OCULTAR BARRA SUPERIOR DE STREAMLIT ---
-st.markdown(
-    """
-    <style>
-    /* Ocultar el Header completo (Toolbar y Menú Hamburguesa) */
-    [data-testid="stHeader"] {
-        display: none !important;
-    }
-    
-    /* Opcional: Eliminar el espacio en blanco que deja la barra arriba */
-    .block-container {
-        padding-top: 2rem !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+/* Ocultar el Header completo (Toolbar y Menú Hamburguesa) */
+[data-testid="stHeader"] {
+    display: none !important;
+}
 
-    /* Estilos para los botones principales (Efecto Glow Cyan) */
-    button[kind="primary"] {
-        background-color: #004D4D !important; /* Cyan oscuro */
-        border: 1px solid #00FFFF !important; /* Borde brillante */
-        box-shadow: 0 0 8px rgba(0, 255, 255, 0.4) !important; /* Resplandor */
-        color: white !important;
-        border-radius: 8px !important;
-        transition: all 0.3s ease;
-    }
-    
-    /* Efecto al pasar el mouse por el botón */
-    button[kind="primary"]:hover {
-        box-shadow: 0 0 15px rgba(0, 255, 255, 0.7) !important;
-        transform: scale(1.02);
-    }
+/* Opcional: Eliminar el espacio en blanco que deja la barra arriba */
+.block-container {
+    padding-top: 2rem !important;
+}
 
-    /* Estilos para las cajas de input y selectores para que se fundan con el fondo */
-    .stTextInput > div > div > input, .stSelectbox > div > div > div {
-        background-color: #0A1118 !important;
-        border: 1px solid #3A506B !important;
-        color: white !important;
-        border-radius: 6px !important;
-    }
-    
-    /* Pequeño glow al hacer foco en un input */
-    .stTextInput > div > div > input:focus, .stSelectbox > div > div > div:focus {
-        border-color: #00FFFF !important;
-        box-shadow: 0 0 5px rgba(0, 255, 255, 0.3) !important;
-    }
-    /* Estilo para los recuadros de las columnas (Tarjetas flotantes) */
-    [data-testid="column"] {
-        background-color: #131D26 !important; /* Fondo sutilmente más claro que el fondo general */
-        border: 1px solid #1E2D3D !important; /* Borde sutil oscuro */
-        border-radius: 12px !important; /* Bordes redondeados */
-        padding: 20px !important; /* Espacio interno para que no quede pegado al borde */
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important; /* Sombra suave para dar profundidad */
-    }
+/* Estilos para los botones principales (Efecto Glow Cyan) */
+button[kind="primary"] {
+    background-color: #004D4D !important; /* Cyan oscuro */
+    border: 1px solid #00FFFF !important; /* Borde brillante */
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.4) !important; /* Resplandor */
+    color: white !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease;
+}
+
+/* Efecto al pasar el mouse por el botón */
+button[kind="primary"]:hover {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.7) !important;
+    transform: scale(1.02);
+}
+
+/* Estilos para las cajas de input y selectores para que se fundan con el fondo */
+.stTextInput > div > div > input,
+.stSelectbox > div > div > div {
+    background-color: #0A1118 !important;
+    border: 1px solid #3A506B !important;
+    color: white !important;
+    border-radius: 6px !important;
+}
+
+/* Pequeño glow al hacer foco en un input */
+.stTextInput > div > div > input:focus,
+.stSelectbox > div > div > div:focus {
+    border-color: #00FFFF !important;
+    box-shadow: 0 0 5px rgba(0, 255, 255, 0.3) !important;
+}
+
+/* Estilo para los recuadros de las columnas (Tarjetas flotantes) */
+[data-testid="column"] {
+    background-color: #131D26 !important;
+    border: 1px solid #1E2D3D !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+}
 </style>
 """
 st.markdown(estilos, unsafe_allow_html=True)
 # --- FIN DE INYECCIÓN CSS ---
+
+
 import mercadopago
 from supabase import create_client, Client
 import streamlit.components.v1 as components # <--- AGREGAR ESTA LÍNEA
