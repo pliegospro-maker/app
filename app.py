@@ -542,56 +542,53 @@ with col2:
                                 c_img, c_size, c_act = st.columns([1, 1.2, 1.2])
 
                         with c_size:
-                            st.markdown("**📏 Dimensiones**")
-                            dim_choice = st.radio("Ajustar:", ["Ancho", "Alto"], horizontal=True, key=f"dim_{file.name}")
+                st.markdown("**📏 Dimensiones**")
+                dim_choice = st.radio("Ajustar:", ["Ancho", "Alto"], horizontal=True, key=f"dim_{file.name}")
                 
-                            # Buscamos la medida límite absoluta del pliego
-                            max_sheet_dim = float(max(sheet_width_cm, sheet_height_cm))
+                # Buscamos la medida límite absoluta del pliego
+                max_sheet_dim = float(max(sheet_width_cm, sheet_height_cm))
                 
-                            if dim_choice == "Ancho":
-                                 # Tope: El ancho no puede superar el pliego, NI hacer que el alto lo supere
-                                 max_w_permitido = min(max_sheet_dim, max_sheet_dim * aspect_ratio)
-                                 # Si suben una foto gigante, el valor por defecto se auto-corta al máximo permitido
-                                 valor_defecto_w = min(max_w_permitido, round(px_to_cm(orig_w), 2))
+                if dim_choice == "Ancho":
+                    # Tope: El ancho no puede superar el pliego, NI hacer que el alto lo supere
+                    max_w_permitido = min(max_sheet_dim, max_sheet_dim * aspect_ratio)
+                    valor_defecto_w = min(max_w_permitido, round(px_to_cm(orig_w), 2))
                     
-                                 new_w_cm = st.number_input("Ancho (cm)", min_value=0.1, max_value=float(max_w_permitido), value=float(valor_defecto_w), key=f"w_{file.name}")
-                                 new_h_cm = new_w_cm / aspect_ratio
-                                 st.caption(f"Alto: {new_h_cm:.2f} cm")
-                                 effective_dpi = orig_w / (new_w_cm / 2.54) if new_w_cm > 0 else 300
-                            else:
-                                # Tope: El alto no puede superar el pliego, NI hacer que el ancho lo supere
-                                max_h_permitido = min(max_sheet_dim, max_sheet_dim / aspect_ratio)
-                                valor_defecto_h = min(max_h_permitido, round(px_to_cm(orig_h), 2))
+                    new_w_cm = st.number_input("Ancho (cm)", min_value=0.1, max_value=float(max_w_permitido), value=float(valor_defecto_w), key=f"w_{file.name}")
+                    new_h_cm = new_w_cm / aspect_ratio
+                    st.caption(f"Alto: {new_h_cm:.2f} cm")
+                    effective_dpi = orig_w / (new_w_cm / 2.54) if new_w_cm > 0 else 300
+                else:
+                    # Tope: El alto no puede superar el pliego, NI hacer que el ancho lo supere
+                    max_h_permitido = min(max_sheet_dim, max_sheet_dim / aspect_ratio)
+                    valor_defecto_h = min(max_h_permitido, round(px_to_cm(orig_h), 2))
                     
-                                new_h_cm = st.number_input("Alto (cm)", min_value=0.1, max_value=float(max_h_permitido), value=float(valor_defecto_h), key=f"h_{file.name}")
-                                new_w_cm = new_h_cm * aspect_ratio
-                                st.caption(f"Ancho: {new_w_cm:.2f} cm")
-                                effective_dpi = orig_h / (new_h_cm / 2.54) if new_h_cm > 0 else 300
-                    
-                                    # El botón MÁGICO: Solo aparece si la resolución cae por debajo de 250 DPI
-                                    if effective_dpi < 250:
-                                        st.markdown("<br>", unsafe_allow_html=True)
-                                        if st.button("🪄 Mejorar Resolución", key=f"up_{file.name}", use_container_width=True):
-                                            with st.spinner("Mejorando resolución..."):
-                                                new_size = (orig_w * 2, orig_h * 2)
-                                                upscaled = img.resize(new_size, Image.Resampling.LANCZOS)
-                                                st.session_state.image_history[file.name].append(upscaled)
-                                                st.session_state.last_action_msg = f"🪄 Upscale aplicado correctamente a {file.name}."
-                                                st.rerun()
-                                    
-                                    if st.button("✂️ Recortar Bordes Auto", key=f"crop_{file.name}", use_container_width=True):
-                                        # --- RECORTE INTELIGENTE DTF (Canal Alpha) ---
-                                        # Detecta solo donde hay tinta real, ignorando las transparencias fantasma
-                                        img_rgba = img.convert("RGBA")
-                                        bbox = img_rgba.split()[3].getbbox() 
-                                        
-                                        if bbox:
-                                            new_img = img.crop(bbox)
-                                            st.session_state.image_history[file.name].append(new_img)
-                                            st.session_state.last_action_msg = f"✂️ Bordes vacíos recortados en {file.name}."
-                                            st.rerun()
-                                        else:
-                                            st.toast("⚠️ La imagen está vacía o ya está ajustada.")        
+                    new_h_cm = st.number_input("Alto (cm)", min_value=0.1, max_value=float(max_h_permitido), value=float(valor_defecto_h), key=f"h_{file.name}")
+                    new_w_cm = new_h_cm * aspect_ratio
+                    st.caption(f"Ancho: {new_w_cm:.2f} cm")
+                    effective_dpi = orig_h / (new_h_cm / 2.54) if new_h_cm > 0 else 300
+
+                # El botón MÁGICO: Solo aparece si la resolución cae por debajo de 250 DPI
+                if effective_dpi < 250:
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    if st.button("🪄 Mejorar Resolución", key=f"up_{file.name}", use_container_width=True):
+                        with st.spinner("Mejorando resolución..."):
+                            new_size = (orig_w * 2, orig_h * 2)
+                            upscaled = img.resize(new_size, Image.Resampling.LANCZOS)
+                            st.session_state.image_history[file.name].append(upscaled)
+                            st.session_state.last_action_msg = f"🪄 Upscale aplicado correctamente a {file.name}."
+                            st.rerun()
+
+                if st.button("✂️ Recortar Bordes Auto", key=f"crop_{file.name}", use_container_width=True):
+                    # --- RECORTE INTELIGENTE DTF (Canal Alpha) ---
+                    img_rgba = img.convert("RGBA")
+                    bbox = img_rgba.split()[3].getbbox()
+                    if bbox:
+                        new_img = img.crop(bbox)
+                        st.session_state.image_history[file.name].append(new_img)
+                        st.session_state.last_action_msg = f"✂️ Bordes vacíos recortados en {file.name}."
+                        st.rerun()
+                    else:
+                        st.toast("⚠️ La imagen está vacía o ya está ajustada.")        
                                     
 
                                 with c_img:
