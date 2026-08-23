@@ -372,7 +372,7 @@ with col_pp:
             <input type="hidden" name="cmd" value="_xclick">
             <input type="hidden" name="business" value="PLIEGOSPRO@GMAIL.COM">
             <input type="hidden" name="item_name" value="Créditos PliegosPro">
-            <input type="hidden" name="amount" value="0.10">
+            <input type="hidden" name="amount" value="3.50">
             <input type="hidden" name="currency_code" value="USD">
             
             <input type="hidden" name="custom" value="{email_usuario}">
