@@ -329,29 +329,38 @@ st.markdown("Elegí tu método de pago según tu país de residencia:")
 col_mp, col_pp = st.columns(2)
 
 with col_mp:
-    # Texto unificado tamaño normal
-    st.markdown("🇦🇷 **Argentina:** $5.000 ARS")
-    
-    # --- EL BOTÓN DE MERCADO PAGO ELEGANTE ---
+    # --- TARJETA TECH MERCADO PAGO ---
     mp_html = """
-    <a href="https://mpago.li/2GESomZ" target="_blank" style="text-decoration: none;">
-        <div style="background-color: #FFE600; color: #009EE3; padding: 8px 15px; font-size: 15px; border-radius: 6px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="20" style="margin:0;">
-            Pagar con MercadoPago
-        </div>
-    </a>
+    <div style="background: linear-gradient(145deg, #0A1118, #131D26); border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0, 255, 255, 0.05); box-sizing: border-box;">
+        <div style="color: #00FFFF; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: bold; margin-bottom: 8px;">🇦🇷 Argentina</div>
+        <div style="color: white; font-size: 32px; font-weight: 900; margin-bottom: 25px; font-family: sans-serif;">$5.000 <span style="font-size: 16px; color: #8A9BA8; font-weight: normal;">ARS</span></div>
+        
+        <a href="https://mpago.li/2GESomZ" target="_blank" style="text-decoration: none;">
+            <div style="background-color: #FFE600; color: #009EE3; padding: 12px 15px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 230, 0, 0.15); transition: 0.3s;">
+                <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="20" style="margin:0;">
+                Pagar con MercadoPago
+            </div>
+        </a>
+    </div>
     """
     st.markdown(mp_html, unsafe_allow_html=True)
     
 with col_pp:
-    # Texto unificado tamaño normal
-    st.markdown("🌎 **Internacional:** $3.00 USD")
-    
-    # --- EL BOTÓN MÁGICO DE PAYPAL ELEGANTE ---
+    # --- TARJETA TECH PAYPAL ---
     paypal_html = f"""
-    <style>body {{ margin: 0; padding: 0; overflow: hidden; }}</style>
-    <div style="display: flex; justify-content: center; width: 100%;">
-        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="width: 100%; margin: 0;">
+    <style>
+        body {{ margin: 0; padding: 0; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }}
+        .tech-card {{ background: linear-gradient(145deg, #0A1118, #131D26); border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0, 255, 255, 0.05); box-sizing: border-box; height: 100%; }}
+        .country-label {{ color: #00FFFF; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: bold; margin-bottom: 8px; }}
+        .price-text {{ color: white; font-size: 32px; font-weight: 900; margin-bottom: 25px; margin-top: 0; }}
+        .currency {{ font-size: 16px; color: #8A9BA8; font-weight: normal; }}
+        .pp-button {{ background-color: #FFC439; color: #003087; border: none; padding: 12px 15px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 196, 57, 0.15); transition: 0.2s; }}
+        .pp-button:hover {{ filter: brightness(1.05); }}
+    </style>
+    <div class="tech-card">
+        <div class="country-label">🌎 Internacional</div>
+        <div class="price-text">$3.00 <span class="currency">USD</span></div>
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="margin: 0; width: 100%;">
             <input type="hidden" name="cmd" value="_xclick">
             <input type="hidden" name="business" value="PLIEGOSPRO@GMAIL.COM">
             <input type="hidden" name="item_name" value="Créditos PliegosPro">
@@ -361,15 +370,15 @@ with col_pp:
             <input type="hidden" name="custom" value="{email_usuario}">
             <input type="hidden" name="notify_url" value="https://hook.us2.make.com/e1hpm35sdb5bmjv09kj9fiq4ztbj6atb">
             
-            <button type="submit" style="background-color: #FFC439; color: #003087; border: none; padding: 8px 15px; font-size: 15px; border-radius: 6px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <button type="submit" class="pp-button">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" height="20" style="margin:0;">
                 Pagar con PayPal
             </button>
         </form>
     </div>
     """
-    # Altura reducida al mínimo para que quede apretadito
-    components.html(paypal_html, height=45)
+    # Aumentamos la altura a 175 para que entre la tarjeta completa sin cortarse
+    components.html(paypal_html, height=175)
     
 
 # --- A partir de aquí sigue el resto de tu código normal (1. Configuración, 2. Cargar, etc.) ---
