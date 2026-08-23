@@ -345,7 +345,7 @@ with col_mp:
         <div class="price-text">$5.000 <span class="currency">ARS</span></div>
         <a href="https://mpago.li/2GESomZ" target="_blank">
             <div class="mp-button">
-                <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="20" style="margin:0;">
+                <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="30" style="margin:0;">
                 Pagar con MercadoPago
             </div>
         </a>
