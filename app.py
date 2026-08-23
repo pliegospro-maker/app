@@ -612,13 +612,13 @@ with col2:
 
                                 with c_act:
                                     st.markdown("**⚙️ Avanzadas (RIP)**")
-                                    if st.button("🌑 Asfixia (-1px)", key=f"choke_{file.name}", use_container_width=True):
+                                    if st.button("🌑 Asfixia (contrae 1px para evitar bordes blancos)", key=f"choke_{file.name}", use_container_width=True):
                                         new_img = apply_white_choke(img)
                                         st.session_state.image_history[file.name].append(new_img)
                                         st.session_state.last_action_msg = f"🌑 Asfixia aplicada a {file.name}."
                                         st.rerun()
                                         
-                                    if st.button("⬛ Rellenar Umbral", key=f"thresh_{file.name}", use_container_width=True):
+                                    if st.button("⬛ Rellenar Umbral (evita semi-transparencias)", key=f"thresh_{file.name}", use_container_width=True):
                                         new_img = apply_alpha_threshold(img)
                                         st.session_state.image_history[file.name].append(new_img)
                                         st.session_state.last_action_msg = f"⬛ Umbral aplicado a {file.name}."
