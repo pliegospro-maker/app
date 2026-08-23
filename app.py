@@ -324,26 +324,34 @@ with col_der:
     st.markdown("---")
 st.markdown("### 💳 Recargar Créditos")
 st.markdown("Elegí tu método de pago según tu país de residencia:")
-
 # Creamos dos columnas
 col_mp, col_pp = st.columns(2)
 
 with col_mp:
     # --- TARJETA TECH MERCADO PAGO ---
     mp_html = """
-    <div style="background: linear-gradient(145deg, #0A1118, #131D26); border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0, 255, 255, 0.05); box-sizing: border-box;">
-        <div style="color: #00FFFF; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: bold; margin-bottom: 8px;">🇦🇷 Argentina</div>
-        <div style="color: white; font-size: 32px; font-weight: 900; margin-bottom: 25px; font-family: sans-serif;">$5.000 <span style="font-size: 16px; color: #8A9BA8; font-weight: normal;">ARS</span></div>
-        
-        <a href="https://mpago.li/2GESomZ" target="_blank" style="text-decoration: none;">
-            <div style="background-color: #FFE600; color: #009EE3; padding: 12px 15px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 230, 0, 0.15); transition: 0.3s;">
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }
+        .tech-card { background: linear-gradient(145deg, #0A1118, #131D26); border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0, 255, 255, 0.05); box-sizing: border-box; height: 100%; }
+        .country-label { color: #00FFFF; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: bold; margin-bottom: 8px; }
+        .price-text { color: white; font-size: 32px; font-weight: 900; margin-bottom: 25px; margin-top: 0; }
+        .currency { font-size: 16px; color: #8A9BA8; font-weight: normal; }
+        .mp-button { background-color: #FFE600; color: #009EE3; padding: 12px 15px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 230, 0, 0.15); transition: 0.2s; box-sizing: border-box; }
+        .mp-button:hover { filter: brightness(1.05); }
+        a { text-decoration: none; display: block; }
+    </style>
+    <div class="tech-card">
+        <div class="country-label">🇦🇷 Argentina</div>
+        <div class="price-text">$5.000 <span class="currency">ARS</span></div>
+        <a href="https://mpago.li/2GESomZ" target="_blank">
+            <div class="mp-button">
                 <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="20" style="margin:0;">
                 Pagar con MercadoPago
             </div>
         </a>
     </div>
     """
-    st.markdown(mp_html, unsafe_allow_html=True)
+    components.html(mp_html, height=175)
     
 with col_pp:
     # --- TARJETA TECH PAYPAL ---
@@ -354,7 +362,7 @@ with col_pp:
         .country-label {{ color: #00FFFF; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: bold; margin-bottom: 8px; }}
         .price-text {{ color: white; font-size: 32px; font-weight: 900; margin-bottom: 25px; margin-top: 0; }}
         .currency {{ font-size: 16px; color: #8A9BA8; font-weight: normal; }}
-        .pp-button {{ background-color: #FFC439; color: #003087; border: none; padding: 12px 15px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 196, 57, 0.15); transition: 0.2s; }}
+        .pp-button {{ background-color: #FFC439; color: #003087; border: none; padding: 12px 15px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 196, 57, 0.15); transition: 0.2s; box-sizing: border-box; }}
         .pp-button:hover {{ filter: brightness(1.05); }}
     </style>
     <div class="tech-card">
@@ -377,7 +385,6 @@ with col_pp:
         </form>
     </div>
     """
-    # Aumentamos la altura a 175 para que entre la tarjeta completa sin cortarse
     components.html(paypal_html, height=175)
     
 
