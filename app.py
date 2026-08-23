@@ -758,59 +758,59 @@ if len(image_configs) > 0:
     # 3. GENERAMOS UNA LISTA DE IMÁGENES (UNA POR CADA PLIEGO)
     minimapas = []
     
-   for bin_id in sorted(bins_live.keys()):
-       minimap = Image.new("RGBA", (mini_w, mini_h), (240, 240, 240, 255))
-       draw = ImageDraw.Draw(minimap)
+    for bin_id in sorted(bins_live.keys()):
+        minimap = Image.new("RGBA", (mini_w, mini_h), (240, 240, 240, 255))
+        draw = ImageDraw.Draw(minimap)
         
-      if use_edge_margins:
-          safe_x0, safe_y0 = int(edge_margin_px * preview_scale), int(edge_margin_px * preview_scale)
-          safe_x1, safe_y1 = mini_w - safe_x0, mini_h - safe_y0
-          draw.rectangle([safe_x0, safe_y0, safe_x1, safe_y1], outline=(200, 200, 200, 255), width=1)
+        if use_edge_margins:
+            safe_x0, safe_y0 = int(edge_margin_px * preview_scale), int(edge_margin_px * preview_scale)
+            safe_x1, safe_y1 = mini_w - safe_x0, mini_h - safe_y0
+            draw.rectangle([safe_x0, safe_y0, safe_x1, safe_y1], outline=(200, 200, 200, 255), width=1)
             
-      for rect in bins_live[bin_id]:
-          b, x, y, w, h, rid = rect
-          conf = rect_map_live[rid]
-          req_w_margin = conf["w_px"] + (margin_px * 2)
-          req_h_margin = conf["h_px"] + (margin_px * 2)
+        for rect in bins_live[bin_id]:
+            b, x, y, w, h, rid = rect
+            conf = rect_map_live[rid]
+            req_w_margin = conf["w_px"] + (margin_px * 2)
+            req_h_margin = conf["h_px"] + (margin_px * 2)
             
-          is_rotated = False
-          if w == req_h_margin and h == req_w_margin and w != h:
-              is_rotated = True
+            is_rotated = False
+            if w == req_h_margin and h == req_w_margin and w != h:
+                is_rotated = True
                 
-          px0 = int((x + edge_margin_px) * preview_scale)
-          py0 = int((gang_height_px - (y + h) - edge_margin_px) * preview_scale)
-          pw = int(w * preview_scale)
-          ph = int(h * preview_scale)
+            px0 = int((x + edge_margin_px) * preview_scale)
+            py0 = int((gang_height_px - (y + h) - edge_margin_px) * preview_scale)
+            pw = int(w * preview_scale)
+            ph = int(h * preview_scale)
             
-          if pw > 0 and ph > 0:
-              thumb = conf["thumb"]
-              if is_rotated:
-                 thumb = thumb.rotate(90, expand=True)
-              minimap.paste(thumb, (px0, py0), thumb)
-              draw.rectangle([px0, py0, px0 + pw, py0 + ph], outline=(50, 100, 200, 100), width=1)
+            if pw > 0 and ph > 0:
+                thumb = conf["thumb"]
+                if is_rotated:
+                   thumb = thumb.rotate(90, expand=True)
+                minimap.paste(thumb, (px0, py0), thumb)
+                draw.rectangle([px0, py0, px0 + pw, py0 + ph], outline=(50, 100, 200, 100), width=1)
         
-      # --- ESCUDO ANTI-CAPTURAS DE PANTALLA (Visor en Vivo) ---
-      ruta_logo = "logo.png"
-      if os.path.exists(ruta_logo):
-          try:
-              wm_img = Image.open(ruta_logo).convert("RGBA")
-              wm_w = max(50, int(mini_w / 3)) # Tamaño proporcional al visor
-              wm_h = int(wm_w * (wm_img.height / wm_img.width))
-              wm_img = wm_img.resize((wm_w, wm_h), Image.Resampling.LANCZOS)
-              alpha = wm_img.split()[3]
-              alpha = Image.eval(alpha, lambda a: int(a * 0.25)) # 25% de opacidad (súper leve)
-              wm_img.putalpha(alpha)
+       # --- ESCUDO ANTI-CAPTURAS DE PANTALLA (Visor en Vivo) ---
+       ruta_logo = "logo.png"
+       if os.path.exists(ruta_logo):
+           try:
+               wm_img = Image.open(ruta_logo).convert("RGBA")
+               wm_w = max(50, int(mini_w / 3)) # Tamaño proporcional al visor
+               wm_h = int(wm_w * (wm_img.height / wm_img.width))
+               wm_img = wm_img.resize((wm_w, wm_h), Image.Resampling.LANCZOS)
+               alpha = wm_img.split()[3]
+               alpha = Image.eval(alpha, lambda a: int(a * 0.25)) # 25% de opacidad (súper leve)
+               wm_img.putalpha(alpha)
                 
-              wm_layer = Image.new("RGBA", minimap.size, (255, 255, 255, 0))
-              for y_pos in range(0, mini_h, wm_h + 30):
-                  for x_pos in range(0, mini_w, wm_w + 30):
-                      wm_layer.paste(wm_img, (x_pos, y_pos), wm_img)
-              minimap = Image.alpha_composite(minimap, wm_layer)
-          except Exception:
-              pass
-      # --------------------------------------------------------
+               wm_layer = Image.new("RGBA", minimap.size, (255, 255, 255, 0))
+               for y_pos in range(0, mini_h, wm_h + 30):
+                   for x_pos in range(0, mini_w, wm_w + 30):
+                       wm_layer.paste(wm_img, (x_pos, y_pos), wm_img)
+               minimap = Image.alpha_composite(minimap, wm_layer)
+           except Exception:
+               pass
+       # --------------------------------------------------------
         
-      minimapas.append(minimap) 
+       minimapas.append(minimap) 
         
 # 4. MOSTRAMOS EL VISOR AL FINAL DEL RECORRIDO (Para Celulares y PC)
     with st.expander("🔍 VISOR DE VISTA PREVIA Y FICHA TÉCNICA", expanded=True):
