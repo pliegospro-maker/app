@@ -329,14 +329,14 @@ st.markdown("Elegí tu método de pago según tu país de residencia:")
 col_mp, col_pp = st.columns(2)
 
 with col_mp:
-    # Texto unificado en una sola línea
-    st.markdown("### 🇦🇷 Argentina: $5.000 ARS")
+    # Texto unificado tamaño normal
+    st.markdown("🇦🇷 **Argentina:** $5.000 ARS")
     
-    # --- EL BOTÓN DE MERCADO PAGO CON LOGO MÁS GRANDE ---
+    # --- EL BOTÓN DE MERCADO PAGO ELEGANTE ---
     mp_html = """
     <a href="https://mpago.li/2GESomZ" target="_blank" style="text-decoration: none;">
-        <div style="background-color: #FFE600; color: #009EE3; border: none; padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="35" style="margin:0;">
+        <div style="background-color: #FFE600; color: #009EE3; padding: 8px 15px; font-size: 15px; border-radius: 6px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="20" style="margin:0;">
             Pagar con MercadoPago
         </div>
     </a>
@@ -344,13 +344,14 @@ with col_mp:
     st.markdown(mp_html, unsafe_allow_html=True)
     
 with col_pp:
-    # Texto unificado en una sola línea
-    st.markdown("### 🌎 Internacional: $3.00 USD")
+    # Texto unificado tamaño normal
+    st.markdown("🌎 **Internacional:** $3.00 USD")
     
-    # --- EL BOTÓN MÁGICO DE PAYPAL CON LOGO MÁS GRANDE ---
+    # --- EL BOTÓN MÁGICO DE PAYPAL ELEGANTE ---
     paypal_html = f"""
+    <style>body {{ margin: 0; padding: 0; overflow: hidden; }}</style>
     <div style="display: flex; justify-content: center; width: 100%;">
-        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="width: 100%;">
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="width: 100%; margin: 0;">
             <input type="hidden" name="cmd" value="_xclick">
             <input type="hidden" name="business" value="PLIEGOSPRO@GMAIL.COM">
             <input type="hidden" name="item_name" value="Créditos PliegosPro">
@@ -360,16 +361,15 @@ with col_pp:
             <input type="hidden" name="custom" value="{email_usuario}">
             <input type="hidden" name="notify_url" value="https://hook.us2.make.com/e1hpm35sdb5bmjv09kj9fiq4ztbj6atb">
             
-            <!-- Diseño del botón modificado para tener LOGO y color oficial -->
-            <button type="submit" style="background-color: #FFC439; color: #003087; border: none; padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" height="25" style="margin:0;">
+            <button type="submit" style="background-color: #FFC439; color: #003087; border: none; padding: 8px 15px; font-size: 15px; border-radius: 6px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" height="20" style="margin:0;">
                 Pagar con PayPal
             </button>
         </form>
     </div>
     """
-    # Aumentamos un poquito más la altura a 70 por si el botón creció y no se corte la sombra
-    components.html(paypal_html, height=70)
+    # Altura reducida al mínimo para que quede apretadito
+    components.html(paypal_html, height=45)
     
 
 # --- A partir de aquí sigue el resto de tu código normal (1. Configuración, 2. Cargar, etc.) ---
