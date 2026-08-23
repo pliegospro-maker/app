@@ -362,24 +362,7 @@ with col_pp:
     """
     components.html(paypal_html, height=50)
     
-# --- INICIO DEL BOTÓN SIMULADOR TEMPORAL ---
-import requests
-if st.button("🧪 Simular Pago para Make", type="primary"):
-    # Tu URL secreta de Make
-    url_make = "https://hook.us2.make.com/e1hpm35sdb5bmjv09kj9fiq4ztbj6atb"
-    
-    # Los datos falsos que Make necesita aprender
-    datos_simulados = {
-        "custom": email_usuario, 
-        "payment_status": "Completed", 
-        "mc_gross": "3.00", 
-        "payer_email": "cliente_falso@gmail.com"
-    }
-    
-    # Disparamos el pago falso
-    requests.post(url_make, data=datos_simulados)
-    st.success("¡Disparo enviado! Revisá la pestaña de Make.")
-# --- FIN DEL BOTÓN SIMULADOR TEMPORAL ---
+
 # --- A partir de aquí sigue el resto de tu código normal (1. Configuración, 2. Cargar, etc.) ---
 st.divider() # Una línea sutil para separar el header del contenido
     
