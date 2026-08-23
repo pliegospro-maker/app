@@ -146,6 +146,7 @@ if not st.session_state.usuario_autenticado:
 # ... (todo lo que ya tenías)
 import streamlit as st
 from PIL import Image, ImageFilter, ImageDraw
+Image.MAX_IMAGE_PIXELS = None # <--- LÍNEA AGREGADA
 from rectpack import newPacker, PackingMode, PackingBin
 import io
 import os
@@ -205,11 +206,17 @@ def cm_to_px(cm): return int(cm * PX_PER_CM)
 def px_to_cm(px): return px / PX_PER_CM
 
 def get_preview_with_bg(img, bg_hex):
+    # --- SALVAVIDAS DE MEMORIA RAM ---
+    # Achicamos la imagen SOLO para mostrarla en pantalla (máximo 800px)
+    # La imagen original de alta calidad NO se ve afectada.
+    img_pantalla = img.copy()
+    img_pantalla.thumbnail((800, 800), Image.Resampling.LANCZOS)
+    
     bg_color = tuple(int(bg_hex.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) + (255,)
-    bg_img = Image.new("RGBA", img.size, bg_color)
-    if img.mode != 'RGBA':
-        img = img.convert('RGBA')
-    bg_img.paste(img, (0,0), img)
+    bg_img = Image.new("RGBA", img_pantalla.size, bg_color)
+    if img_pantalla.mode != 'RGBA':
+        img_pantalla = img_pantalla.convert('RGBA')
+    bg_img.paste(img_pantalla, (0,0), img_pantalla)
     return bg_img
 
 
