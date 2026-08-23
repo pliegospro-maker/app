@@ -668,7 +668,7 @@ with col2:
                                     with cc1:
                                         target_color = st.color_picker("Color (Clica para usar el gotero)", "#000000", key=f"cp_{safe_key}")
                                     with cc2:
-                                        tol_val = st.slider("Tolerancia", 0, 100, 30, key=f"tol_exact_{safe_key}")
+                                        tol_val = st.slider("Tolerancia (mayor número = borra más colores similares)", 0, 100, 30, key=f"tol_exact_{safe_key}")
                                         
                                     preview_img = remove_specific_color(img, target_color, tol_val)
                                     
@@ -689,7 +689,7 @@ with col2:
                                 else:
                                     # Opción de la Barra de Luminosidad
                                     lum_target = st.slider("Luminosidad a borrar (0=Negro, 255=Blanco)", 0, 255, 255, key=f"lum_{safe_key}")
-                                    tol_lum = st.slider("Tolerancia", 0, 100, 30, key=f"tol_lum_{safe_key}")
+                                    tol_lum = st.slider("Tolerancia (mayor número = borra más tonos similares)", 0, 100, 30, key=f"tol_lum_{safe_key}")
                                     preview_img = remove_luminance(img, lum_target, tol_lum)
                                     
                                     prev_col1, prev_col2 = st.columns([2, 1])
