@@ -9,6 +9,7 @@ estilos = """
     # --- OCULTAR BARRA SUPERIOR DE STREAMLIT ---
 st.markdown(
     """
+    <style>
     /* Ocultar el Header completo (Toolbar y Menú Hamburguesa) */
     [data-testid="stHeader"] {
         display: none !important;
