@@ -426,7 +426,7 @@ if st.session_state.last_action_msg:
 col1, col2 = st.columns([1, 2.5])
 
 with col1:
-    st.markdown("<h3 style='color: #00FFFF; text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);'>1. Configuración del Pliego</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color: #38BDF8; text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);'>1. Configuración del Pliego</h3>", unsafe_allow_html=True)
     sheet_choice = st.selectbox("Tipo de pliego:", list(SHEET_TYPES.keys()))
     sheet_width_cm = SHEET_TYPES[sheet_choice]["width_cm"]
     sheet_height_cm = SHEET_TYPES[sheet_choice]["height_cm"]
@@ -440,7 +440,7 @@ with col1:
     texto_marca = "MUESTRA GRATIS - PLIEGOS PRO" 
     opacidad_marca = 128
 
-    st.markdown("<h3 style='color: #00FFFF; text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);'>2. Cargar Diseños</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color: #38BDF8; text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);'>2. Cargar Diseños</h3>", unsafe_allow_html=True)
     uploaded_files = st.file_uploader("Subir imágenes", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
     if st.button("🗑️ Limpiar papelera"):
         st.session_state.deleted_images = set()
@@ -477,7 +477,7 @@ with col1:
     st.markdown("---")
 
 with col2:
-                st.markdown("<h3 style='color: #00FFFF; text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);'>3. Edición de Imágenes</h3>", unsafe_allow_html=True)
+                st.markdown("<h3 style='color: #38BDF8; text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);'>3. Edición de Imágenes</h3>", unsafe_allow_html=True)
 
                 # --- ESCUDO ANTI-CORTES ---
                 # 1. Guardamos lo que se sube directamente a la caja fuerte de memoria
