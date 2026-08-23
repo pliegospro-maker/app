@@ -538,10 +538,10 @@ with col2:
                                         st.rerun()
 
                                 # --- ELIMINAMOS LA COLUMNA FANTASMA ---
-                                # Pasamos a 3 columnas bien proporcionadas
-                                c_img, c_size, c_act = st.columns([1, 1.2, 1.2])
+            # Pasamos a 3 columnas bien proporcionadas
+            c_img, c_size, c_act = st.columns([1, 1.2, 1.2])
 
-                        with c_size:
+            with c_size:
                 st.markdown("**📏 Dimensiones**")
                 dim_choice = st.radio("Ajustar:", ["Ancho", "Alto"], horizontal=True, key=f"dim_{file.name}")
                 
