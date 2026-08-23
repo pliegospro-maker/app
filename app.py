@@ -320,7 +320,7 @@ with col_der:
         </button>
     </a>
     """
-    st.markdown(boton_pago, unsafe_allow_html=True)
+   
     st.markdown("---")
         st.markdown("### 💳 Recargar Créditos")
         st.markdown("Elegí tu método de pago según tu país de residencia:")
