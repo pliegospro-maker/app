@@ -352,6 +352,8 @@ with col_pp:
             
             <!-- EL CAMPO SECRETO: Le mandamos el email del usuario para que Make.com lo lea -->
             <input type="hidden" name="custom" value="{email_usuario}">
+            <!-- EL AVISADOR: Le dice a PayPal que le mande los datos a Make cuando se pague -->
+            <input type="hidden" name="notify_url" value="https://hook.us2.make.com/e1hpm35sdb5bmjv09kj9fiq4ztbj6atb">
             
             <!-- Diseño del botón -->
             <input type="submit" value="Pagar con PayPal" style="background-color: #0070ba; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-family: sans-serif; font-weight: bold; transition: 0.3s;">
