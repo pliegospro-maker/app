@@ -345,7 +345,7 @@ with col_mp:
         <div class="price-text">$5.000 <span class="currency">ARS</span></div>
         <a href="https://mpago.li/2GESomZ" target="_blank">
             <div class="mp-button">
-                <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="30" style="margin:0;">
+                <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="20" style="margin:0;">
                 Pagar con MercadoPago
             </div>
         </a>
@@ -377,7 +377,8 @@ with col_pp:
             
             <input type="hidden" name="custom" value="{email_usuario}">
             <input type="hidden" name="notify_url" value="https://hook.us2.make.com/e1hpm35sdb5bmjv09kj9fiq4ztbj6atb">
-            
+            <input type="hidden" name="return" value="https://pliegospro.streamlit.app/">
+            <input type="hidden" name="cancel_return" value="https://pliegospro.streamlit.app/">
             <button type="submit" class="pp-button">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" height="20" style="margin:0;">
                 Pagar con PayPal
