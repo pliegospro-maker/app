@@ -367,12 +367,12 @@ with col_pp:
     </style>
     <div class="tech-card">
         <div class="country-label">🌎 Internacional</div>
-        <div class="price-text">$3.00 <span class="currency">USD</span></div>
+        <div class="price-text">$3.50 <span class="currency">USD</span></div>
         <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="margin: 0; width: 100%;">
             <input type="hidden" name="cmd" value="_xclick">
             <input type="hidden" name="business" value="PLIEGOSPRO@GMAIL.COM">
             <input type="hidden" name="item_name" value="Créditos PliegosPro">
-            <input type="hidden" name="amount" value="3.00">
+            <input type="hidden" name="amount" value="0.10">
             <input type="hidden" name="currency_code" value="USD">
             
             <input type="hidden" name="custom" value="{email_usuario}">
