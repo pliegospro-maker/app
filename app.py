@@ -782,14 +782,35 @@ if len(image_configs) > 0:
             ph = int(h * preview_scale)
             
             if pw > 0 and ph > 0:
-                thumb = conf["thumb"]
-                if is_rotated:
-                    thumb = thumb.rotate(90, expand=True)
-                minimap.paste(thumb, (px0, py0), thumb)
+                    thumb = conf["thumb"]
+                    if is_rotated:
+                        thumb = thumb.rotate(90, expand=True)
+                    minimap.paste(thumb, (px0, py0), thumb)
+                    draw.rectangle([px0, py0, px0 + pw, py0 + ph], outline=(50, 100, 200, 100), width=1)
+            
+            # --- ESCUDO ANTI-CAPTURAS DE PANTALLA (Visor en Vivo) ---
+            ruta_logo = "logo.png"
+            if os.path.exists(ruta_logo):
+                try:
+                    wm_img = Image.open(ruta_logo).convert("RGBA")
+                    wm_w = max(50, int(mini_w / 3)) # Tamaño proporcional al visor
+                    wm_h = int(wm_w * (wm_img.height / wm_img.width))
+                    wm_img = wm_img.resize((wm_w, wm_h), Image.Resampling.LANCZOS)
+                    alpha = wm_img.split()[3]
+                    alpha = Image.eval(alpha, lambda a: int(a * 0.25)) # 25% de opacidad (súper leve)
+                    wm_img.putalpha(alpha)
                     
-            draw.rectangle([px0, py0, px0 + pw, py0 + ph], outline=(50, 100, 200, 100), width=1)
-                    
-        minimapas.append(minimap)
+                    wm_layer = Image.new("RGBA", minimap.size, (255, 255, 255, 0))
+                    for y_pos in range(0, mini_h, wm_h + 30):
+                        for x_pos in range(0, mini_w, wm_w + 30):
+                            wm_layer.paste(wm_img, (x_pos, y_pos), wm_img)
+                    minimap = Image.alpha_composite(minimap, wm_layer)
+                except Exception:
+                    pass
+            # --------------------------------------------------------
+
+            minimapas.append(minimap)
+        
 # 4. MOSTRAMOS EL VISOR AL FINAL DEL RECORRIDO (Para Celulares y PC)
     with st.expander("🔍 VISOR DE VISTA PREVIA Y FICHA TÉCNICA", expanded=True):
         if len(minimapas) > 1:
