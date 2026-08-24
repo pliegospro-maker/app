@@ -1070,16 +1070,26 @@ if len(image_configs) > 0:
                         
                         sdk = mercadopago.SDK(st.secrets["MP_ACCESS_TOKEN"])
                         pref_data_peaje = {
-                            "items": [{"title": f"{creditos_faltantes} Créditos PliegosPro", "quantity": 1, "unit_price": precio_total, "currency_id": "ARS"}],
-                            "payer": {"email": email_usuario},
-                            "back_urls": {"success": f"https://pliegospro.streamlit.app/?auth={user_id}",
+                            "items": [
+                                {
+                                    "title": f"{creditos_faltantes} Créditos PliegosPro",
+                                    "quantity": int(creditos_faltantes),
+                                    "unit_price": 10.0,
+                                    "currency_id": "ARS"
+                                }
+                            ],
+                            "payer": {
+                                "email": st.session_state.email_usuario
+                            },
+                            "back_urls": {
+                                "success": f"https://pliegospro.streamlit.app/?auth={st.session_state.user_id}"
+                            },
                             "auto_return": "approved",
-                            "external_reference": email_usuario,
+                            "external_reference": st.session_state.email_usuario,
                             "notification_url": "https://hook.us2.make.com/r5og8gzq9xaj9vwbma93aff51ahsx5jb"
                         }
                         res_peaje = sdk.preference().create(pref_data_peaje)
                         link_mp_peaje = res_peaje["response"]["init_point"]
-                        
                         st.markdown(f"[👉 Comprar los {creditos_faltantes} créditos que faltan aquí]({link_mp_peaje})")
                     except Exception as e:
                         st.write("Cargando botón de pago...")            
