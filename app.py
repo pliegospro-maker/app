@@ -80,9 +80,22 @@ if 'user_id' not in st.session_state:
 if 'email_usuario' not in st.session_state:
     st.session_state.email_usuario = None
 
-# --- ESCUDO DE SEGURIDAD TOTAL (URL LIMPIA Y PRIVADA) ---
-# Nos aseguramos de que la barra de direcciones jamás muestre credenciales ni IDs
-if len(st.query_params) > 0:
+# --- RESTAURAR SESIÓN AL VOLVER DE MERCADOPAGO (POST-PAGO) ---
+# Si vuelve de MercadoPago y trae un token temporal de sesión en la URL, lo recuperamos
+if not st.session_state.usuario_autenticado and "auth" in st.query_params:
+    token_recuperacion = st.query_params["auth"]
+    try:
+        resp_user = supabase.table("perfiles").select("*").eq("id", token_recuperacion).execute()
+        if len(resp_user.data) > 0:
+            st.session_state.usuario_autenticado = True
+            st.session_state.user_id = token_recuperacion
+            st.session_state.email_usuario = resp_user.data[0]["email"]
+            st.session_state.creditos = resp_user.data[0].get("creditos", 0)
+    except Exception:
+        pass
+
+# Limpiamos la URL para que no quede fija y sea seguro
+if "auth" in st.query_params and st.session_state.usuario_autenticado:
     st.query_params.clear()
 
 
@@ -408,7 +421,7 @@ try:
         pref_data_billetera = {
             "items": [{"title": "1 Crédito PliegosPro", "quantity": 1, "unit_price": 10.0, "currency_id": "ARS"}],
             "payer": {"email": email_usuario},
-            "back_urls": {"success": "https://pliegospro.streamlit.app/"},
+            "back_urls": {"success": f"https://pliegospro.streamlit.app/?auth={user_id}",
             "auto_return": "approved",
             "external_reference": email_usuario,  # <--- EL DNI DEL USUARIO
             "notification_url": "https://hook.us2.make.com/r5og8gzq9xaj9vwbma93aff51ahsx5jb"  # <--- EL TELÉFONO DE TU ROBOT
@@ -1051,7 +1064,7 @@ if len(image_configs) > 0:
                         pref_data_peaje = {
                             "items": [{"title": f"{creditos_faltantes} Créditos PliegosPro", "quantity": 1, "unit_price": precio_total, "currency_id": "ARS"}],
                             "payer": {"email": email_usuario},
-                            "back_urls": {"success": "https://pliegospro.streamlit.app/"},
+                            "back_urls": {"success": f"https://pliegospro.streamlit.app/?auth={user_id}",
                             "auto_return": "approved",
                             "external_reference": email_usuario,
                             "notification_url": "https://hook.us2.make.com/r5og8gzq9xaj9vwbma93aff51ahsx5jb"
