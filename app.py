@@ -98,35 +98,35 @@ if not st.session_state.usuario_autenticado:
 
    
     with tab_login:
-    email_login = st.text_input("Tu Email", key="email_login").strip().lower()
-    password_login = st.text_input("Tu Contraseña", type="password", key="pass_login")
+        email_login = st.text_input("Tu Email", key="email_login").strip().lower()
+        password_login = st.text_input("Tu Contraseña", type="password", key="pass_login")
     
-    if st.button("Ingresar al Software", type="primary"):
-        try:
-            # Inicia sesión directamente
-            respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
-            user_id = respuesta.user.id # Obtenemos el UUID secreto
-            
-            # Guardamos los datos de forma privada en la memoria interna (NUNCA en la URL)
-            st.session_state.usuario_autenticado = True
-            st.session_state.user_id = user_id
-            st.session_state.email_usuario = email_login
-            
-            # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
+        if st.button("Ingresar al Software", type="primary"):
             try:
-                respuesta_bd = supabase.table("perfiles").select("creditos").eq("email", email_login).execute()
-                if len(respuesta_bd.data) > 0:
-                    st.session_state.creditos = respuesta_bd.data[0]["creditos"]
-                else:
-                    st.session_state.creditos = 0
-            except Exception as error_db:
-                st.session_state.creditos = 0
-                
-            st.query_params.clear() # Limpiamos la URL por completo para que quede limpia
-            st.rerun()
+                # Inicia sesión directamente
+                respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
+                user_id = respuesta.user.id # Obtenemos el UUID secreto
             
-        except Exception as e:
-            st.error("Email o contraseña incorrectos.")   
+                # Guardamos los datos de forma privada en la memoria interna (NUNCA en la URL)
+                st.session_state.usuario_autenticado = True
+                st.session_state.user_id = user_id
+                st.session_state.email_usuario = email_login
+            
+                # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
+                try:
+                    respuesta_bd = supabase.table("perfiles").select("creditos").eq("email", email_login).execute()
+                    if len(respuesta_bd.data) > 0:
+                        st.session_state.creditos = respuesta_bd.data[0]["creditos"]
+                    else:
+                        st.session_state.creditos = 0
+                except Exception as error_db:
+                    st.session_state.creditos = 0
+                
+                st.query_params.clear() # Limpiamos la URL por completo para que quede limpia
+                st.rerun()
+            
+            except Exception as e:
+                st.error("Email o contraseña incorrectos.")   
 
     with tab_registro:
         st.info("Creá tu cuenta gratis. Podés armar tus pliegos y solo pagás cuando quieras descargarlos en alta calidad.")
