@@ -72,13 +72,30 @@ url_supabase: str = st.secrets["SUPABASE_URL"]
 clave_supabase: str = st.secrets["SUPABASE_KEY"]
 supabase: Client = create_client(url_supabase, clave_supabase)
 
-# 2. Configurar la memoria temporal
+# 2. Configurar el Gestor de Cookies Seguras
+from streamlit_cookies_manager import EncryptedCookieManager
+
+# Inicializamos el tarjetero de cookies con una contraseña secreta interna
+cookies = EncryptedCookieManager(prefix="pliegospro_", password=st.secrets["SUPABASE_KEY"])
+if not cookies.ready():
+    st.stop()  # Espera un milisegundo a que carguen las cookies del navegador
+
+# Sincronizamos la memoria temporal con la cookie guardada
 if 'usuario_autenticado' not in st.session_state:
-    st.session_state.usuario_autenticado = False
-if 'user_id' not in st.session_state:
-    st.session_state.user_id = None
-if 'email_usuario' not in st.session_state:
-    st.session_state.email_usuario = None
+    # Si la cookie ya tiene un email guardado, restauramos la sesión automáticamente
+    if cookies.get("user_email"):
+        st.session_state.usuario_autenticado = True
+        st.session_state.email_usuario = cookies.get("user_email")
+        st.session_state.user_id = cookies.get("user_id")
+    else:
+        st.session_state.usuario_autenticado = False
+        st.session_state.user_id = None
+        st.session_state.email_usuario = None
+
+# --- SISTEMA DE SESIÓN SEGURO Y PRIVADO ---
+if not st.session_state.usuario_autenticado:
+    if len(st.query_params) > 0:
+        st.query_params.clear()
 
 # --- SISTEMA DE SESIÓN SEGURO Y PRIVADO (SIN RASTRO EN URL) ---
 # Si el usuario ya está autenticado en la memoria del navegador, lo dejamos pasar directo
@@ -123,6 +140,10 @@ if not st.session_state.usuario_autenticado:
                     st.session_state.creditos = 0
                 
                 st.query_params.clear() # Limpiamos la URL por completo para que quede limpia
+                # Guardamos la cookie cifrada en el navegador del usuario por 30 días
+                cookies["user_email"] = email_login
+                cookies["user_id"] = user_id
+                cookies.save()
                 st.rerun()
             
             except Exception as e:
@@ -308,9 +329,12 @@ with col_der:
 
     # --- BOTÓN DE CERRAR SESIÓN ---
     if st.button("🚪 Cerrar Sesión", use_container_width=True):
+        cookies["user_email"] = ""
+        cookies["user_id"] = ""
+        cookies.save()
         st.session_state.clear() # Borra toda la memoria de la sesión
-        st.query_params.clear() # Limpia el token secreto de la URL
-        st.rerun() # Recarga la página y te devuelve al inicio
+        st.query_params.clear() # Limpia la URL
+        st.rerun() # Recarga la página
     st.markdown(f"💳 **Tus Créditos:** {creditos_actuales}")
     
     # Botón HTML 100% funcional con estilos en línea
