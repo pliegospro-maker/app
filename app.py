@@ -72,37 +72,19 @@ url_supabase: str = st.secrets["SUPABASE_URL"]
 clave_supabase: str = st.secrets["SUPABASE_KEY"]
 supabase: Client = create_client(url_supabase, clave_supabase)
 
-# 2. Configurar el Gestor de Cookies Seguras
-from streamlit_cookies_manager import EncryptedCookieManager
-
-# Inicializamos el tarjetero de cookies con una contraseña secreta interna
-cookies = EncryptedCookieManager(prefix="pliegospro_", password=st.secrets["SUPABASE_KEY"])
-if not cookies.ready():
-    st.stop()  # Espera un milisegundo a que carguen las cookies del navegador
-
-# Sincronizamos la memoria temporal con la cookie guardada
+# 2. Configurar la memoria temporal y persistencia de sesión
 if 'usuario_autenticado' not in st.session_state:
-    # Si la cookie ya tiene un email guardado, restauramos la sesión automáticamente
-    if cookies.get("user_email"):
-        st.session_state.usuario_autenticado = True
-        st.session_state.email_usuario = cookies.get("user_email")
-        st.session_state.user_id = cookies.get("user_id")
-    else:
-        st.session_state.usuario_autenticado = False
-        st.session_state.user_id = None
-        st.session_state.email_usuario = None
+    st.session_state.usuario_autenticado = False
+if 'user_id' not in st.session_state:
+    st.session_state.user_id = None
+if 'email_usuario' not in st.session_state:
+    st.session_state.email_usuario = None
 
-# --- SISTEMA DE SESIÓN SEGURO Y PRIVADO ---
+# --- SISTEMA DE SESIÓN SEGURO Y LIMPIO ---
 if not st.session_state.usuario_autenticado:
     if len(st.query_params) > 0:
         st.query_params.clear()
 
-# --- SISTEMA DE SESIÓN SEGURO Y PRIVADO (SIN RASTRO EN URL) ---
-# Si el usuario ya está autenticado en la memoria del navegador, lo dejamos pasar directo
-if not st.session_state.usuario_autenticado:
-    # Por las dudas, limpiamos cualquier parámetro viejo que haya quedado en la URL
-    if len(st.query_params) > 0:
-        st.query_params.clear()
 
 # 3. Pantalla de Autenticación (Modelo Freemium)
 if not st.session_state.usuario_autenticado:
