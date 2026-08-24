@@ -75,21 +75,17 @@ supabase: Client = create_client(url_supabase, clave_supabase)
 # 2. Configurar la memoria temporal
 if 'usuario_autenticado' not in st.session_state:
     st.session_state.usuario_autenticado = False
+if 'user_id' not in st.session_state:
+    st.session_state.user_id = None
+if 'email_usuario' not in st.session_state:
+    st.session_state.email_usuario = None
 
-# --- NUEVO SISTEMA DE SESIÓN SEGURO (CON UUID) ---
-if "session" in st.query_params:
-    token_usuario = st.query_params["session"]
-    try:
-        # Buscamos quién es el dueño de este token secreto
-        respuesta_perfil = supabase.table("perfiles").select("email, creditos").eq("id", token_usuario).execute()
-        if len(respuesta_perfil.data) > 0:
-            st.session_state.usuario_autenticado = True
-            st.session_state.user_id = token_usuario
-            st.session_state.email_usuario = respuesta_perfil.data[0]["email"]
-        else:
-            st.session_state.usuario_autenticado = False
-    except:
-        st.session_state.usuario_autenticado = False
+# --- SISTEMA DE SESIÓN SEGURO Y PRIVADO (SIN RASTRO EN URL) ---
+# Si el usuario ya está autenticado en la memoria del navegador, lo dejamos pasar directo
+if not st.session_state.usuario_autenticado:
+    # Por las dudas, limpiamos cualquier parámetro viejo que haya quedado en la URL
+    if len(st.query_params) > 0:
+        st.query_params.clear()
 
 # 3. Pantalla de Autenticación (Modelo Freemium)
 if not st.session_state.usuario_autenticado:
@@ -105,22 +101,20 @@ if not st.session_state.usuario_autenticado:
             password_login = st.text_input("Tu Contraseña", type="password", key="pass_login")
             
             if st.button("Ingresar al Software", type="primary"):
-                try:
-            # Inicia sesión directamente
-                    respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
-                    user_id = respuesta.user.id # Obtenemos el UUID secreto
-            
-                    st.session_state.usuario_autenticado = True
-                    st.session_state.user_id = user_id
-                    st.session_state.email_usuario = email_login
-            
-                    # --- MAGIA SEGURA CONTRA EL F5 ---
-                    st.query_params.clear() # Limpiamos basura vieja de la URL
-                    st.query_params["session"] = user_id # Guardamos el UUID, no el email
-            
-                    st.rerun()
-                except Exception as e:
-                    st.error("Email o contraseña incorrectos.")
+            try:
+                # Inicia sesión directamente
+                respuesta = supabase.auth.sign_in_with_password({"email": email_login, "password": password_login})
+                user_id = respuesta.user.id # Obtenemos el UUID secreto
+                
+                # Guardamos los datos de forma privada en la memoria interna (NUNCA en la URL)
+                st.session_state.usuario_autenticado = True
+                st.session_state.user_id = user_id
+                st.session_state.email_usuario = email_login
+                
+                st.query_params.clear() # Limpiamos la URL por completo para que quede limpia
+                st.rerun()
+            except Exception as e:
+                st.error("Email o contraseña incorrectos.")
 
                     # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
                     try:
