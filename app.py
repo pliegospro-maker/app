@@ -311,9 +311,6 @@ with col_der:
 
     # --- BOTÓN DE CERRAR SESIÓN ---
     if st.button("🚪 Cerrar Sesión", use_container_width=True):
-        cookies["user_email"] = ""
-        cookies["user_id"] = ""
-        cookies.save()
         st.session_state.clear() # Borra toda la memoria de la sesión
         st.query_params.clear() # Limpia la URL
         st.rerun() # Recarga la página
