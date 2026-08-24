@@ -1074,7 +1074,7 @@ if len(image_configs) > 0:
                                 {
                                     "title": f"{creditos_faltantes} Créditos PliegosPro",
                                     "quantity": int(creditos_faltantes),
-                                    "unit_price": 10.0,
+                                    "unit_price": 5000.0,
                                     "currency_id": "ARS"
                                 }
                             ],
