@@ -1072,3 +1072,5 @@ if len(image_configs) > 0:
                         st.markdown(f"[👉 Comprar los {creditos_faltantes} créditos que faltan aquí]({link_mp_peaje})")
                     except Exception as e:
                         st.write("Cargando botón de pago...")            
+# --- FOOTER APLICACIÓN PRINCIPAL ---
+st.markdown("<br><br><br><p style='text-align: center; color: #555555; font-size: 13px;'>⚡ Powered by Paquete Impresiones</p>", unsafe_allow_html=True)
