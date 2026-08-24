@@ -798,7 +798,7 @@ if len(image_configs) > 0:
                 wm_h = int(wm_w * (wm_img.height / wm_img.width))
                 wm_img = wm_img.resize((wm_w, wm_h), Image.Resampling.LANCZOS)
                 alpha = wm_img.split()[3]
-                alpha = Image.eval(alpha, lambda a: int(a * 0.25)) # 25% de opacidad (súper leve)
+                alpha = Image.eval(alpha, lambda a: int(a * 045)) # 45% de opacidad
                 wm_img.putalpha(alpha)
                 
                 wm_layer = Image.new("RGBA", minimap.size, (255, 255, 255, 0))
@@ -810,7 +810,7 @@ if len(image_configs) > 0:
                 pass
         # --------------------------------------------------------
         
-        minimapas.append(minimap) 
+        minimapas.append(minimap.convert("RGB")) 
         
 # 4. MOSTRAMOS EL VISOR AL FINAL DEL RECORRIDO (Para Celulares y PC)
     with st.expander("🔍 VISOR DE VISTA PREVIA Y FICHA TÉCNICA", expanded=True):
