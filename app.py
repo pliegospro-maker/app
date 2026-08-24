@@ -122,10 +122,6 @@ if not st.session_state.usuario_autenticado:
                     st.session_state.creditos = 0
                 
                 st.query_params.clear() # Limpiamos la URL por completo para que quede limpia
-                # Guardamos la cookie cifrada en el navegador del usuario por 30 días
-                cookies["user_email"] = email_login
-                cookies["user_id"] = user_id
-                cookies.save()
                 st.rerun()
             
             except Exception as e:
