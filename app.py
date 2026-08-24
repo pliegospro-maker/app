@@ -153,7 +153,7 @@ if not st.session_state.usuario_autenticado:
             except Exception as e:
                 st.error(f"⚠️ Error exacto: {e}")
     # --- FOOTER LOGIN ---
-    st.markdown("<br><br><p style='text-align: center; color: #555555; font-size: 13px;'>⚡ Powered by Paquete Impresiones</p>", unsafe_allow_html=True)
+    st.markdown("<br><br><p style='text-align: center; color: #555555; font-size: 13px;'>⚡ Powered by @PaqueteImpresiones</p>", unsafe_allow_html=True)
     # EL ESCUDO (Frena el código acá si no inició sesión)
     st.stop()
 # ... (todo lo que ya tenías)
@@ -486,7 +486,7 @@ with col1:
     with st.expander("🤖 Asistente Virtual 24/7", expanded=False):
         # Usamos el enlace oficial (iframe) de tu bot de Chatbase
         components.iframe("https://www.chatbase.co/chatbot-iframe/qBw1nKTt9az-7COIOZRzd", height=480)
-    
+    st.markdown("<p style='color: #8A9BA8; font-size: 14px;'>📧 <b>Soporte:</b> pliegospro@gmail.com</p>", unsafe_allow_html=True)
     st.markdown("---")
 
 with col2:
