@@ -417,22 +417,30 @@ st.divider() # Una línea sutil para separar el header del contenido
     
 # Generamos un link automático para 1 crédito
 try:
-        sdk = mercadopago.SDK(st.secrets["MP_ACCESS_TOKEN"])
-        pref_data_billetera = {
-            "items": [{"title": "1 Crédito PliegosPro", "quantity": 1, "unit_price": 10.0, "currency_id": "ARS"}],
-            "payer": {"email": email_usuario},
-            "back_urls": {"success": f"https://pliegospro.streamlit.app/?auth={user_id}",
-            "auto_return": "approved",
-            "external_reference": email_usuario,  # <--- EL DNI DEL USUARIO
-            "notification_url": "https://hook.us2.make.com/r5og8gzq9xaj9vwbma93aff51ahsx5jb"  # <--- EL TELÉFONO DE TU ROBOT
-        }
-        res_billetera = sdk.preference().create(pref_data_billetera)
-        link_mp_billetera = res_billetera["response"]["init_point"]
-        
-     
-
+    sdk = mercadopago.SDK(st.secrets["MP_ACCESS_TOKEN"])
+    pref_data_billetera = {
+        "items": [
+            {
+                "title": "1 Crédito PliegosPro",
+                "quantity": 1,
+                "unit_price": 10.0,
+                "currency_id": "ARS"
+            }
+        ],
+        "payer": {
+            "email": email_usuario
+        },
+        "back_urls": {
+            "success": f"https://pliegospro.streamlit.app/?auth={user_id}"
+        },
+        "auto_return": "approved",
+        "external_reference": email_usuario,
+        "notification_url": "https://hook.us2.make.com/r5og8gzq9xaj9vwbma93aff51ahsx5jb"
+    }
+    res_billetera = sdk.preference().create(pref_data_billetera)
+    link_mp_billetera = res_billetera["response"]["init_point"]
 except Exception as e:
-        st.error("Error al conectar con Mercado Pago.")
+    st.error("Error al conectar con Mercado Pago.")
 # ---------------------------
 
 if st.session_state.last_action_msg:
