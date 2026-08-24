@@ -152,7 +152,8 @@ if not st.session_state.usuario_autenticado:
                 st.success("✅ ¡Cuenta creada con éxito! Ahora podés Iniciar Sesión en la pestaña de al lado.")
             except Exception as e:
                 st.error(f"⚠️ Error exacto: {e}")
-
+    # --- FOOTER LOGIN ---
+    st.markdown("<br><br><p style='text-align: center; color: #555555; font-size: 13px;'>⚡ Powered by Paquete Impresiones</p>", unsafe_allow_html=True)
     # EL ESCUDO (Frena el código acá si no inició sesión)
     st.stop()
 # ... (todo lo que ya tenías)
