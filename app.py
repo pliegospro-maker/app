@@ -72,7 +72,7 @@ url_supabase: str = st.secrets["SUPABASE_URL"]
 clave_supabase: str = st.secrets["SUPABASE_KEY"]
 supabase: Client = create_client(url_supabase, clave_supabase)
 
-# 2. Configurar la memoria temporal y persistencia de sesión
+# 2. Configurar la memoria temporal y persistencia segura
 if 'usuario_autenticado' not in st.session_state:
     st.session_state.usuario_autenticado = False
 if 'user_id' not in st.session_state:
@@ -80,10 +80,10 @@ if 'user_id' not in st.session_state:
 if 'email_usuario' not in st.session_state:
     st.session_state.email_usuario = None
 
-# --- SISTEMA DE SESIÓN SEGURO Y LIMPIO ---
-if not st.session_state.usuario_autenticado:
-    if len(st.query_params) > 0:
-        st.query_params.clear()
+# --- ESCUDO DE SEGURIDAD TOTAL (URL LIMPIA Y PRIVADA) ---
+# Nos aseguramos de que la barra de direcciones jamás muestre credenciales ni IDs
+if len(st.query_params) > 0:
+    st.query_params.clear()
 
 
 # 3. Pantalla de Autenticación (Modelo Freemium)
