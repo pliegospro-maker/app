@@ -328,7 +328,7 @@ with col_der:
     st.markdown(f"💳 **Tus Créditos:** {creditos_actuales}")
 
 # --- CARTEL FREEMIUM DESTACADO (JUSTO ABAJO DEL BANNER) ---
-st.success("💡 **¡ARMÁ TU PLIEGO 100% GRATIS!**\n\nPodés subir todos tus diseños, organizarlos con el optimizador automático (Tetris), quitar fondos y ver la **vista previa en vivo con marca de agua sin ningún costo**. Solo abonás tus créditos al momento de descargar los archivos finales listos para imprenta en máxima calidad (300 DPI).")
+st.success("💡 **¡ARMÁ TU PLIEGO 100% GRATIS!**\n\nPodés subir todos tus diseños, organizarlos con el optimizador automático (Tetris), quitar fondos y ver la **vista previa en vivo sin ningún costo**.")
 
 st.divider() # Línea divisoria debajo del cartel
 
