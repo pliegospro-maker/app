@@ -313,6 +313,12 @@ with col_izq:
     # Aquí cargas tu banner actual
     # Asegúrate de poner el nombre correcto de tu archivo de imagen
     st.image("bannerweb.png", use_container_width=True)
+    st.markdown("<h3 style='color: #38BDF8; text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);'>2. Cargar Diseños</h3>", unsafe_allow_html=True)
+
+# --- CARTEL INFORMATIVO DE MODELO FREEMIUM ---
+st.info("💡 **¡Armá tu pliego gratis!** Podés subir todas tus imágenes, organizarlas con el Tetris y ver la vista previa en vivo sin costo. Solo abonás tus créditos al momento de descargar los archivos finales listos para imprenta.")
+
+uploaded_files = st.file_uploader("Subir imágenes", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
 
 with col_der:
     st.markdown("### 👋 Bienvenido/a")
