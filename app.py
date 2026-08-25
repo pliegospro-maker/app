@@ -310,13 +310,15 @@ col_titulo, col_billetera = st.columns([3, 1])
 col_izq, col_der = st.columns([3, 1])
 
 with col_izq:
-    # Aquí cargas tu banner actual
-    # Asegúrate de poner el nombre correcto de tu archivo de imagen
     st.image("bannerweb.png", use_container_width=True)
-
 with col_der:
     st.markdown("### 👋 Bienvenido/a")
     st.markdown(f"**{email_usuario}**")
+
+# --- CARTEL FREEMIUM DESTACADO (GRANDE Y ABAJO DEL BANNER) ---
+st.success("💡 **¡ARMÁ TU PLIEGO 100% GRATIS!**\n\nPodés subir todos tus diseños, organizarlos con el optimizador automático (Tetris), quitar fondos y ver la **vista previa en vivo con marca de agua sin ningún costo**. Solo abonás tus créditos al momento de descargar los archivos finales listos para imprenta en máxima calidad (300 DPI).")
+
+st.divider() # Una línea sutil para separar el banner del contenido
 
     # --- BOTÓN DE CERRAR SESIÓN ---
     if st.button("🚪 Cerrar Sesión", use_container_width=True):
