@@ -314,17 +314,13 @@ with col_izq:
 with col_der:
     st.markdown("### 👋 Bienvenido/a")
     st.markdown(f"**{email_usuario}**")
-
-# --- CARTEL FREEMIUM DESTACADO (GRANDE Y ABAJO DEL BANNER) ---
-st.success("💡 **¡ARMÁ TU PLIEGO 100% GRATIS!**\n\nPodés subir todos tus diseños, organizarlos con el optimizador automático (Tetris), quitar fondos y ver la **vista previa en vivo con marca de agua sin ningún costo**. Solo abonás tus créditos al momento de descargar los archivos finales listos para imprenta en máxima calidad (300 DPI).")
-
-st.divider() # Una línea sutil para separar el banner del contenido
-
+    
     # --- BOTÓN DE CERRAR SESIÓN ---
     if st.button("🚪 Cerrar Sesión", use_container_width=True):
         st.session_state.clear() # Borra toda la memoria de la sesión
         st.query_params.clear() # Limpia la URL
         st.rerun() # Recarga la página
+        
     st.markdown(f"💳 **Tus Créditos:** {creditos_actuales}")
     
     # Botón HTML 100% funcional con estilos en línea
