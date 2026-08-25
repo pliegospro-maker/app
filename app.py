@@ -1023,7 +1023,7 @@ if len(image_configs) > 0:
                         st.write("Cargando botón de pago...")      
 st.markdown("---")
 st.markdown("### 💳 Recargar Créditos")
-st.markdown("Elegí tu método de pago según tu país de residencia:")
+st.markdown("Con 1 crédito podes descargar el archivo armado a 300DPI listo para impresión. Elegí tu método de pago según tu país de residencia:")
 # Creamos dos columnas
 col_mp, col_pp = st.columns(2)
 
