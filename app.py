@@ -309,8 +309,12 @@ col_titulo, col_billetera = st.columns([3, 1])
 # Crear dos columnas: la izquierda más grande (ratio 3) y la derecha más chica (ratio 1)
 col_izq, col_der = st.columns([3, 1])
 
+# Crear dos columnas: la izquierda más grande (ratio 3) y la derecha más chica (ratio 1)
+col_izq, col_der = st.columns([3, 1])
+
 with col_izq:
     st.image("bannerweb.png", use_container_width=True)
+
 with col_der:
     st.markdown("### 👋 Bienvenido/a")
     st.markdown(f"**{email_usuario}**")
@@ -322,6 +326,7 @@ with col_der:
         st.rerun() # Recarga la página
         
     st.markdown(f"💳 **Tus Créditos:** {creditos_actuales}")
+
 # --- CARTEL FREEMIUM DESTACADO (JUSTO ABAJO DEL BANNER) ---
 st.success("💡 **¡ARMÁ TU PLIEGO 100% GRATIS!**\n\nPodés subir todos tus diseños, organizarlos con el optimizador automático (Tetris), quitar fondos y ver la **vista previa en vivo con marca de agua sin ningún costo**. Solo abonás tus créditos al momento de descargar los archivos finales listos para imprenta en máxima calidad (300 DPI).")
 
