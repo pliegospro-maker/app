@@ -332,25 +332,13 @@ st.success("💡 **¡ARMÁ TU PLIEGO 100% GRATIS!**\n\nPodés subir todos tus di
 
 st.divider() # Línea divisoria debajo del cartel
 
-    
-    # Botón HTML 100% funcional con estilos en línea
-    boton_pago = """
-    <a href="https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=384518284-e8745b6a-0301-4ba4-9e10-e2e6d99a3d2a" target="_blank" style="text-decoration: none;">
-        <button style="
-            background-color: #004D4D; 
-            border: 1px solid #00FFFF; 
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.4); 
-            color: white; 
-            border-radius: 8px; 
-            padding: 10px 15px; 
-            cursor: pointer; 
-            width: 100%;
-            font-weight: bold;
-            transition: 0.3s;">
-            👉 Recargar 1 Crédito ($5.000)
-        </button>
-    </a>
-    """
+boton_pago = """
+<a href="https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=384518284-e8745b6a-0301-4ba4-9e10-e2e6d99a3d2a" target="_blank" style="text-decoration: none;">
+<button style=" background-color: #004D4D; border: 1px solid #00FFFF; box-shadow: 0 0 8px rgba(0, 255, 255, 0.4); color: white; border-radius: 8px; padding: 10px 15px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s;">
+👉 Recargar 1 Crédito ($5.000)
+</button>
+</a>
+"""
    
     
 
