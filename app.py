@@ -344,72 +344,6 @@ with col_der:
     </a>
     """
    
-    st.markdown("---")
-st.markdown("### 💳 Recargar Créditos")
-st.markdown("Elegí tu método de pago según tu país de residencia:")
-# Creamos dos columnas
-col_mp, col_pp = st.columns(2)
-
-with col_mp:
-    # --- TARJETA TECH MERCADO PAGO ---
-    mp_html = """
-    <style>
-        body { margin: 0; padding: 0; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }
-        .tech-card { background: linear-gradient(145deg, #0A1118, #131D26); border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0, 255, 255, 0.05); box-sizing: border-box; height: 100%; }
-        .country-label { color: #00FFFF; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: bold; margin-bottom: 8px; }
-        .price-text { color: white; font-size: 32px; font-weight: 900; margin-bottom: 25px; margin-top: 0; }
-        .currency { font-size: 16px; color: #8A9BA8; font-weight: normal; }
-        .mp-button { background-color: #FFE600; color: #009EE3; padding: 12px 15px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 230, 0, 0.15); transition: 0.2s; box-sizing: border-box; }
-        .mp-button:hover { filter: brightness(1.05); }
-        a { text-decoration: none; display: block; }
-    </style>
-    <div class="tech-card">
-        <div class="country-label">🇦🇷 Argentina</div>
-        <div class="price-text">$5.000 <span class="currency">ARS</span></div>
-        <a href="https://mpago.li/2GESomZ" target="_blank">
-            <div class="mp-button">
-                <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="20" style="margin:0;">
-                Pagar con MercadoPago
-            </div>
-        </a>
-    </div>
-    """
-    components.html(mp_html, height=175)
-    
-with col_pp:
-    # --- TARJETA TECH PAYPAL ---
-    paypal_html = f"""
-    <style>
-        body {{ margin: 0; padding: 0; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }}
-        .tech-card {{ background: linear-gradient(145deg, #0A1118, #131D26); border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0, 255, 255, 0.05); box-sizing: border-box; height: 100%; }}
-        .country-label {{ color: #00FFFF; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: bold; margin-bottom: 8px; }}
-        .price-text {{ color: white; font-size: 32px; font-weight: 900; margin-bottom: 25px; margin-top: 0; }}
-        .currency {{ font-size: 16px; color: #8A9BA8; font-weight: normal; }}
-        .pp-button {{ background-color: #FFC439; color: #003087; border: none; padding: 12px 15px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 196, 57, 0.15); transition: 0.2s; box-sizing: border-box; }}
-        .pp-button:hover {{ filter: brightness(1.05); }}
-    </style>
-    <div class="tech-card">
-        <div class="country-label">🌎 Internacional</div>
-        <div class="price-text">$3.50 <span class="currency">USD</span></div>
-        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="margin: 0; width: 100%;">
-            <input type="hidden" name="cmd" value="_xclick">
-            <input type="hidden" name="business" value="PLIEGOSPRO@GMAIL.COM">
-            <input type="hidden" name="item_name" value="Créditos PliegosPro">
-            <input type="hidden" name="amount" value="3.50">
-            <input type="hidden" name="currency_code" value="USD">
-            
-            <input type="hidden" name="custom" value="{email_usuario}">
-            <input type="hidden" name="notify_url" value="https://hook.us2.make.com/e1hpm35sdb5bmjv09kj9fiq4ztbj6atb">
-            <input type="hidden" name="return" value="https://pliegospro.streamlit.app/">
-            <input type="hidden" name="cancel_return" value="https://pliegospro.streamlit.app/">
-            <button type="submit" class="pp-button">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" height="20" style="margin:0;">
-                Pagar con PayPal
-            </button>
-        </form>
-    </div>
-    """
-    components.html(paypal_html, height=175)
     
 
 # --- A partir de aquí sigue el resto de tu código normal (1. Configuración, 2. Cargar, etc.) ---
@@ -1092,6 +1026,73 @@ if len(image_configs) > 0:
                         link_mp_peaje = res_peaje["response"]["init_point"]
                         st.markdown(f"[👉 Comprar los {creditos_faltantes} créditos que faltan aquí]({link_mp_peaje})")
                     except Exception as e:
-                        st.write("Cargando botón de pago...")            
+                        st.write("Cargando botón de pago...")      
+st.markdown("---")
+st.markdown("### 💳 Recargar Créditos")
+st.markdown("Elegí tu método de pago según tu país de residencia:")
+# Creamos dos columnas
+col_mp, col_pp = st.columns(2)
+
+with col_mp:
+    # --- TARJETA TECH MERCADO PAGO ---
+    mp_html = """
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }
+        .tech-card { background: linear-gradient(145deg, #0A1118, #131D26); border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0, 255, 255, 0.05); box-sizing: border-box; height: 100%; }
+        .country-label { color: #00FFFF; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: bold; margin-bottom: 8px; }
+        .price-text { color: white; font-size: 32px; font-weight: 900; margin-bottom: 25px; margin-top: 0; }
+        .currency { font-size: 16px; color: #8A9BA8; font-weight: normal; }
+        .mp-button { background-color: #FFE600; color: #009EE3; padding: 12px 15px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 230, 0, 0.15); transition: 0.2s; box-sizing: border-box; }
+        .mp-button:hover { filter: brightness(1.05); }
+        a { text-decoration: none; display: block; }
+    </style>
+    <div class="tech-card">
+        <div class="country-label">🇦🇷 Argentina</div>
+        <div class="price-text">$5.000 <span class="currency">ARS</span></div>
+        <a href="https://mpago.li/2GESomZ" target="_blank">
+            <div class="mp-button">
+                <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-0.png" height="20" style="margin:0;">
+                Pagar con MercadoPago
+            </div>
+        </a>
+    </div>
+    """
+    components.html(mp_html, height=175)
+    
+with col_pp:
+    # --- TARJETA TECH PAYPAL ---
+    paypal_html = f"""
+    <style>
+        body {{ margin: 0; padding: 0; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }}
+        .tech-card {{ background: linear-gradient(145deg, #0A1118, #131D26); border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0, 255, 255, 0.05); box-sizing: border-box; height: 100%; }}
+        .country-label {{ color: #00FFFF; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: bold; margin-bottom: 8px; }}
+        .price-text {{ color: white; font-size: 32px; font-weight: 900; margin-bottom: 25px; margin-top: 0; }}
+        .currency {{ font-size: 16px; color: #8A9BA8; font-weight: normal; }}
+        .pp-button {{ background-color: #FFC439; color: #003087; border: none; padding: 12px 15px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 196, 57, 0.15); transition: 0.2s; box-sizing: border-box; }}
+        .pp-button:hover {{ filter: brightness(1.05); }}
+    </style>
+    <div class="tech-card">
+        <div class="country-label">🌎 Internacional</div>
+        <div class="price-text">$3.50 <span class="currency">USD</span></div>
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="margin: 0; width: 100%;">
+            <input type="hidden" name="cmd" value="_xclick">
+            <input type="hidden" name="business" value="PLIEGOSPRO@GMAIL.COM">
+            <input type="hidden" name="item_name" value="Créditos PliegosPro">
+            <input type="hidden" name="amount" value="3.50">
+            <input type="hidden" name="currency_code" value="USD">
+            
+            <input type="hidden" name="custom" value="{email_usuario}">
+            <input type="hidden" name="notify_url" value="https://hook.us2.make.com/e1hpm35sdb5bmjv09kj9fiq4ztbj6atb">
+            <input type="hidden" name="return" value="https://pliegospro.streamlit.app/">
+            <input type="hidden" name="cancel_return" value="https://pliegospro.streamlit.app/">
+            <button type="submit" class="pp-button">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" height="20" style="margin:0;">
+                Pagar con PayPal
+            </button>
+        </form>
+    </div>
+    """
+    components.html(paypal_html, height=175)
+    
 # --- FOOTER APLICACIÓN PRINCIPAL ---
 st.markdown("<br><br><br><p style='text-align: center; color: #555555; font-size: 13px;'>⚡ Powered by @PaqueteImpresiones</p>", unsafe_allow_html=True)
