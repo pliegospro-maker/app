@@ -429,14 +429,14 @@ with col1:
     margin_px = cm_to_px(margin_cm)
     
     use_edge_margins = st.checkbox("Aplicar márgenes de borde", value=True, help="Deja un espacio libre en los 4 bordes del pliego.")
-        # --- AUTOGUARDADO EN SEGUNDO PLANO ---
-        if "user_id" in st.session_state and st.session_state.user_id:
-            datos_a_guardar = {
-                "sheet_choice": sheet_choice,
-                "margin_cm": margin_cm,
-                "use_edge_margins": use_edge_margins
-            }
-            guardar_proyecto_actual(st.session_state.user_id, datos_a_guardar)
+    # --- AUTOGUARDADO EN SEGUNDO PLANO ---
+    if "user_id" in st.session_state and st.session_state.user_id:
+          datos_a_guardar = {
+            "sheet_choice": sheet_choice,
+            "margin_cm": margin_cm,
+            "use_edge_margins": use_edge_margins
+        }
+        guardar_proyecto_actual(st.session_state.user_id, datos_a_guardar)
   # Marca de agua fija y oculta para las descargas gratuitas
     texto_marca = "MUESTRA GRATIS - PLIEGOS PRO" 
     opacidad_marca = 128
