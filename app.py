@@ -80,6 +80,26 @@ if 'user_id' not in st.session_state:
 if 'email_usuario' not in st.session_state:
     st.session_state.email_usuario = None
 
+import json
+from datetime import datetime, timedelta
+
+# --- 1. FUNCIÓN DE AUTOGUARDADO GLOBAL ---
+def guardar_proyecto_actual(user_id, datos_pliego):
+    try:
+        json_data = json.dumps(datos_pliego)
+        supabase.table("proyectos_guardados").upsert({
+            "user_id": user_id,
+            "estado_json": json_data,
+            "updated_at": datetime.utcnow().isoformat()
+        }, on_conflict="user_id").execute()
+    except Exception as e:
+        pass 
+
+# 1. Conectar a Supabase
+url_supabase: str = st.secrets["SUPABASE_URL"]
+clave_supabase: str = st.secrets["SUPABASE_KEY"]
+supabase: Client = create_client(url_supabase, clave_supabase)
+
 # --- RESTAURAR SESIÓN AL VOLVER DE MERCADOPAGO (POST-PAGO) ---
 # Si vuelve de MercadoPago y trae un token temporal de sesión en la URL, lo recuperamos
 if not st.session_state.usuario_autenticado and "auth" in st.query_params:
@@ -124,20 +144,6 @@ if not st.session_state.usuario_autenticado:
                 st.session_state.user_id = user_id
                 st.session_state.email_usuario = email_login
 
-                import json
-                from datetime import datetime, timedelta
-
-                # --- 1. FUNCIÓN DE AUTOGUARDADO ---
-                def guardar_proyecto_actual(user_id, datos_pliego):
-                    try:
-                        json_data = json.dumps(datos_pliego)
-                        supabase.table("proyectos_guardados").upsert({
-                            "user_id": user_id,
-                            "estado_json": json_data,
-                            "updated_at": datetime.utcnow().isoformat()
-                        }, on_conflict="user_id").execute()
-                    except Exception as e:
-                        pass # Si hay algún problema de red momentáneo, no interrumpe al usuario
                 
                 # --- 2. DETECCIÓN Y RECUPERACIÓN AL ENTRAR ---
                 if st.session_state.get("usuario_autenticado"):
