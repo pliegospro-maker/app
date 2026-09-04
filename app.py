@@ -72,17 +72,18 @@ import mercadopago
 from supabase import create_client, Client
 import streamlit.components.v1 as components
 
-# --- 1. FUNCIÓN DE AUTOGUARDADO GLOBAL ---
-def guardar_proyecto_actual(user_id, datos_pliego):
-    try:
-        json_data = json.dumps(datos_pliego)
-        supabase.table("proyectos_guardados").upsert({
-            "user_id": user_id,
-            "estado_json": json_data,
-            "updated_at": datetime.utcnow().isoformat()
-        }, on_conflict="user_id").execute()
-    except Exception as e:
-        pass
+# --- AUTOGUARDADO INTELIGENTE EN SEGUNDO PLANO ---
+    if "user_id" in st.session_state and st.session_state.user_id:
+        try:
+            datos_a_guardar = {
+                "sheet_choice": sheet_choice,
+                "margin_cm": margin_cm,
+                "use_edge_margins": use_edge_margins,
+                "imagenes_cargadas": list(st.session_state.image_history.keys()) if "image_history" in st.session_state else []
+            }
+            guardar_proyecto_actual(st.session_state.user_id, datos_a_guardar)
+        except Exception as e:
+            pass
 
 # 1. Conectar a Supabase
 url_supabase: str = st.secrets["SUPABASE_URL"]
