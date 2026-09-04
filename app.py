@@ -72,16 +72,6 @@ import mercadopago
 from supabase import create_client, Client
 import streamlit.components.v1 as components
 
-# --- AUTOGUARDADO INTELIGENTE EN SEGUNDO PLANO ---
-if "user_id" in st.session_state and st.session_state.user_id:
-    try:
-        datos_a_guardar = {
-            "sheet_choice": sheet_choice,
-            ...
-        }
-        guardar_proyecto_actual(st.session_state.user_id, datos_a_guardar)
-    except Exception as e:
-        pass
 
 # 1. Conectar a Supabase
 url_supabase: str = st.secrets["SUPABASE_URL"]
