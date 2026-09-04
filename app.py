@@ -431,7 +431,7 @@ with col1:
     use_edge_margins = st.checkbox("Aplicar márgenes de borde", value=True, help="Deja un espacio libre en los 4 bordes del pliego.")
     # --- AUTOGUARDADO EN SEGUNDO PLANO ---
     if "user_id" in st.session_state and st.session_state.user_id:
-          datos_a_guardar = {
+        datos_a_guardar = {
             "sheet_choice": sheet_choice,
             "margin_cm": margin_cm,
             "use_edge_margins": use_edge_margins
