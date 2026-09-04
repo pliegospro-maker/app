@@ -66,6 +66,23 @@ import mercadopago
 from supabase import create_client, Client
 import streamlit.components.v1 as components # <--- AGREGAR ESTA LÍNEA
 
+import json
+from datetime import datetime, timedelta
+import mercadopago
+from supabase import create_client, Client
+import streamlit.components.v1 as components
+
+# --- 1. FUNCIÓN DE AUTOGUARDADO GLOBAL ---
+def guardar_proyecto_actual(user_id, datos_pliego):
+    try:
+        json_data = json.dumps(datos_pliego)
+        supabase.table("proyectos_guardados").upsert({
+            "user_id": user_id,
+            "estado_json": json_data,
+            "updated_at": datetime.utcnow().isoformat()
+        }, on_conflict="user_id").execute()
+    except Exception as e:
+        pass
 
 # 1. Conectar a Supabase
 url_supabase: str = st.secrets["SUPABASE_URL"]
@@ -80,20 +97,7 @@ if 'user_id' not in st.session_state:
 if 'email_usuario' not in st.session_state:
     st.session_state.email_usuario = None
 
-import json
-from datetime import datetime, timedelta
 
-# --- 1. FUNCIÓN DE AUTOGUARDADO GLOBAL ---
-def guardar_proyecto_actual(user_id, datos_pliego):
-    try:
-        json_data = json.dumps(datos_pliego)
-        supabase.table("proyectos_guardados").upsert({
-            "user_id": user_id,
-            "estado_json": json_data,
-            "updated_at": datetime.utcnow().isoformat()
-        }, on_conflict="user_id").execute()
-    except Exception as e:
-        pass 
 
 # 1. Conectar a Supabase
 url_supabase: str = st.secrets["SUPABASE_URL"]
