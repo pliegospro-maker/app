@@ -123,6 +123,48 @@ if not st.session_state.usuario_autenticado:
                 st.session_state.usuario_autenticado = True
                 st.session_state.user_id = user_id
                 st.session_state.email_usuario = email_login
+
+                import json
+                from datetime import datetime, timedelta
+
+                # --- 1. FUNCIÓN DE AUTOGUARDADO ---
+                def guardar_proyecto_actual(user_id, datos_pliego):
+                    try:
+                        json_data = json.dumps(datos_pliego)
+                        supabase.table("proyectos_guardados").upsert({
+                            "user_id": user_id,
+                            "estado_json": json_data,
+                            "updated_at": datetime.utcnow().isoformat()
+                        }, on_conflict="user_id").execute()
+                    except Exception as e:
+                        pass # Si hay algún problema de red momentáneo, no interrumpe al usuario
+                
+                # --- 2. DETECCIÓN Y RECUPERACIÓN AL ENTRAR ---
+                if st.session_state.get("usuario_autenticado"):
+                    try:
+                        resp_guardado = supabase.table("proyectos_guardados").select("*").eq("user_id", st.session_state.user_id).execute()
+                        
+                        if len(resp_guardado.data) > 0:
+                            proyecto = resp_guardado.data[0]
+                            fecha_guardado = datetime.fromisoformat(proyecto["updated_at"].replace("Z", "+00:00"))
+                            tiempo_transcurrido = datetime.now(fecha_guardado.tzinfo) - fecha_guardado
+                            
+                            # Si el trabajo guardado tiene menos de 2 horas de antigüedad:
+                            if tiempo_transcurrido < timedelta(hours=2) and not st.session_state.get("proyecto_restaurado", False):
+                                st.warning(f"🔄 **¡Encontramos un pliego sin terminar!** Fue guardado hace {int(tiempo_transcurrido.seconds / 60)} minutos.")
+                                col_rec1, col_rec2 = st.columns(2)
+                                with col_rec1:
+                                    if st.button("📥 Recuperar mi trabajo anterior"):
+                                        st.session_state.datos_recuperados = json.loads(proyecto["estado_json"])
+                                        st.session_state.proyecto_restaurado = True
+                                        st.rerun()
+                                with col_rec2:
+                                    if st.button("🗑️ Descartar y empezar de nuevo"):
+                                        supabase.table("proyectos_guardados").delete().eq("user_id", st.session_state.user_id).execute()
+                                        st.session_state.proyecto_restaurado = True
+                                        st.rerun()
+                    except Exception as e:
+                        pass
             
                 # === BUSCAR LOS CRÉDITOS A LA CAJA FUERTE ===
                 try:
